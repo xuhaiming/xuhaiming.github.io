@@ -9,7 +9,10 @@ requirejs.config({
         skel: 'skel.min',
         skelLayers: 'skel-layers.min',
         init: 'init',
-        router: '../app/router'
+        router: '../app/router',
+        sideBar: '../app/side-bar',
+        boxCalendar: '../app/box-calendar',
+        content: '../app/content'
     },
     shim: {
         underscore: {
