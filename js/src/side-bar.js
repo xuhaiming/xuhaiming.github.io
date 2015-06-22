@@ -5,7 +5,7 @@ define(['react', 'jquery', 'skel', 'skelLayers', 'init', 'boxCalendar'], functio
                     <div id="sidebar">
 
                         <h1 id="logo">
-                            <a href="#">STRIPED</a>
+                            <a href="#">MY BLOG</a>
                         </h1>
 
                         <nav id="nav">
@@ -34,12 +34,9 @@ define(['react', 'jquery', 'skel', 'skelLayers', 'init', 'boxCalendar'], functio
                         <section className="box text-style1">
                             <div className="inner">
                                 <p>
-                                    <strong>Striped:</strong>
-                                    A free and fully responsive HTML5 site
-                                    template designed by
-                                    <a href="http://n33.co/">AJ</a>
-                                    for
-                                    <a href="http://html5up.net/">HTML5 UP</a>
+                                    <strong>Note: </strong>
+                                    You can find the source code of this website through
+                                    <a href="https://github.com/xuhaiming/xuhaiming.github.io"> this link</a>
                                 </p>
                             </div>
                         </section>
@@ -67,30 +64,10 @@ define(['react', 'jquery', 'skel', 'skelLayers', 'init', 'boxCalendar'], functio
                             </ul>
                         </section>
 
-                        <section className="box recent-comments">
-                            <header>
-                                <h2>Recent Comments</h2>
-                            </header>
-                            <ul>
-                                <li>case on
-                                    <a href="#">Lorem ipsum dolor</a>
-                                </li>
-                                <li>molly on
-                                    <a href="#">Sed dolore magna</a>
-                                </li>
-                                <li>case on
-                                    <a href="#">Sed dolore magna</a>
-                                </li>
-                            </ul>
-                        </section>
-
                         <BoxCalendar></BoxCalendar>
 
                         <ul id="copyright">
-                            <li>&copy; Untitled.</li>
-                            <li>Design:
-                                <a href="http://html5up.net">HTML5 UP</a>
-                            </li>
+                            <li>&copy; 2015 Xu Haiming</li>
                         </ul>
 
                     </div>

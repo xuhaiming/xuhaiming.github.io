@@ -5,7 +5,7 @@ define(['react', 'jquery', 'skel', 'skelLayers', 'init', 'boxCalendar'], functio
                     React.createElement("div", {id: "sidebar"}, 
 
                         React.createElement("h1", {id: "logo"}, 
-                            React.createElement("a", {href: "#"}, "STRIPED")
+                            React.createElement("a", {href: "#"}, "MY BLOG")
                         ), 
 
                         React.createElement("nav", {id: "nav"}, 
@@ -34,12 +34,9 @@ define(['react', 'jquery', 'skel', 'skelLayers', 'init', 'boxCalendar'], functio
                         React.createElement("section", {className: "box text-style1"}, 
                             React.createElement("div", {className: "inner"}, 
                                 React.createElement("p", null, 
-                                    React.createElement("strong", null, "Striped:"), 
-                                    "A free and fully responsive HTML5 site" + ' ' +
-                                    "template designed by", 
-                                    React.createElement("a", {href: "http://n33.co/"}, "AJ"), 
-                                    "for", 
-                                    React.createElement("a", {href: "http://html5up.net/"}, "HTML5 UP")
+                                    React.createElement("strong", null, "Note: "), 
+                                    "You can find the source code of this website through", 
+                                    React.createElement("a", {href: "https://github.com/xuhaiming/xuhaiming.github.io"}, " this link")
                                 )
                             )
                         ), 
@@ -67,30 +64,10 @@ define(['react', 'jquery', 'skel', 'skelLayers', 'init', 'boxCalendar'], functio
                             )
                         ), 
 
-                        React.createElement("section", {className: "box recent-comments"}, 
-                            React.createElement("header", null, 
-                                React.createElement("h2", null, "Recent Comments")
-                            ), 
-                            React.createElement("ul", null, 
-                                React.createElement("li", null, "case on", 
-                                    React.createElement("a", {href: "#"}, "Lorem ipsum dolor")
-                                ), 
-                                React.createElement("li", null, "molly on", 
-                                    React.createElement("a", {href: "#"}, "Sed dolore magna")
-                                ), 
-                                React.createElement("li", null, "case on", 
-                                    React.createElement("a", {href: "#"}, "Sed dolore magna")
-                                )
-                            )
-                        ), 
-
                         React.createElement(BoxCalendar, null), 
 
                         React.createElement("ul", {id: "copyright"}, 
-                            React.createElement("li", null, "© Untitled."), 
-                            React.createElement("li", null, "Design:", 
-                                React.createElement("a", {href: "http://html5up.net"}, "HTML5 UP")
-                            )
+                            React.createElement("li", null, "© 2015 Xu Haiming")
                         )
 
                     )

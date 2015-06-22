@@ -1,36 +1,58 @@
 define(['react', 'jquery', 'skel', 'skelLayers', 'init'], function(React, $, myskel, skelLayers, init) {
     return React.createClass({
+        getInitialState: function() {
+            return {
+                posts: []
+            };
+        },
+        componentDidMount: function(){
+            $.get( "http://haimingblogservice.azurewebsites.net/api/Posts", function( data ) {
+                this.setState({
+                    posts: data.value
+                });
+            }.bind(this));
+        },
+        getMonth: function(){
+            var month = new Array();
+                month[0] = "Jan";
+                month[1] = "Feb";
+                month[2] = "Mar";
+                month[3] = "Apr";
+                month[4] = "May";
+                month[5] = "June";
+                month[6] = "July";
+                month[7] = "Aug";
+                month[8] = "Sep";
+                month[9] = "Oct";
+                month[10] = "Nov";
+                month[11] = "Dec";
+            return month;
+        },
         render: function () {
+            var Posts = this.state.posts.map(function(data){
+                var parsedDate = new Date(data.PublishDate);
+                var month = this.getMonth();
+                return (
+                    React.createElement("article", {className: "box post post-excerpt"}, 
+                        React.createElement("header", null, 
+                            React.createElement("h2", null, React.createElement("a", {href: "#"}, data.Title)), 
+                            React.createElement("p", null, data.SubTitle)
+                        ), 
+                        React.createElement("div", {className: "info"}, 
+                            React.createElement("span", {className: "date"}, React.createElement("span", {className: "month"}, month[parsedDate.getMonth()]), " ", React.createElement("span", {className: "day"}, parsedDate.getDate()), React.createElement("span", {className: "year"}, ", ", parsedDate.getFullYear())), 
+                            React.createElement("ul", {className: "stats"}, 
+                                React.createElement("li", null, React.createElement("a", {href: "#", className: "icon fa-comment"}, "16")), 
+                                React.createElement("li", null, React.createElement("a", {href: "#", className: "icon fa-heart"}, "32"))
+                            )
+                        ), 
+                        React.createElement("span", {dangerouslySetInnerHTML: {__html: data.Content}})
+                    )
+                );
+            }.bind(this));
             return (
                 React.createElement("div", {id: "content"}, 
                     React.createElement("div", {className: "inner"}, 
-
-                        React.createElement("article", {className: "box post post-excerpt"}, 
-                            React.createElement("header", null, 
-                                React.createElement("h2", null, React.createElement("a", {href: "#"}, "Welcome to Striped")), 
-                                React.createElement("p", null, "A free, fully responsive HTML5 site template by HTML5 UP")
-                            ), 
-                            React.createElement("div", {className: "info"}, 
-                                React.createElement("span", {className: "date"}, React.createElement("span", {className: "month"}, "Jul", React.createElement("span", null, "y")), " ", React.createElement("span", {className: "day"}, "14"), React.createElement("span", {className: "year"}, ", 2014")), 
-                                React.createElement("ul", {className: "stats"}, 
-                                    React.createElement("li", null, React.createElement("a", {href: "#", className: "icon fa-comment"}, "16")), 
-                                    React.createElement("li", null, React.createElement("a", {href: "#", className: "icon fa-heart"}, "32")), 
-                                    React.createElement("li", null, React.createElement("a", {href: "#", className: "icon fa-twitter"}, "64")), 
-                                    React.createElement("li", null, React.createElement("a", {href: "#", className: "icon fa-facebook"}, "128"))
-                                )
-                            ), 
-                            React.createElement("a", {href: "#", className: "image featured"}, React.createElement("img", {src: "images/pic01.jpg", alt: ""})), 
-                            React.createElement("p", null, 
-                                React.createElement("strong", null, "Hello!"), " You're looking at ", React.createElement("strong", null, "Striped"), ", a fully responsive HTML5 site template designed by ", React.createElement("a", {href: "http://n33.co"}, "AJ"), 
-                                "for ", React.createElement("a", {href: "http://html5up.net"}, "HTML5 UP"), " It features a clean, minimalistic design, styling for all basic page elements (including blockquotes, tables and lists), a" + ' ' +
-                                "repositionable sidebar (left or right), and HTML5/CSS3 code designed for quick and easy customization (see code comments for details)."
-                            ), 
-                            React.createElement("p", null, 
-                                "Striped is released for free under the ", React.createElement("a", {href: "http://html5up.net/license"}, "Creative Commons Attribution license"), " so feel free to use it for personal projects" + ' ' +
-                                "or even commercial ones – just be sure to credit ", React.createElement("a", {href: "http://html5up.net"}, "HTML5 UP"), " for the design. If you like what you see here, be sure to check out", 
-                                React.createElement("a", {href: "http://html5up.net"}, "HTML5 UP"), " for more cool designs or follow me on ", React.createElement("a", {href: "http://twitter.com/n33co"}, "Twitter"), " for new releases and updates."
-                            )
-                        ), 
+                        Posts, 
 
                         React.createElement("article", {className: "box post post-excerpt"}, 
                             React.createElement("header", null, 

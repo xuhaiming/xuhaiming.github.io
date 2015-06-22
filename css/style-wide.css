@@ -73,8 +73,7 @@
 						margin: 0 0 0.75em 0;
 					}
 
-						.box.post .info .date .year,
-						.box.post .info .date .month span
+						.box.post .info .date .year
 						{
 							display: none;
 						}
