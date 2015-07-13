@@ -13,9 +13,6 @@ requirejs.config({
     shim: {
         underscore: {
             exports: '_'
-        },
-        'scrollzer': {
-            deps: ['jquery']
         }
     }
 });

@@ -1,4 +1,4 @@
-define(['react', 'jquery', 'scrolly', 'skel', 'util', 'main'],
+define(['react', 'jquery', 'scrollzer', 'scrolly', 'util', 'skel', 'main'],
     function(React) {
         var initializeRoute = function(){
             var author = function () {
