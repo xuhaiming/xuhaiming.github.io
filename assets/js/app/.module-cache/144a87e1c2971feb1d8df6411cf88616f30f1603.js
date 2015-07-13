@@ -1,4 +1,5 @@
-define(['react', 'jquery', 'skel', 'skelLayers','director', 'init', 'sideBar', 'content'], function(React, $, myskel, skelLayers, director, init, SideBar, Content) {
+define(['react', 'jquery', 'skel','director'],
+    function(React, $, myskel, director) {
         var initializeRoute = function(){
             var author = function () {
                 console.log('author');
@@ -23,22 +24,21 @@ define(['react', 'jquery', 'skel', 'skelLayers','director', 'init', 'sideBar', '
             router.init();
         };
 
-        var MainPage = React.createClass({
+        var MainPage = React.createClass({displayName: "MainPage",
             componentWillMount: function(){
                 initializeRoute();
             },
             render: function(){
                 return (
-                <div id="wrapper">
-                    <Content></Content>
-                    <SideBar></SideBar>
-                </div>
+                React.createElement("div", {id: "wrapper"}, 
+                    "test"
+                )
                 )
             }
         });
 
         React.render(
-        <MainPage></MainPage>,
+        React.createElement(MainPage, null),
             document.getElementById('main-page')
         );
     }

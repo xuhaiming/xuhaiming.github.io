@@ -6,28 +6,17 @@
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		<link rel="icon" type="image/x-icon" href="https://assets-cdn.github.com/favicon.ico">
-		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
-        <script src="js/lib/require.min.js"></script>
-        <script>
-            require(['./js/common'], function () {
-                require(['init']);
-            });
-        </script>
-		<noscript>
-			<link rel="shortcut icon" href="/images/specialicon.ico" type="image/x-icon" />
-			<link rel="stylesheet" href="css/skel.css" />
-			<link rel="stylesheet" href="css/style.css" />
-			<link rel="stylesheet" href="css/style-desktop.css" />
-			<link rel="stylesheet" href="css/style-wide.css" />
-		</noscript>
-		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+        <script src="assets/js/lib/require.min.js"></script>
+		<link rel="stylesheet" href="assets/css/main.css" />
 	</head>
 
 	<body class="left-sidebar">
         <div id="main-page"></div>
 
         <script>
-            require(['js/app/main-page']);
+			requirejs(['assets/js/common'], function (common) {
+				requirejs(['app/main-page']);
+			});
         </script>
 	</body>
 </html>

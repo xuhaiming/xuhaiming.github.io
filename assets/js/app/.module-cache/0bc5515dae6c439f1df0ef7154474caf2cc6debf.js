@@ -21,24 +21,24 @@ define(['react', 'jquery', 'skel', 'skelLayers','director', 'init', 'sideBar', '
             var router = Router(routes);
 
             router.init();
-        };
+        }
 
-        var MainPage = React.createClass({
+        var MainPage = React.createClass({displayName: "MainPage",
             componentWillMount: function(){
                 initializeRoute();
             },
             render: function(){
                 return (
-                <div id="wrapper">
-                    <Content></Content>
-                    <SideBar></SideBar>
-                </div>
+                React.createElement("div", {id: "wrapper"}, 
+                    React.createElement(Content, null), 
+                    React.createElement(SideBar, null)
+                )
                 )
             }
         });
 
         React.render(
-        <MainPage></MainPage>,
+        React.createElement(MainPage, null),
             document.getElementById('main-page')
         );
     }
