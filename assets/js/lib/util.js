@@ -1,4 +1,4 @@
-define(['jquery', 'scrollzer', 'scrolly'],
+define(['scrollzer', 'scrolly'],
 	function($) {
 
 	/**
