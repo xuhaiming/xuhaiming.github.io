@@ -1,6 +1,7 @@
-define(['jquery', 'scrolly', 'scrollzer'],
+define(['jquery', 'scrolly'],
 	function($) {
 
+	require('scrollzer');
 	$.fn.navList = function() {
 
 		var	$this = $(this);

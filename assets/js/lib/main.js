@@ -1,5 +1,6 @@
-define(['jquery', 'skel', 'scrolly', 'scrollzer', 'util'],
+define(['jquery', 'skel', 'scrolly', 'util'],
 		function($) {
+	require('scrollzer');
 
 	skel.breakpoints({
 		xlarge: '(max-width: 1680px)',
