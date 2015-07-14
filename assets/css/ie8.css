@@ -1,60 +1,52 @@
 /*
-	Read Only by HTML5 UP
+	Prologue by HTML5 UP
 	html5up.net | @n33co
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
-/* Basic */
+/* Section/Article */
 
-	code,
-	input[type="text"],
-	input[type="password"],
-	input[type="email"],
-	select,
-	textarea,
-	.box,
-	.image,
-	.image img,
-	input[type="submit"],
-	input[type="reset"],
-	input[type="button"],
-	.button {
-		position: relative;
-		-ms-behavior: url("assets/js/ie/PIE.htc");
+	section > .last-child, section.last-child, article > .last-child, article.last-child {
+		margin-bottom: 0;
 	}
 
 /* Form */
 
-	input[type="text"],
-	input[type="password"],
-	input[type="email"],
-	select {
-		line-height: 2.75em;
+	form input[type="text"],
+	form input[type="email"],
+	form input[type="password"],
+	form select,
+	form textarea {
+		-ms-behavior: url("assets/js/ie/PIE.htc");
 	}
-
-	input[type="checkbox"],
-	input[type="radio"] {
-		-moz-appearance: normal;
-		-webkit-appearance: normal;
-		-ms-appearance: normal;
-		appearance: normal;
-	}
-
-		input[type="checkbox"] + label,
-		input[type="radio"] + label {
-			padding: 0 0 0 1.5em;
-		}
-
-			input[type="checkbox"] + label:before,
-			input[type="radio"] + label:before {
-				display: none;
-			}
 
 /* Button */
 
-	input[type="submit"].alt,
-	input[type="reset"].alt,
-	input[type="button"].alt,
-	.button.alt {
-		border: solid 2px #e4e4e4;
+	input[type="button"],
+	input[type="submit"],
+	input[type="reset"],
+	button,
+	.button {
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
+
+/* Header */
+
+	#nav ul li a {
+		color: #888;
+	}
+
+		#nav ul li a.active {
+			background: #1C2022;
+		}
+
+	#headerToggle .toggle {
+		background-color: #888;
+	}
+
+/* Main */
+
+	#main > section.cover {
+		background-position: auto;
+		-ms-behavior: url("assets/js/ie/backgroundsize.min.htc");
 	}
