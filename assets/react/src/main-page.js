@@ -1,4 +1,14 @@
 class MainPage extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            blog: {}
+        };
+        $.get( "http://haimingblogservice.azurewebsites.net/api/Posts", function( data ) {
+            this.setState({blog: data.value[0]});
+            console.log(data.value[0]);
+        }.bind(this));
+    }
     render() {
         return (
             <div>
@@ -8,14 +18,14 @@ class MainPage extends React.Component {
 
                         <div id="logo">
                             <span className="image avatar48"><img src="images/avatar.jpg" alt="" /></span>
-                            <h1 id="title">Jane Doe</h1>
-                            <p>Hyperspace Engineer</p>
+                            <h1 id="title">Xu Haiming</h1>
+                            <p>Software Engineer</p>
                         </div>
 
                         <nav id="nav">
                             <ul>
                                 <li><a href="#top" id="top-link" className="skel-layers-ignoreHref"><span className="icon fa-home">Intro</span></a></li>
-                                <li><a href="#portfolio" id="portfolio-link" className="skel-layers-ignoreHref"><span className="icon fa-th">Portfolio</span></a></li>
+                                <li><a href="#blogs" id="blogs-link" className="skel-layers-ignoreHref"><span className="icon fa-th">Blogs</span></a></li>
                                 <li><a href="#about" id="about-link" className="skel-layers-ignoreHref"><span className="icon fa-user">About Me</span></a></li>
                                 <li><a href="#contact" id="contact-link" className="skel-layers-ignoreHref"><span className="icon fa-envelope">Contact</span></a></li>
                             </ul>
@@ -43,24 +53,22 @@ class MainPage extends React.Component {
                         <div className="container">
 
                             <header>
-                                <h2 className="alt">Hi! I'm <strong>Prologue</strong>, a <a href="http://html5up.net/license">free</a> responsive<br />
-                                    site template designed by <a href="http://html5up.net">HTML5 UP</a>.</h2>
-                                <p>Ligula scelerisque justo sem accumsan diam quis<br />
-                                    vitae natoque dictum sollicitudin elementum.</p>
+                                <h2 className="alt">This is my amazing blog page</h2>
+                                <p>It is super super super beautiful</p>
                             </header>
 
                             <footer>
-                                <a href="#portfolio" className="button scrolly">Magna Aliquam</a>
+                                <a href="#portfolio" className="button scrolly">A Useless Button</a>
                             </footer>
 
                         </div>
                     </section>
 
-                    <section id="portfolio" className="two">
+                    <section id="blogs" className="two">
                         <div className="container">
 
                             <header>
-                                <h2>Portfolio</h2>
+                                <h2>Blogs</h2>
                             </header>
 
                             <p>Vitae natoque dictum etiam semper magnis enim feugiat convallis convallis
@@ -71,9 +79,9 @@ class MainPage extends React.Component {
                             <div className="row">
                                 <div className="4u 12u$(mobile)">
                                     <article className="item">
-                                        <a href="#" className="image fit"><img src="images/pic02.jpg" alt="" /></a>
+                                        <a href="#" className="image fit"><img src={"images/pic0" + this.state.blog.Id + ".jpg"} alt="" /></a>
                                         <header>
-                                            <h3>Ipsum Feugiat</h3>
+                                            <h3>{this.state.blog.Title}</h3>
                                         </header>
                                     </article>
                                     <article className="item">
@@ -142,10 +150,8 @@ class MainPage extends React.Component {
                                 <h2>Contact</h2>
                             </header>
 
-                            <p>Elementum sem parturient nulla quam placerat viverra
-                                mauris non cum elit tempus ullamcorper dolor. Libero rutrum ut lacinia
-                                donec curae mus. Eleifend id porttitor ac ultricies lobortis sem nunc
-                                orci ridiculus faucibus a consectetur. Porttitor curae mauris urna mi dolor.</p>
+                            <p>You can contact me by filling the information in the form below and
+                                click the "Send Message" button. But finally you will find nothing happens.</p>
 
                             <form method="post" action="#">
                                 <div className="row">
@@ -168,7 +174,7 @@ class MainPage extends React.Component {
                 <div id="footer">
 
                     <ul className="copyright">
-                        <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                        <li>&copy; Xu Haiming. All rights reserved.</li><li>2015</li>
                     </ul>
 
                 </div>
