@@ -4,11 +4,11 @@ class MainPage extends React.Component {
             this.setState({
                 onMainContainer: false
             });
-            console.log("blog id: " + blogId);
+
         }.bind(this);
 
         var routes = {
-            '/blogs/:blogId': viewBlogs
+            'blog/:blogId': viewBlogs
         };
 
         var router = Router(routes);
@@ -16,9 +16,13 @@ class MainPage extends React.Component {
         router.init();
     }
 
+    componentDidMount() {
+        this.initializeRoute();
+    }
+
     constructor() {
         super();
-        this.initializeRoute();
+
         this.state = {
             onMainContainer: true
         };

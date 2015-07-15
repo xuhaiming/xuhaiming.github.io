@@ -64,6 +64,16 @@
 
 					});
 
+			// Tricky fix for blog detail heilight
+			if (window.location.hash.substr(1) !== 'intro' &&
+				window.location.hash.substr(1) !== 'blogs' &&
+				window.location.hash.substr(1) !== 'contact' &&
+				window.location.hash.substr(1) !== 'about'
+			) {
+				$('#contact-link').removeClass('active').addClass('scrollzer-locked');
+				$('#blogs-link').addClass('active');
+			}
+
 			// Initialize scrollzer.
 				var ids = [];
 

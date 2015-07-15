@@ -1,13 +1,14 @@
-var ____Classm=React.Component;for(var ____Classm____Key in ____Classm){if(____Classm.hasOwnProperty(____Classm____Key)){MainPage[____Classm____Key]=____Classm[____Classm____Key];}}var ____SuperProtoOf____Classm=____Classm===null?null:____Classm.prototype;MainPage.prototype=Object.create(____SuperProtoOf____Classm);MainPage.prototype.constructor=MainPage;MainPage.__superConstructor__=____Classm;
+var ____Classf=React.Component;for(var ____Classf____Key in ____Classf){if(____Classf.hasOwnProperty(____Classf____Key)){MainPage[____Classf____Key]=____Classf[____Classf____Key];}}var ____SuperProtoOf____Classf=____Classf===null?null:____Classf.prototype;MainPage.prototype=Object.create(____SuperProtoOf____Classf);MainPage.prototype.constructor=MainPage;MainPage.__superConstructor__=____Classf;
     Object.defineProperty(MainPage.prototype,"initializeRoute",{writable:true,configurable:true,value:function() {"use strict";
         var viewBlogs = function (blogId) {
             this.setState({
                 onMainContainer: false
             });
+
         }.bind(this);
 
         var routes = {
-            '/blogs/:blogId': viewBlogs
+            'blog/:blogId': viewBlogs
         };
 
         var router = Router(routes);
@@ -15,9 +16,13 @@ var ____Classm=React.Component;for(var ____Classm____Key in ____Classm){if(____C
         router.init();
     }});
 
-    function MainPage() {"use strict";
-        ____Classm.call(this);
+    Object.defineProperty(MainPage.prototype,"componentDidMount",{writable:true,configurable:true,value:function() {"use strict";
         this.initializeRoute();
+    }});
+
+    function MainPage() {"use strict";
+        ____Classf.call(this);
+
         this.state = {
             onMainContainer: true
         };
