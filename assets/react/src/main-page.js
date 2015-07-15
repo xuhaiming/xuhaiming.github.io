@@ -4,7 +4,6 @@ class MainPage extends React.Component {
             this.setState({
                 onMainContainer: false
             });
-
         }.bind(this);
 
         var routes = {

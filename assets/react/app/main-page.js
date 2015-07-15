@@ -1,10 +1,9 @@
-var ____Classf=React.Component;for(var ____Classf____Key in ____Classf){if(____Classf.hasOwnProperty(____Classf____Key)){MainPage[____Classf____Key]=____Classf[____Classf____Key];}}var ____SuperProtoOf____Classf=____Classf===null?null:____Classf.prototype;MainPage.prototype=Object.create(____SuperProtoOf____Classf);MainPage.prototype.constructor=MainPage;MainPage.__superConstructor__=____Classf;
+var ____Classe=React.Component;for(var ____Classe____Key in ____Classe){if(____Classe.hasOwnProperty(____Classe____Key)){MainPage[____Classe____Key]=____Classe[____Classe____Key];}}var ____SuperProtoOf____Classe=____Classe===null?null:____Classe.prototype;MainPage.prototype=Object.create(____SuperProtoOf____Classe);MainPage.prototype.constructor=MainPage;MainPage.__superConstructor__=____Classe;
     Object.defineProperty(MainPage.prototype,"initializeRoute",{writable:true,configurable:true,value:function() {"use strict";
         var viewBlogs = function (blogId) {
             this.setState({
                 onMainContainer: false
             });
-
         }.bind(this);
 
         var routes = {
@@ -21,7 +20,7 @@ var ____Classf=React.Component;for(var ____Classf____Key in ____Classf){if(____C
     }});
 
     function MainPage() {"use strict";
-        ____Classf.call(this);
+        ____Classe.call(this);
 
         this.state = {
             onMainContainer: true
