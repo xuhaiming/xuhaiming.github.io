@@ -1,10 +1,10 @@
-var ____Classq=React.Component;for(var ____Classq____Key in ____Classq){if(____Classq.hasOwnProperty(____Classq____Key)){BlogListSection[____Classq____Key]=____Classq[____Classq____Key];}}var ____SuperProtoOf____Classq=____Classq===null?null:____Classq.prototype;BlogListSection.prototype=Object.create(____SuperProtoOf____Classq);BlogListSection.prototype.constructor=BlogListSection;BlogListSection.__superConstructor__=____Classq;
+var ____Class6=React.Component;for(var ____Class6____Key in ____Class6){if(____Class6.hasOwnProperty(____Class6____Key)){BlogListSection[____Class6____Key]=____Class6[____Class6____Key];}}var ____SuperProtoOf____Class6=____Class6===null?null:____Class6.prototype;BlogListSection.prototype=Object.create(____SuperProtoOf____Class6);BlogListSection.prototype.constructor=BlogListSection;BlogListSection.__superConstructor__=____Class6;
     function BlogListSection() {"use strict";
-        ____Classq.call(this);
+        ____Class6.call(this);
         this.state = {
             blog: {}
         };
-        $.get("http://haimingblogservice.azurewebsites.net/api/Posts", function (data) {
+        $.get("http://haimingblogservice.azurewebsites.net/api/Posts", function(data)  {
             this.setState({blog: data.value[0]});
         }.bind(this));
     }
@@ -27,7 +27,7 @@ var ____Classq=React.Component;for(var ____Classq____Key in ____Classq){if(____C
                         React.createElement("div", {className: "4u 12u$(mobile)"}, 
                             React.createElement("article", {className: "item"}, 
                                 React.createElement("a", {href: "#", className: "image fit"}, React.createElement("img", {
-                                    src: "images/pic0" + this.state.blog.Id + ".jpg", alt: ""})), 
+                                    src: "images/pic01.jpg", alt: ""})), 
                                 React.createElement("header", null, 
                                     React.createElement("h3", null, this.state.blog.Title)
                                 )

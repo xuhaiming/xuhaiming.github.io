@@ -4,9 +4,9 @@ class BlogListSection extends React.Component {
         this.state = {
             blog: {}
         };
-        $.get("http://haimingblogservice.azurewebsites.net/api/Posts", function (data) {
+        $.get("http://haimingblogservice.azurewebsites.net/api/Posts", (data) => {
             this.setState({blog: data.value[0]});
-        }.bind(this));
+        });
     }
 
     render() {
@@ -27,7 +27,7 @@ class BlogListSection extends React.Component {
                         <div className="4u 12u$(mobile)">
                             <article className="item">
                                 <a href="#" className="image fit"><img
-                                    src={"images/pic0" + this.state.blog.Id + ".jpg"} alt=""/></a>
+                                    src={"images/pic01.jpg"} alt=""/></a>
                                 <header>
                                     <h3>{this.state.blog.Title}</h3>
                                 </header>

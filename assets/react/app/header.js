@@ -1,5 +1,13 @@
-var ____Classm=React.Component;for(var ____Classm____Key in ____Classm){if(____Classm.hasOwnProperty(____Classm____Key)){Header[____Classm____Key]=____Classm[____Classm____Key];}}var ____SuperProtoOf____Classm=____Classm===null?null:____Classm.prototype;Header.prototype=Object.create(____SuperProtoOf____Classm);Header.prototype.constructor=Header;Header.__superConstructor__=____Classm;function Header(){"use strict";if(____Classm!==null){____Classm.apply(this,arguments);}}
+var ____Classr=React.Component;for(var ____Classr____Key in ____Classr){if(____Classr.hasOwnProperty(____Classr____Key)){Header[____Classr____Key]=____Classr[____Classr____Key];}}var ____SuperProtoOf____Classr=____Classr===null?null:____Classr.prototype;Header.prototype=Object.create(____SuperProtoOf____Classr);Header.prototype.constructor=Header;Header.__superConstructor__=____Classr;
+    function Header(props) {"use strict";
+        ____Classr.call(this,props);
+    }
+
     Object.defineProperty(Header.prototype,"render",{writable:true,configurable:true,value:function() {"use strict";
+        var getUrl = window.location;
+        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+        var urlBaseString = this.props.isOnHomePage ? "" : baseUrl;
+
         return (
             React.createElement("div", {id: "header"}, 
 
@@ -15,13 +23,13 @@ var ____Classm=React.Component;for(var ____Classm____Key in ____Classm){if(____C
 
                     React.createElement("nav", {id: "nav"}, 
                         React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("a", {href: "#top", id: "top-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
+                            React.createElement("li", null, React.createElement("a", {href: urlBaseString + "#intro", id: "intro-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
                                 className: "icon fa-home"}, "Intro"))), 
-                            React.createElement("li", null, React.createElement("a", {href: "#blogs", id: "blogs-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
+                            React.createElement("li", null, React.createElement("a", {href: urlBaseString + "#blogs", id: "blogs-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
                                 className: "icon fa-th"}, "Blogs"))), 
-                            React.createElement("li", null, React.createElement("a", {href: "#about", id: "about-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
+                            React.createElement("li", null, React.createElement("a", {href: urlBaseString + "#about", id: "about-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
                                 className: "icon fa-user"}, "About Me"))), 
-                            React.createElement("li", null, React.createElement("a", {href: "#contact", id: "contact-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
+                            React.createElement("li", null, React.createElement("a", {href: urlBaseString + "#contact", id: "contact-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
                                 className: "icon fa-envelope"}, "Contact")))
                         )
                     )

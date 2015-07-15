@@ -1,7 +1,7 @@
 class TopSection extends React.Component {
     render() {
         return (
-            <section id="top" className="one dark cover">
+            <section id="intro" className="one dark cover">
                 <div className="container">
 
                     <header>

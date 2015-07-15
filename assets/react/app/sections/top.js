@@ -1,7 +1,7 @@
-var ____Classj=React.Component;for(var ____Classj____Key in ____Classj){if(____Classj.hasOwnProperty(____Classj____Key)){TopSection[____Classj____Key]=____Classj[____Classj____Key];}}var ____SuperProtoOf____Classj=____Classj===null?null:____Classj.prototype;TopSection.prototype=Object.create(____SuperProtoOf____Classj);TopSection.prototype.constructor=TopSection;TopSection.__superConstructor__=____Classj;function TopSection(){"use strict";if(____Classj!==null){____Classj.apply(this,arguments);}}
+var ____Classg=React.Component;for(var ____Classg____Key in ____Classg){if(____Classg.hasOwnProperty(____Classg____Key)){TopSection[____Classg____Key]=____Classg[____Classg____Key];}}var ____SuperProtoOf____Classg=____Classg===null?null:____Classg.prototype;TopSection.prototype=Object.create(____SuperProtoOf____Classg);TopSection.prototype.constructor=TopSection;TopSection.__superConstructor__=____Classg;function TopSection(){"use strict";if(____Classg!==null){____Classg.apply(this,arguments);}}
     Object.defineProperty(TopSection.prototype,"render",{writable:true,configurable:true,value:function() {"use strict";
         return (
-            React.createElement("section", {id: "top", className: "one dark cover"}, 
+            React.createElement("section", {id: "intro", className: "one dark cover"}, 
                 React.createElement("div", {className: "container"}, 
 
                     React.createElement("header", null, 

@@ -1,9 +1,33 @@
 class MainPage extends React.Component {
+    initializeRoute() {
+        var viewBlogs = function (blogId) {
+            this.setState({
+                onMainContainer: false
+            });
+        }.bind(this);
+
+        var routes = {
+            '/blogs/:blogId': viewBlogs
+        };
+
+        var router = Router(routes);
+
+        router.init();
+    }
+
+    constructor() {
+        super();
+        this.initializeRoute();
+        this.state = {
+            onMainContainer: true
+        };
+    }
+
     render() {
         return (
             <div>
-                <Header />
-                <MainContainer />
+                <Header isOnHomePage={this.state.onMainContainer}/>
+                {this.state.onMainContainer ? <MainContainer /> : <BlogContainer />}
                 <Footer />
             </div>
         );

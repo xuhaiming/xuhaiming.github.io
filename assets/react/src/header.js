@@ -1,5 +1,13 @@
 class Header extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
+        var getUrl = window.location;
+        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+        var urlBaseString = this.props.isOnHomePage ? "" : baseUrl;
+
         return (
             <div id="header">
 
@@ -15,13 +23,13 @@ class Header extends React.Component {
 
                     <nav id="nav">
                         <ul>
-                            <li><a href="#top" id="top-link" className="skel-layers-ignoreHref"><span
+                            <li><a href={urlBaseString + "#intro"} id="intro-link" className="skel-layers-ignoreHref"><span
                                 className="icon fa-home">Intro</span></a></li>
-                            <li><a href="#blogs" id="blogs-link" className="skel-layers-ignoreHref"><span
+                            <li><a href={urlBaseString + "#blogs"} id="blogs-link" className="skel-layers-ignoreHref"><span
                                 className="icon fa-th">Blogs</span></a></li>
-                            <li><a href="#about" id="about-link" className="skel-layers-ignoreHref"><span
+                            <li><a href={urlBaseString + "#about"} id="about-link" className="skel-layers-ignoreHref"><span
                                 className="icon fa-user">About Me</span></a></li>
-                            <li><a href="#contact" id="contact-link" className="skel-layers-ignoreHref"><span
+                            <li><a href={urlBaseString + "#contact"} id="contact-link" className="skel-layers-ignoreHref"><span
                                 className="icon fa-envelope">Contact</span></a></li>
                         </ul>
                     </nav>
