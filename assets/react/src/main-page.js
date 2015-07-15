@@ -4,6 +4,7 @@ class MainPage extends React.Component {
             this.setState({
                 onMainContainer: false
             });
+            console.log("blog id: " + blogId);
         }.bind(this);
 
         var routes = {
