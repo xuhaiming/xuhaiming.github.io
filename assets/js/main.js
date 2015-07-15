@@ -68,9 +68,12 @@
 			if (window.location.hash.substr(1) !== 'intro' &&
 				window.location.hash.substr(1) !== 'blogs' &&
 				window.location.hash.substr(1) !== 'contact' &&
-				window.location.hash.substr(1) !== 'about'
+				window.location.hash.substr(1) !== 'about' &&
+				window.location.hash.substr(1) !== ''
 			) {
-				$('#contact-link').removeClass('active').addClass('scrollzer-locked');
+				$('#contact-link').removeClass('active');
+				$('#intro-link').removeClass('active');
+				$('#about-link').removeClass('active');
 				$('#blogs-link').addClass('active');
 			}
 
@@ -88,7 +91,9 @@
 
 				});
 
-				$.scrollzer(ids, { pad: 200, lastHack: true });
+                if (ids.length !== 0) {
+                    $.scrollzer(ids, {pad: 200, lastHack: true});
+                }
 
 		// Header (narrower + mobile).
 
