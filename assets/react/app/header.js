@@ -1,12 +1,13 @@
-var ____Classr=React.Component;for(var ____Classr____Key in ____Classr){if(____Classr.hasOwnProperty(____Classr____Key)){Header[____Classr____Key]=____Classr[____Classr____Key];}}var ____SuperProtoOf____Classr=____Classr===null?null:____Classr.prototype;Header.prototype=Object.create(____SuperProtoOf____Classr);Header.prototype.constructor=Header;Header.__superConstructor__=____Classr;
+var ____Class7=React.Component;for(var ____Class7____Key in ____Class7){if(____Class7.hasOwnProperty(____Class7____Key)){Header[____Class7____Key]=____Class7[____Class7____Key];}}var ____SuperProtoOf____Class7=____Class7===null?null:____Class7.prototype;Header.prototype=Object.create(____SuperProtoOf____Class7);Header.prototype.constructor=Header;Header.__superConstructor__=____Class7;
     function Header(props) {"use strict";
-        ____Classr.call(this,props);
+        ____Class7.call(this,props);
     }
 
     Object.defineProperty(Header.prototype,"render",{writable:true,configurable:true,value:function() {"use strict";
         var getUrl = window.location;
         var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
-        var urlBaseString = this.props.isOnHomePage ? "" : baseUrl;
+        var isOnMainPage = this.props.isOnMainPage;
+        var urlBaseString = isOnMainPage ? "" : baseUrl;
 
         return (
             React.createElement("div", {id: "header"}, 
@@ -14,7 +15,7 @@ var ____Classr=React.Component;for(var ____Classr____Key in ____Classr){if(____C
                 React.createElement("div", {className: "top"}, 
 
                     React.createElement("div", {id: "logo"}, 
-                        React.createElement("span", {className: "image avatar48"}, React.createElement("img", {src: "images/avatar.jpg", alt: ""})), 
+                        React.createElement("span", {className: "image avatar48"}, React.createElement("img", {src: baseUrl + "/images/avatar.jpg", alt: ""})), 
 
                         React.createElement("h1", {id: "title"}, "Xu Haiming"), 
 
@@ -25,7 +26,7 @@ var ____Classr=React.Component;for(var ____Classr____Key in ____Classr){if(____C
                         React.createElement("ul", null, 
                             React.createElement("li", null, React.createElement("a", {href: urlBaseString + "#intro", id: "intro-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
                                 className: "icon fa-home"}, "Intro"))), 
-                            React.createElement("li", null, React.createElement("a", {href: urlBaseString + "#blogs", id: "blogs-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
+                            React.createElement("li", null, React.createElement("a", {href: urlBaseString + "#blogs", id: "blogs-link", className: isOnMainPage ? "skel-layers-ignoreHref" : "skel-layers-ignoreHref active"}, React.createElement("span", {
                                 className: "icon fa-th"}, "Blogs"))), 
                             React.createElement("li", null, React.createElement("a", {href: urlBaseString + "#about", id: "about-link", className: "skel-layers-ignoreHref"}, React.createElement("span", {
                                 className: "icon fa-user"}, "About Me"))), 

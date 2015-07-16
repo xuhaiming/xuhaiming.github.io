@@ -6,7 +6,8 @@ class Header extends React.Component {
     render() {
         var getUrl = window.location;
         var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
-        var urlBaseString = this.props.isOnHomePage ? "" : baseUrl;
+        var isOnMainPage = this.props.isOnMainPage;
+        var urlBaseString = isOnMainPage ? "" : baseUrl;
 
         return (
             <div id="header">
@@ -14,7 +15,7 @@ class Header extends React.Component {
                 <div className="top">
 
                     <div id="logo">
-                        <span className="image avatar48"><img src="images/avatar.jpg" alt=""/></span>
+                        <span className="image avatar48"><img src={baseUrl + "/images/avatar.jpg"} alt=""/></span>
 
                         <h1 id="title">Xu Haiming</h1>
 
@@ -25,7 +26,7 @@ class Header extends React.Component {
                         <ul>
                             <li><a href={urlBaseString + "#intro"} id="intro-link" className="skel-layers-ignoreHref"><span
                                 className="icon fa-home">Intro</span></a></li>
-                            <li><a href={urlBaseString + "#blogs"} id="blogs-link" className="skel-layers-ignoreHref"><span
+                            <li><a href={urlBaseString + "#blogs"} id="blogs-link" className={isOnMainPage ? "skel-layers-ignoreHref" : "skel-layers-ignoreHref active"}><span
                                 className="icon fa-th">Blogs</span></a></li>
                             <li><a href={urlBaseString + "#about"} id="about-link" className="skel-layers-ignoreHref"><span
                                 className="icon fa-user">About Me</span></a></li>
