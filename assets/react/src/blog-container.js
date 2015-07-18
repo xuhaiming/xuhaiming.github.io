@@ -8,7 +8,7 @@ class BlogContainer extends React.Component {
                             <h2>{this.props.blog.Title}</h2>
                         </header>
 
-                        <p>{this.props.blog.Content}</p>
+                        <p><span dangerouslySetInnerHTML={{__html: this.props.blog.Content}} /></p>
                     </div>
                 </section>
                 <section className="two">
