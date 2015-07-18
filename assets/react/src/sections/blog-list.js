@@ -1,11 +1,52 @@
+class BlogArticle extends React.Component {
+    render() {
+        var getUrl = window.location;
+        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+        var linkUrl = baseUrl + "/blogs#" +  this.props.item.Url;
+        return (
+            <article className="item">
+                <a href={linkUrl} className="image fit"><img src="images/pic03.jpg" alt=""/></a>
+                <header>
+                    <h3>{this.props.item.Title}</h3>
+                </header>
+            </article>
+        );
+    }
+}
+
+class BlogList extends React.Component {
+    render() {
+        var ArticlesComponent = this.props.list.map(item => {
+            return <BlogArticle item={item}/>;
+        });
+        return (
+            <div className="4u 12u$(mobile)">
+                {ArticlesComponent}
+            </div>
+        );
+    }
+}
+
 class BlogListSection extends React.Component {
     constructor() {
         super();
         this.state = {
-            blog: {}
+            blogListCol1: [],
+            blogListCol2: [],
+            blogListCol3: []
         };
         $.get("http://haimingblogservice.azurewebsites.net/api/Posts", (data) => {
-            this.setState({blog: data.value[0]});
+            var blogs = data.value;
+            var index = 0;
+            blogs.forEach(blog => {
+                _.extend(blog, {index: index});
+                index++;
+            });
+            this.setState({
+                blogListCol1: _.filter(blogs, blog => {return blog.index % 3 == 0; }),
+                blogListCol2: _.filter(blogs, blog => {return blog.index % 3 == 1; }),
+                blogListCol3: _.filter(blogs, blog => {return blog.index % 3 == 2; })
+            });
         });
     }
 
@@ -24,49 +65,9 @@ class BlogListSection extends React.Component {
                         fusce hendrerit lacus ridiculus.</p>
 
                     <div className="row">
-                        <div className="4u 12u$(mobile)">
-                            <article className="item">
-                                <a href="#" className="image fit"><img
-                                    src={"images/pic01.jpg"} alt=""/></a>
-                                <header>
-                                    <h3>{this.state.blog.Title}</h3>
-                                </header>
-                            </article>
-                            <article className="item">
-                                <a href="#" className="image fit"><img src="images/pic03.jpg" alt=""/></a>
-                                <header>
-                                    <h3>Rhoncus Semper</h3>
-                                </header>
-                            </article>
-                        </div>
-                        <div className="4u 12u$(mobile)">
-                            <article className="item">
-                                <a href="#" className="image fit"><img src="images/pic04.jpg" alt=""/></a>
-                                <header>
-                                    <h3>Magna Nullam</h3>
-                                </header>
-                            </article>
-                            <article className="item">
-                                <a href="#" className="image fit"><img src="images/pic05.jpg" alt=""/></a>
-                                <header>
-                                    <h3>Natoque Vitae</h3>
-                                </header>
-                            </article>
-                        </div>
-                        <div className="4u$ 12u$(mobile)">
-                            <article className="item">
-                                <a href="#" className="image fit"><img src="images/pic06.jpg" alt=""/></a>
-                                <header>
-                                    <h3>Dolor Penatibus</h3>
-                                </header>
-                            </article>
-                            <article className="item">
-                                <a href="#" className="image fit"><img src="images/pic07.jpg" alt=""/></a>
-                                <header>
-                                    <h3>Orci Convallis</h3>
-                                </header>
-                            </article>
-                        </div>
+                        <BlogList list={this.state.blogListCol1}/>
+                        <BlogList list={this.state.blogListCol2}/>
+                        <BlogList list={this.state.blogListCol3}/>
                     </div>
 
                 </div>
