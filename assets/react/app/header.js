@@ -1,11 +1,12 @@
-var ____Class7=React.Component;for(var ____Class7____Key in ____Class7){if(____Class7.hasOwnProperty(____Class7____Key)){Header[____Class7____Key]=____Class7[____Class7____Key];}}var ____SuperProtoOf____Class7=____Class7===null?null:____Class7.prototype;Header.prototype=Object.create(____SuperProtoOf____Class7);Header.prototype.constructor=Header;Header.__superConstructor__=____Class7;
+var ____Class1=React.Component;for(var ____Class1____Key in ____Class1){if(____Class1.hasOwnProperty(____Class1____Key)){Header[____Class1____Key]=____Class1[____Class1____Key];}}var ____SuperProtoOf____Class1=____Class1===null?null:____Class1.prototype;Header.prototype=Object.create(____SuperProtoOf____Class1);Header.prototype.constructor=Header;Header.__superConstructor__=____Class1;
     function Header(props) {"use strict";
-        ____Class7.call(this,props);
+        ____Class1.call(this,props);
     }
 
     Object.defineProperty(Header.prototype,"render",{writable:true,configurable:true,value:function() {"use strict";
         var getUrl = window.location;
-        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/";
+        baseUrl = getUrl.host === "xuhaiming.github.io" ? baseUrl : baseUrl + getUrl.pathname.split('/')[1];
         var isOnMainPage = this.props.isOnMainPage;
         var urlBaseString = isOnMainPage ? "" : baseUrl;
 

@@ -5,7 +5,8 @@ class Header extends React.Component {
 
     render() {
         var getUrl = window.location;
-        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/";
+        baseUrl = getUrl.host === "xuhaiming.github.io" ? baseUrl : baseUrl + getUrl.pathname.split('/')[1];
         var isOnMainPage = this.props.isOnMainPage;
         var urlBaseString = isOnMainPage ? "" : baseUrl;
 
