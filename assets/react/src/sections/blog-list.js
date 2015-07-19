@@ -5,7 +5,7 @@ class BlogArticle extends React.Component {
         var linkUrl = baseUrl + "/blogs#" +  this.props.item.Url;
         return (
             <article className="item">
-                <a href={linkUrl} className="image fit"><img src="images/pic03.jpg" alt=""/></a>
+                <a href={linkUrl} className="image fit"><img src={"images/thumbnails/" + this.props.item.Url + ".png"} alt=""/></a>
                 <header>
                     <h3>{this.props.item.Title}</h3>
                 </header>

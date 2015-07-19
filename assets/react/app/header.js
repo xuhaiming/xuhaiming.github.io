@@ -1,6 +1,6 @@
-var ____Class1=React.Component;for(var ____Class1____Key in ____Class1){if(____Class1.hasOwnProperty(____Class1____Key)){Header[____Class1____Key]=____Class1[____Class1____Key];}}var ____SuperProtoOf____Class1=____Class1===null?null:____Class1.prototype;Header.prototype=Object.create(____SuperProtoOf____Class1);Header.prototype.constructor=Header;Header.__superConstructor__=____Class1;
+var ____Class0=React.Component;for(var ____Class0____Key in ____Class0){if(____Class0.hasOwnProperty(____Class0____Key)){Header[____Class0____Key]=____Class0[____Class0____Key];}}var ____SuperProtoOf____Class0=____Class0===null?null:____Class0.prototype;Header.prototype=Object.create(____SuperProtoOf____Class0);Header.prototype.constructor=Header;Header.__superConstructor__=____Class0;
     function Header(props) {"use strict";
-        ____Class1.call(this,props);
+        ____Class0.call(this,props);
     }
 
     Object.defineProperty(Header.prototype,"render",{writable:true,configurable:true,value:function() {"use strict";
@@ -16,7 +16,7 @@ var ____Class1=React.Component;for(var ____Class1____Key in ____Class1){if(____C
                 React.createElement("div", {className: "top"}, 
 
                     React.createElement("div", {id: "logo"}, 
-                        React.createElement("span", {className: "image avatar48"}, React.createElement("img", {src: baseUrl + "/images/avatar.jpg", alt: ""})), 
+                        React.createElement("span", {className: "image avatar48"}, React.createElement("img", {src: baseUrl + "/images/favicon.ico", alt: ""})), 
 
                         React.createElement("h1", {id: "title"}, "Xu Haiming"), 
 

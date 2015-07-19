@@ -1,5 +1,6 @@
 class BlogContainer extends React.Component {
     render() {
+        var publishDate = moment(this.props.blog.PublishDate).format('MMMM DD, YYYY');
         return (
             <div id="main">
                 <section className="two">
@@ -7,7 +8,7 @@ class BlogContainer extends React.Component {
                         <header>
                             <h2>{this.props.blog.Title}</h2>
                         </header>
-                        <span>{this.props.blog.PublishDate}</span>
+                        <p>{publishDate}</p>
                         <p className="blog-content"><span dangerouslySetInnerHTML={{__html: this.props.blog.Content}} /></p>
                     </div>
                 </section>

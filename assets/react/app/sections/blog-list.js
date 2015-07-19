@@ -1,11 +1,11 @@
-var ____Classo=React.Component;for(var ____Classo____Key in ____Classo){if(____Classo.hasOwnProperty(____Classo____Key)){BlogArticle[____Classo____Key]=____Classo[____Classo____Key];}}var ____SuperProtoOf____Classo=____Classo===null?null:____Classo.prototype;BlogArticle.prototype=Object.create(____SuperProtoOf____Classo);BlogArticle.prototype.constructor=BlogArticle;BlogArticle.__superConstructor__=____Classo;function BlogArticle(){"use strict";if(____Classo!==null){____Classo.apply(this,arguments);}}
+var ____Classa=React.Component;for(var ____Classa____Key in ____Classa){if(____Classa.hasOwnProperty(____Classa____Key)){BlogArticle[____Classa____Key]=____Classa[____Classa____Key];}}var ____SuperProtoOf____Classa=____Classa===null?null:____Classa.prototype;BlogArticle.prototype=Object.create(____SuperProtoOf____Classa);BlogArticle.prototype.constructor=BlogArticle;BlogArticle.__superConstructor__=____Classa;function BlogArticle(){"use strict";if(____Classa!==null){____Classa.apply(this,arguments);}}
     Object.defineProperty(BlogArticle.prototype,"render",{writable:true,configurable:true,value:function() {"use strict";
         var getUrl = window.location;
         var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
         var linkUrl = baseUrl + "/blogs#" +  this.props.item.Url;
         return (
             React.createElement("article", {className: "item"}, 
-                React.createElement("a", {href: linkUrl, className: "image fit"}, React.createElement("img", {src: "images/pic03.jpg", alt: ""})), 
+                React.createElement("a", {href: linkUrl, className: "image fit"}, React.createElement("img", {src: "images/thumbnails/" + this.props.item.Url + ".png", alt: ""})), 
                 React.createElement("header", null, 
                     React.createElement("h3", null, this.props.item.Title)
                 )
@@ -14,7 +14,7 @@ var ____Classo=React.Component;for(var ____Classo____Key in ____Classo){if(____C
     }});
 
 
-var ____Classp=React.Component;for(var ____Classp____Key in ____Classp){if(____Classp.hasOwnProperty(____Classp____Key)){BlogList[____Classp____Key]=____Classp[____Classp____Key];}}var ____SuperProtoOf____Classp=____Classp===null?null:____Classp.prototype;BlogList.prototype=Object.create(____SuperProtoOf____Classp);BlogList.prototype.constructor=BlogList;BlogList.__superConstructor__=____Classp;function BlogList(){"use strict";if(____Classp!==null){____Classp.apply(this,arguments);}}
+var ____Classb=React.Component;for(var ____Classb____Key in ____Classb){if(____Classb.hasOwnProperty(____Classb____Key)){BlogList[____Classb____Key]=____Classb[____Classb____Key];}}var ____SuperProtoOf____Classb=____Classb===null?null:____Classb.prototype;BlogList.prototype=Object.create(____SuperProtoOf____Classb);BlogList.prototype.constructor=BlogList;BlogList.__superConstructor__=____Classb;function BlogList(){"use strict";if(____Classb!==null){____Classb.apply(this,arguments);}}
     Object.defineProperty(BlogList.prototype,"render",{writable:true,configurable:true,value:function() {"use strict";
         var ArticlesComponent = this.props.list.map(function(item)  {
             return React.createElement(BlogArticle, {item: item});
@@ -27,9 +27,9 @@ var ____Classp=React.Component;for(var ____Classp____Key in ____Classp){if(____C
     }});
 
 
-var ____Classq=React.Component;for(var ____Classq____Key in ____Classq){if(____Classq.hasOwnProperty(____Classq____Key)){BlogListSection[____Classq____Key]=____Classq[____Classq____Key];}}var ____SuperProtoOf____Classq=____Classq===null?null:____Classq.prototype;BlogListSection.prototype=Object.create(____SuperProtoOf____Classq);BlogListSection.prototype.constructor=BlogListSection;BlogListSection.__superConstructor__=____Classq;
+var ____Classc=React.Component;for(var ____Classc____Key in ____Classc){if(____Classc.hasOwnProperty(____Classc____Key)){BlogListSection[____Classc____Key]=____Classc[____Classc____Key];}}var ____SuperProtoOf____Classc=____Classc===null?null:____Classc.prototype;BlogListSection.prototype=Object.create(____SuperProtoOf____Classc);BlogListSection.prototype.constructor=BlogListSection;BlogListSection.__superConstructor__=____Classc;
     function BlogListSection() {"use strict";
-        ____Classq.call(this);
+        ____Classc.call(this);
         this.state = {
             blogListCol1: [],
             blogListCol2: [],
