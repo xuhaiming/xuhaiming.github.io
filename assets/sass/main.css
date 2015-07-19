@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @import url("font-awesome.min.css");
 @import url("http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,600");
 /* Reset */
@@ -1187,7 +1188,7 @@ body {
 /* Basic */
 body {
   background: #fff;
-  font-family: 'Source Sans Pro', sans-serif;
+  font-family: 'Source Sans Pro', sans-serif，微软雅黑, "MicrosoftJhengHei";
   font-size: 18pt;
   font-weight: 300;
   line-height: 1.75em;
