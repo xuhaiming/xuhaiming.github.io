@@ -2,7 +2,7 @@ class BlogArticle extends React.Component {
     render() {
         var getUrl = window.location;
         var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
-        var linkUrl = baseUrl + "/blogs#" +  this.props.item.Url;
+        var linkUrl = baseUrl + "/blogs/#/" +  this.props.item.Url;
         return (
             <article className="item">
                 <a href={linkUrl} className="image fit"><img src={"images/thumbnails/" + this.props.item.Url + ".png"} alt=""/></a>
