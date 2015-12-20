@@ -14,12 +14,10 @@ class AboutSection extends React.Component {
 
                     <a href="#" className="image featured"><img src="images/pic08.jpg" alt=""/></a>
 
-                    <p>Tincidunt eu elit diam magnis pretium accumsan etiam id urna. Ridiculus
-                        ultricies curae quis et rhoncus velit. Lobortis elementum aliquet nec vitae
-                        laoreet eget cubilia quam non etiam odio tincidunt montes. Elementum sem
-                        parturient nulla quam placerat viverra mauris non cum elit tempus ullamcorper
-                        dolor. Libero rutrum ut lacinia donec curae mus vel quisque sociis nec
-                        ornare iaculis.</p>
+                    <p>I am a software developer who is currently working at ThoughtWorks, Beijing.
+                    I have development experiences in ASP .NET, Windows UWP Application, CE-HTML TV Application, etc.
+                    And I am also very interested in different kinds of frontend development. Coding makes
+                    my life colorful. :)</p>
 
                 </div>
             </section>

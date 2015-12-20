@@ -58,11 +58,6 @@ class BlogListSection extends React.Component {
                         <h2>Blogs</h2>
                     </header>
 
-                    <p>Vitae natoque dictum etiam semper magnis enim feugiat convallis convallis
-                        egestas rhoncus ridiculus in quis risus amet curabitur tempor orci penatibus.
-                        Tellus erat mauris ipsum fermentum etiam vivamus eget. Nunc nibh morbi quis
-                        fusce hendrerit lacus ridiculus.</p>
-
                     <div className="row">
                         <div className="4u 12u$(mobile)">
                             {this.getColumnArticles(0)}

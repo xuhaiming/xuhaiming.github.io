@@ -14,7 +14,7 @@ class Header extends React.Component {
                 <div className="top">
 
                     <div id="logo">
-                        <span className="image avatar48"><img src={urlPrefix + "images/avatar.jpg"} alt=""/></span>
+                        <span className="image avatar48"><img src={urlPrefix + "images/favicon.ico"} alt=""/></span>
                         <h1 id="title">Xu Haiming</h1>
                         <p>Software Engineer</p>
                     </div>

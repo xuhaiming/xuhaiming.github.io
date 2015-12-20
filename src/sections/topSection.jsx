@@ -7,19 +7,15 @@ class TopSection extends React.Component {
         return (
             <section id="top" className="one dark cover">
                 <div className="container">
-
                     <header>
-                        <h2 className="alt">Hi! I'm <strong>Prologue</strong>, a <a href="http://html5up.net/license">free</a>
-                            responsive<br />
-                            site template designed by <a href="http://html5up.net">HTML5 UP</a>.</h2>
-                        <p>Ligula scelerisque justo sem accumsan diam quis<br />
-                            vitae natoque dictum sollicitudin elementum.</p>
+                        <h2 className="alt">Welcome to my tech blog website!</h2>
+                        <p>This website mainly shares my software development experiences which are related to <br /> web,
+                        mobile, backend development, etc. Just click the button below and start your journey!</p>
                     </header>
 
                     <footer>
-                        <a href="#portfolio" className="button scrolly">Magna Aliquam</a>
+                        <a href="#blogs" className="button scrolly">Go to Blogs</a>
                     </footer>
-
                 </div>
             </section>
         )

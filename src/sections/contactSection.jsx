@@ -7,15 +7,9 @@ class ContactSection extends React.Component {
         return (
             <section id="contact" className="four">
                 <div className="container">
-
                     <header>
                         <h2>Contact</h2>
                     </header>
-
-                    <p>Elementum sem parturient nulla quam placerat viverra
-                        mauris non cum elit tempus ullamcorper dolor. Libero rutrum ut lacinia
-                        donec curae mus. Eleifend id porttitor ac ultricies lobortis sem nunc
-                        orci ridiculus faucibus a consectetur. Porttitor curae mauris urna mi dolor.</p>
 
                     <form method="post" action="#">
                         <div className="row">
@@ -31,7 +25,6 @@ class ContactSection extends React.Component {
                             </div>
                         </div>
                     </form>
-
                 </div>
             </section>
         )

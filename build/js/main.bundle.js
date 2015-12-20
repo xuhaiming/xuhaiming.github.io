@@ -60,9 +60,9 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 158);
 	
-	var Header = __webpack_require__(/*! ./sections/header.jsx */ 159);
-	var Content = __webpack_require__(/*! ./sections/content.jsx */ 160);
-	var Footer = __webpack_require__(/*! ./sections/footer.jsx */ 165);
+	var Header = __webpack_require__(/*! ./sections/header.jsx */ 215);
+	var Content = __webpack_require__(/*! ./sections/content.jsx */ 308);
+	var Footer = __webpack_require__(/*! ./sections/footer.jsx */ 307);
 	
 	var MainComponent = (function (_React$Component) {
 	    _inherits(MainComponent, _React$Component);
@@ -20153,7 +20153,63 @@
 
 
 /***/ },
-/* 159 */
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */
 /*!*********************************!*\
   !*** ./src/sections/header.jsx ***!
   \*********************************/
@@ -20199,7 +20255,7 @@
 	                        React.createElement(
 	                            "span",
 	                            { className: "image avatar48" },
-	                            React.createElement("img", { src: urlPrefix + "images/avatar.jpg", alt: "" })
+	                            React.createElement("img", { src: urlPrefix + "images/favicon.ico", alt: "" })
 	                        ),
 	                        React.createElement(
 	                            "h1",
@@ -20360,7 +20416,164 @@
 	module.exports = Header;
 
 /***/ },
-/* 160 */
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */,
+/* 224 */,
+/* 225 */,
+/* 226 */,
+/* 227 */,
+/* 228 */,
+/* 229 */,
+/* 230 */,
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
+/* 235 */,
+/* 236 */,
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */,
+/* 242 */,
+/* 243 */,
+/* 244 */,
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */,
+/* 251 */,
+/* 252 */,
+/* 253 */,
+/* 254 */,
+/* 255 */,
+/* 256 */,
+/* 257 */,
+/* 258 */,
+/* 259 */,
+/* 260 */,
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */,
+/* 299 */,
+/* 300 */,
+/* 301 */,
+/* 302 */,
+/* 303 */,
+/* 304 */,
+/* 305 */,
+/* 306 */
+/*!********************************!*\
+  !*** ./src/blogListConfig.jsx ***!
+  \********************************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	module.exports = [{
+	    title: "About my website",
+	    date: "2015-12-20",
+	    thumbnail: "pic02.jpg"
+	}];
+
+/***/ },
+/* 307 */
+/*!*********************************!*\
+  !*** ./src/sections/footer.jsx ***!
+  \*********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var React = __webpack_require__(/*! react */ 1);
+	
+	var Footer = (function (_React$Component) {
+	    _inherits(Footer, _React$Component);
+	
+	    function Footer() {
+	        _classCallCheck(this, Footer);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Footer).apply(this, arguments));
+	    }
+	
+	    _createClass(Footer, [{
+	        key: "render",
+	        value: function render() {
+	            return React.createElement(
+	                "div",
+	                { id: "footer" },
+	                React.createElement(
+	                    "ul",
+	                    { className: "copyright" },
+	                    React.createElement(
+	                        "li",
+	                        null,
+	                        "© 2016 Xu Haiming. All rights reserved."
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return Footer;
+	})(React.Component);
+	
+	module.exports = Footer;
+
+/***/ },
+/* 308 */
 /*!**********************************!*\
   !*** ./src/sections/content.jsx ***!
   \**********************************/
@@ -20377,10 +20590,10 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var React = __webpack_require__(/*! react */ 1);
-	var TopSection = __webpack_require__(/*! ./topSection.jsx */ 161);
-	var BlogListSection = __webpack_require__(/*! ./blogListSection.jsx */ 162);
-	var AboutSection = __webpack_require__(/*! ./aboutSection.jsx */ 163);
-	var ContactSection = __webpack_require__(/*! ./contactSection.jsx */ 164);
+	var TopSection = __webpack_require__(/*! ./topSection.jsx */ 309);
+	var BlogListSection = __webpack_require__(/*! ./blogListSection.jsx */ 310);
+	var AboutSection = __webpack_require__(/*! ./aboutSection.jsx */ 311);
+	var ContactSection = __webpack_require__(/*! ./contactSection.jsx */ 312);
 	
 	var Content = (function (_React$Component) {
 	    _inherits(Content, _React$Component);
@@ -20411,7 +20624,7 @@
 	module.exports = Content;
 
 /***/ },
-/* 161 */
+/* 309 */
 /*!*************************************!*\
   !*** ./src/sections/topSection.jsx ***!
   \*************************************/
@@ -20453,34 +20666,14 @@
 	                        React.createElement(
 	                            "h2",
 	                            { className: "alt" },
-	                            "Hi! I'm ",
-	                            React.createElement(
-	                                "strong",
-	                                null,
-	                                "Prologue"
-	                            ),
-	                            ", a ",
-	                            React.createElement(
-	                                "a",
-	                                { href: "http://html5up.net/license" },
-	                                "free"
-	                            ),
-	                            "responsive",
-	                            React.createElement("br", null),
-	                            "site template designed by ",
-	                            React.createElement(
-	                                "a",
-	                                { href: "http://html5up.net" },
-	                                "HTML5 UP"
-	                            ),
-	                            "."
+	                            "Welcome to my tech blog website!"
 	                        ),
 	                        React.createElement(
 	                            "p",
 	                            null,
-	                            "Ligula scelerisque justo sem accumsan diam quis",
+	                            "This website mainly shares my software development experiences which are related to ",
 	                            React.createElement("br", null),
-	                            "vitae natoque dictum sollicitudin elementum."
+	                            " web, mobile, backend development, etc. Just click the button below and start your journey!"
 	                        )
 	                    ),
 	                    React.createElement(
@@ -20488,8 +20681,8 @@
 	                        null,
 	                        React.createElement(
 	                            "a",
-	                            { href: "#portfolio", className: "button scrolly" },
-	                            "Magna Aliquam"
+	                            { href: "#blogs", className: "button scrolly" },
+	                            "Go to Blogs"
 	                        )
 	                    )
 	                )
@@ -20503,7 +20696,7 @@
 	module.exports = TopSection;
 
 /***/ },
-/* 162 */
+/* 310 */
 /*!******************************************!*\
   !*** ./src/sections/blogListSection.jsx ***!
   \******************************************/
@@ -20520,7 +20713,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var React = __webpack_require__(/*! react */ 1);
-	var BlogListConfig = __webpack_require__(/*! ../blogListConfig.jsx */ 223);
+	var BlogListConfig = __webpack_require__(/*! ../blogListConfig.jsx */ 306);
 	
 	var Article = (function (_React$Component) {
 	    _inherits(Article, _React$Component);
@@ -20619,11 +20812,6 @@
 	                        )
 	                    ),
 	                    React.createElement(
-	                        'p',
-	                        null,
-	                        'Vitae natoque dictum etiam semper magnis enim feugiat convallis convallis egestas rhoncus ridiculus in quis risus amet curabitur tempor orci penatibus. Tellus erat mauris ipsum fermentum etiam vivamus eget. Nunc nibh morbi quis fusce hendrerit lacus ridiculus.'
-	                    ),
-	                    React.createElement(
 	                        'div',
 	                        { className: 'row' },
 	                        React.createElement(
@@ -20653,7 +20841,7 @@
 	module.exports = BlogListSection;
 
 /***/ },
-/* 163 */
+/* 311 */
 /*!***************************************!*\
   !*** ./src/sections/aboutSection.jsx ***!
   \***************************************/
@@ -20706,7 +20894,7 @@
 	                    React.createElement(
 	                        "p",
 	                        null,
-	                        "Tincidunt eu elit diam magnis pretium accumsan etiam id urna. Ridiculus ultricies curae quis et rhoncus velit. Lobortis elementum aliquet nec vitae laoreet eget cubilia quam non etiam odio tincidunt montes. Elementum sem parturient nulla quam placerat viverra mauris non cum elit tempus ullamcorper dolor. Libero rutrum ut lacinia donec curae mus vel quisque sociis nec ornare iaculis."
+	                        "I am a software developer who is currently working at ThoughtWorks, Beijing. I have development experiences in ASP .NET, Windows UWP Application, CE-HTML TV Application, etc. And I am also very interested in different kinds of frontend development. Coding makes my life colorful. :)"
 	                    )
 	                )
 	            );
@@ -20719,7 +20907,7 @@
 	module.exports = AboutSection;
 
 /***/ },
-/* 164 */
+/* 312 */
 /*!*****************************************!*\
   !*** ./src/sections/contactSection.jsx ***!
   \*****************************************/
@@ -20765,11 +20953,6 @@
 	                        )
 	                    ),
 	                    React.createElement(
-	                        "p",
-	                        null,
-	                        "Elementum sem parturient nulla quam placerat viverra mauris non cum elit tempus ullamcorper dolor. Libero rutrum ut lacinia donec curae mus. Eleifend id porttitor ac ultricies lobortis sem nunc orci ridiculus faucibus a consectetur. Porttitor curae mauris urna mi dolor."
-	                    ),
-	                    React.createElement(
 	                        "form",
 	                        { method: "post", action: "#" },
 	                        React.createElement(
@@ -20806,142 +20989,6 @@
 	})(React.Component);
 	
 	module.exports = ContactSection;
-
-/***/ },
-/* 165 */
-/*!*********************************!*\
-  !*** ./src/sections/footer.jsx ***!
-  \*********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var React = __webpack_require__(/*! react */ 1);
-	
-	var Footer = (function (_React$Component) {
-	    _inherits(Footer, _React$Component);
-	
-	    function Footer() {
-	        _classCallCheck(this, Footer);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Footer).apply(this, arguments));
-	    }
-	
-	    _createClass(Footer, [{
-	        key: "render",
-	        value: function render() {
-	            return React.createElement(
-	                "div",
-	                { id: "footer" },
-	                React.createElement(
-	                    "ul",
-	                    { className: "copyright" },
-	                    React.createElement(
-	                        "li",
-	                        null,
-	                        "© 2016 Xu Haiming. All rights reserved."
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return Footer;
-	})(React.Component);
-	
-	module.exports = Footer;
-
-/***/ },
-/* 166 */,
-/* 167 */,
-/* 168 */,
-/* 169 */,
-/* 170 */,
-/* 171 */,
-/* 172 */,
-/* 173 */,
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */,
-/* 204 */,
-/* 205 */,
-/* 206 */,
-/* 207 */,
-/* 208 */,
-/* 209 */,
-/* 210 */,
-/* 211 */,
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */,
-/* 217 */,
-/* 218 */,
-/* 219 */,
-/* 220 */,
-/* 221 */,
-/* 222 */,
-/* 223 */
-/*!********************************!*\
-  !*** ./src/blogListConfig.jsx ***!
-  \********************************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	module.exports = [{
-	    title: "About my website",
-	    date: "2015-12-20",
-	    thumbnail: "pic02.jpg"
-	}, {
-	    title: "About my website 1",
-	    date: "2015-12-20",
-	    thumbnail: "pic02.jpg"
-	}, {
-	    title: "About my website 2",
-	    date: "2015-12-20",
-	    thumbnail: "pic02.jpg"
-	}, {
-	    title: "About my website 3",
-	    date: "2015-12-20",
-	    thumbnail: "pic02.jpg"
-	}];
 
 /***/ }
 /******/ ]);
