@@ -2,6 +2,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var { Router, Route } = require('react-router');
 var $ = require('jquery');
 
 require('../sass/style.scss');
@@ -20,7 +21,8 @@ class BlogPage extends React.Component {
     }
 
     componentDidMount() {
-        $.get("2015-12-20-about-my-website.html", (htmlContent) => {
+        var blogUrl = this.props.params.blogUrl;
+        $.get(blogUrl + ".html", (htmlContent) => {
             this.setState({htmlContent: htmlContent});
         });
     }
@@ -29,7 +31,9 @@ class BlogPage extends React.Component {
         return (
             <div>
                 <Header isRootPage={false}/>
-                <BlogContent content={this.state.htmlContent}/>
+                <BlogContent
+                    blogUrl = {this.props.params.blogUrl}
+                    content={this.state.htmlContent}/>
                 <Footer />
             </div>
         );
@@ -37,6 +41,9 @@ class BlogPage extends React.Component {
 }
 
 ReactDOM.render(
-    <BlogPage />,
+    <Router>
+        <Route path="/:blogUrl" component={BlogPage} />
+        <Route path="/" component={BlogPage} />
+    </Router>,
     document.getElementById('blog-page')
 );

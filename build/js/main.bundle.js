@@ -20520,161 +20520,126 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var React = __webpack_require__(/*! react */ 1);
+	var BlogListConfig = __webpack_require__(/*! ../blogListConfig.jsx */ 223);
 	
-	var BlogListSection = (function (_React$Component) {
-	    _inherits(BlogListSection, _React$Component);
+	var Article = (function (_React$Component) {
+	    _inherits(Article, _React$Component);
+	
+	    function Article() {
+	        _classCallCheck(this, Article);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Article).apply(this, arguments));
+	    }
+	
+	    _createClass(Article, [{
+	        key: 'getBlogUrl',
+	        value: function getBlogUrl() {
+	            var convertedTitle = this.props.title.toLowerCase().replace(/ /g, "-");
+	            return "blogs/#/" + this.props.date + "-" + convertedTitle;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return React.createElement(
+	                'article',
+	                { className: 'item' },
+	                React.createElement(
+	                    'a',
+	                    { href: this.getBlogUrl(), className: 'image fit' },
+	                    React.createElement('img', { src: "images/" + this.props.thumbnail, alt: '' })
+	                ),
+	                React.createElement(
+	                    'header',
+	                    null,
+	                    React.createElement(
+	                        'h3',
+	                        null,
+	                        this.props.title
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return Article;
+	})(React.Component);
+	
+	var BlogListSection = (function (_React$Component2) {
+	    _inherits(BlogListSection, _React$Component2);
 	
 	    function BlogListSection() {
 	        _classCallCheck(this, BlogListSection);
 	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(BlogListSection).apply(this, arguments));
+	        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(BlogListSection).call(this));
+	
+	        _this2.state = {
+	            displayBlogList: []
+	        };
+	        return _this2;
 	    }
 	
 	    _createClass(BlogListSection, [{
-	        key: "render",
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var displayBlogList = [[], [], []];
+	            var coloumIndex = 0;
+	            BlogListConfig.forEach(function (blog) {
+	                displayBlogList[coloumIndex].push(blog);
+	                coloumIndex = coloumIndex === 2 ? 0 : coloumIndex + 1;
+	            });
+	
+	            this.setState({
+	                displayBlogList: displayBlogList
+	            });
+	        }
+	    }, {
+	        key: 'getColumnArticles',
+	        value: function getColumnArticles(columnIndex) {
+	            if (this.state.displayBlogList.length === 0) return null;
+	            return this.state.displayBlogList[columnIndex].map(function (blog) {
+	                return React.createElement(Article, { key: blog.title, title: blog.title, thumbnail: blog.thumbnail, date: blog.date });
+	            });
+	        }
+	    }, {
+	        key: 'render',
 	        value: function render() {
 	            return React.createElement(
-	                "section",
-	                { id: "blogs", className: "two" },
+	                'section',
+	                { id: 'blogs', className: 'two' },
 	                React.createElement(
-	                    "div",
-	                    { className: "container" },
+	                    'div',
+	                    { className: 'container' },
 	                    React.createElement(
-	                        "header",
+	                        'header',
 	                        null,
 	                        React.createElement(
-	                            "h2",
+	                            'h2',
 	                            null,
-	                            "Blogs"
+	                            'Blogs'
 	                        )
 	                    ),
 	                    React.createElement(
-	                        "p",
+	                        'p',
 	                        null,
-	                        "Vitae natoque dictum etiam semper magnis enim feugiat convallis convallis egestas rhoncus ridiculus in quis risus amet curabitur tempor orci penatibus. Tellus erat mauris ipsum fermentum etiam vivamus eget. Nunc nibh morbi quis fusce hendrerit lacus ridiculus."
+	                        'Vitae natoque dictum etiam semper magnis enim feugiat convallis convallis egestas rhoncus ridiculus in quis risus amet curabitur tempor orci penatibus. Tellus erat mauris ipsum fermentum etiam vivamus eget. Nunc nibh morbi quis fusce hendrerit lacus ridiculus.'
 	                    ),
 	                    React.createElement(
-	                        "div",
-	                        { className: "row" },
+	                        'div',
+	                        { className: 'row' },
 	                        React.createElement(
-	                            "div",
-	                            { className: "4u 12u$(mobile)" },
-	                            React.createElement(
-	                                "article",
-	                                { className: "item" },
-	                                React.createElement(
-	                                    "a",
-	                                    { href: "#", className: "image fit" },
-	                                    React.createElement("img", { src: "images/pic02.jpg", alt: "" })
-	                                ),
-	                                React.createElement(
-	                                    "header",
-	                                    null,
-	                                    React.createElement(
-	                                        "h3",
-	                                        null,
-	                                        "Ipsum Feugiat"
-	                                    )
-	                                )
-	                            ),
-	                            React.createElement(
-	                                "article",
-	                                { className: "item" },
-	                                React.createElement(
-	                                    "a",
-	                                    { href: "#", className: "image fit" },
-	                                    React.createElement("img", { src: "images/pic03.jpg", alt: "" })
-	                                ),
-	                                React.createElement(
-	                                    "header",
-	                                    null,
-	                                    React.createElement(
-	                                        "h3",
-	                                        null,
-	                                        "Rhoncus Semper"
-	                                    )
-	                                )
-	                            )
+	                            'div',
+	                            { className: '4u 12u$(mobile)' },
+	                            this.getColumnArticles(0)
 	                        ),
 	                        React.createElement(
-	                            "div",
-	                            { className: "4u 12u$(mobile)" },
-	                            React.createElement(
-	                                "article",
-	                                { className: "item" },
-	                                React.createElement(
-	                                    "a",
-	                                    { href: "#", className: "image fit" },
-	                                    React.createElement("img", { src: "images/pic04.jpg", alt: "" })
-	                                ),
-	                                React.createElement(
-	                                    "header",
-	                                    null,
-	                                    React.createElement(
-	                                        "h3",
-	                                        null,
-	                                        "Magna Nullam"
-	                                    )
-	                                )
-	                            ),
-	                            React.createElement(
-	                                "article",
-	                                { className: "item" },
-	                                React.createElement(
-	                                    "a",
-	                                    { href: "#", className: "image fit" },
-	                                    React.createElement("img", { src: "images/pic05.jpg", alt: "" })
-	                                ),
-	                                React.createElement(
-	                                    "header",
-	                                    null,
-	                                    React.createElement(
-	                                        "h3",
-	                                        null,
-	                                        "Natoque Vitae"
-	                                    )
-	                                )
-	                            )
+	                            'div',
+	                            { className: '4u 12u$(mobile)' },
+	                            this.getColumnArticles(1)
 	                        ),
 	                        React.createElement(
-	                            "div",
-	                            { className: "4u$ 12u$(mobile)" },
-	                            React.createElement(
-	                                "article",
-	                                { className: "item" },
-	                                React.createElement(
-	                                    "a",
-	                                    { href: "#", className: "image fit" },
-	                                    React.createElement("img", { src: "images/pic06.jpg", alt: "" })
-	                                ),
-	                                React.createElement(
-	                                    "header",
-	                                    null,
-	                                    React.createElement(
-	                                        "h3",
-	                                        null,
-	                                        "Dolor Penatibus"
-	                                    )
-	                                )
-	                            ),
-	                            React.createElement(
-	                                "article",
-	                                { className: "item" },
-	                                React.createElement(
-	                                    "a",
-	                                    { href: "#", className: "image fit" },
-	                                    React.createElement("img", { src: "images/pic07.jpg", alt: "" })
-	                                ),
-	                                React.createElement(
-	                                    "header",
-	                                    null,
-	                                    React.createElement(
-	                                        "h3",
-	                                        null,
-	                                        "Orci Convallis"
-	                                    )
-	                                )
-	                            )
+	                            'div',
+	                            { className: '4u$ 12u$(mobile)' },
+	                            this.getColumnArticles(2)
 	                        )
 	                    )
 	                )
@@ -20893,6 +20858,90 @@
 	})(React.Component);
 	
 	module.exports = Footer;
+
+/***/ },
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */
+/*!********************************!*\
+  !*** ./src/blogListConfig.jsx ***!
+  \********************************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	module.exports = [{
+	    title: "About my website",
+	    date: "2015-12-20",
+	    thumbnail: "pic02.jpg"
+	}, {
+	    title: "About my website 1",
+	    date: "2015-12-20",
+	    thumbnail: "pic02.jpg"
+	}, {
+	    title: "About my website 2",
+	    date: "2015-12-20",
+	    thumbnail: "pic02.jpg"
+	}, {
+	    title: "About my website 3",
+	    date: "2015-12-20",
+	    thumbnail: "pic02.jpg"
+	}];
 
 /***/ }
 /******/ ]);
