@@ -12,7 +12,7 @@ class Article extends React.Component {
     render() {
         return (
             <article className="item">
-                <a href={this.getBlogUrl()} className="image fit"><img src={"images/" + this.props.thumbnail} alt=""/></a>
+                <a href={this.getBlogUrl()} className="image fit"><img src={"images/thumbnails/" + this.props.thumbnail} alt=""/></a>
                 <header>
                     <h3>{this.props.title}</h3>
                 </header>
