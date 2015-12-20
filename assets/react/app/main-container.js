@@ -4,7 +4,7 @@ var ____Classx=React.Component;for(var ____Classx____Key in ____Classx){if(____C
             React.createElement("div", {id: "main"}, 
                 React.createElement(TopSection, null), 
                 React.createElement(BlogListSection, null), 
-                React.createElement(AboutSection, null), 
+                React.createElement(ContactSection, null),
                 React.createElement(ContactSection, null)
             )
         );
