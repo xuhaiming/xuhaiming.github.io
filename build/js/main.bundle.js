@@ -20889,12 +20889,12 @@
 	                    React.createElement(
 	                        "a",
 	                        { href: "#", className: "image featured" },
-	                        React.createElement("img", { src: "images/pic08.jpg", alt: "" })
+	                        React.createElement("img", { src: "images/me.png", alt: "" })
 	                    ),
 	                    React.createElement(
 	                        "p",
 	                        null,
-	                        "I am a software developer who is currently working at ThoughtWorks, Beijing. I have development experiences in ASP .NET, Windows UWP Application, CE-HTML TV Application, etc. And I am also very interested in different kinds of frontend development. Coding makes my life colorful. :)"
+	                        "I am a software developer who is graduated at Fontys University of Applied Science, Eindhoven, the Netherlands, currently working at ThoughtWorks, Beijing. I have development experiences in ASP .NET, Windows UWP Application, Virtual Reality, CE-HTML TV Application, etc. And I am also very interested in many different kinds of frontend development. Coding makes my life colorful!"
 	                    )
 	                )
 	            );
