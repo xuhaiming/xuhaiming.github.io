@@ -21,9 +21,14 @@ class BlogPage extends React.Component {
     }
 
     componentDidMount() {
+        hljs.initHighlightingOnLoad();
         var blogUrl = this.props.params.blogUrl;
         $.get(blogUrl + ".html", (htmlContent) => {
-            this.setState({htmlContent: htmlContent});
+            this.setState({htmlContent: htmlContent}, () => {
+                $('pre code').each((i, block) => {
+                    hljs.highlightBlock(block);
+                });
+            });
         });
     }
 

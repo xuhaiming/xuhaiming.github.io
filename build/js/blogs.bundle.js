@@ -92,9 +92,14 @@
 	        value: function componentDidMount() {
 	            var _this2 = this;
 	
+	            hljs.initHighlightingOnLoad();
 	            var blogUrl = this.props.params.blogUrl;
 	            $.get(blogUrl + ".html", function (htmlContent) {
-	                _this2.setState({ htmlContent: htmlContent });
+	                _this2.setState({ htmlContent: htmlContent }, function () {
+	                    $('pre code').each(function (i, block) {
+	                        hljs.highlightBlock(block);
+	                    });
+	                });
 	            });
 	        }
 	    }, {
@@ -59077,6 +59082,10 @@
 	    title: "About my website",
 	    date: "2015-12-20",
 	    thumbnail: "about-my-blog.png"
+	}, {
+	    title: "Display Code Using Highlight JS",
+	    date: "2016-01-10",
+	    thumbnail: "highlight-js.png"
 	}];
 
 /***/ },

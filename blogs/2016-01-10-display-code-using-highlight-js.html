@@ -1,0 +1,35 @@
+<p>As the propose of this website is writing tech blog, it is very important to give a good view of example codes.
+    &quot;pre&quot; and &quot;code&quot; tags provide the developers possibility to use HTML on their website,
+    but the styling and keyword highlight still need effort to do.</p>
+
+<p>Fortunately, there is a greatlibrary called Highlight JS can help us achieve this goal.
+    Just few lines of code following the <a href="https://highlightjs.org/usage/" style="color: rgb(7, 130, 193);">Highlight JS guide,</a>
+    you will be able to customize your code in the website.</p>
+
+<p>Although it is possible to use NPM to install the Highlight JS package,
+    I still prefer to directly reference the JavaScript file because I can customize what I need to support in this library.&nbsp;</p>
+
+<p>In the component did mount function on my blog jsx file, I initialized the Highlight JS function:</p>
+
+<pre>
+    <code>
+        hljs.initHighlightingOnLoad();
+    </code>
+</pre>
+
+
+<p>After the HTML has been loaded to the DOM, I applied all texts in &quot;pre&quot; &quot;code&quot; tags with the seleted style:</p>
+
+<pre>
+    <code class="jsx javascript">
+        $.get(blogUrl + ".html", (htmlContent) => {
+            this.setState({htmlContent: htmlContent}, () => {
+                $('pre code').each((i, block) => {
+                    hljs.highlightBlock(block);
+                });
+            });
+        });
+    </code>
+</pre>
+
+<p>Then it works! Really simple, isn&#39;t it?</p>
