@@ -1,3 +1,3 @@
 # xuhaiming.github.io
 
-My personal website (working in progress)
+My personal tech blog
