@@ -18,9 +18,11 @@ export default {
 </script>
 
 <style>
-  $color: blue;
+  :root {
+    --mainColor: red;
+  }
 
   body {
-    background-color: $color;
+    color: var(--mainColor);
   }
 </style>

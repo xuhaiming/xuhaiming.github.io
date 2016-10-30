@@ -50,7 +50,7 @@ module.exports = {
     new webpack.LoaderOptionsPlugin({
       vue: {
         postcss: [
-          require('precss')({ /* options */ })
+          require('postcss-cssnext')()
         ]
       }
     }),
