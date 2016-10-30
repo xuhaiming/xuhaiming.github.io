@@ -1,5 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
+var ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 module.exports = {
   entry: './src/main.js',
@@ -14,7 +15,11 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue',
         options: {
-          // vue-loader options go here
+          loaders: {
+            css: ExtractTextPlugin.extract({
+              loader: 'css-loader'
+            })
+          }
         }
       },
       {
@@ -48,7 +53,8 @@ module.exports = {
           require('precss')({ /* options */ })
         ]
       }
-    })
+    }),
+    new ExtractTextPlugin('style.css')
   ]
 }
 
