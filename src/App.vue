@@ -29,7 +29,7 @@
 
         </div>
       </div>
-      <div class="parallax"><img src="/src/assets/logo.png" alt="Unsplashed background img 1"></div>
+      <div class="parallax"><img src="./assets/logo.png" alt="Unsplashed background img 1"></div>
     </div>
 
 
@@ -77,7 +77,7 @@
           </div>
         </div>
       </div>
-      <div class="parallax"><img src="/src/assets/logo.png" alt="Unsplashed background img 2"></div>
+      <div class="parallax"><img src="./assets/logo.png" alt="Unsplashed background img 2"></div>
     </div>
 
     <div class="container">
@@ -103,7 +103,7 @@
           </div>
         </div>
       </div>
-      <div class="parallax"><img src="/src/assets/logo.png" alt="Unsplashed background img 3"></div>
+      <div class="parallax"><img src="./assets/logo.png" alt="Unsplashed background img 3"></div>
     </div>
 
     <footer class="page-footer teal">
