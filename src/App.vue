@@ -19,8 +19,8 @@
         <div class="container">
           <div class="row center">
             <h3 class="header center grey-text text-lighten-2">Welcome to Haiming Pages</h3>
-            <br><br>
             <h5 class="header col s12 light">This is Haiming Xu's personal homepage using Vue JS 2.0 and Materialize CSS hosted on Github Pages.</h5>
+            <a class="waves-effect waves-light btn-large teal darken-1 view-github" target="_blank" href="https://github.com/xuhaiming/xuhaiming.github.io">View on Github</a>
           </div>
         </div>
       </div>
@@ -29,33 +29,7 @@
 
     <div class="container">
       <div class="section">
-
-        <div class="row">
-          <div class="col s12 l4">
-            <div class="icon-block">
-              <h5 class="center">Web Development</h5>
-
-              <p class="light">Since ECMA Script 2015 and Node JS 7.0 released, Javascript has became to one of the most powerful programming language. Great frameworks such as React JS and Vue JS with Webpack make this world more beautiful.</p>
-            </div>
-          </div>
-
-          <div class="col s12 l4">
-            <div class="icon-block">
-              <h5 class="center">.NET Platforms</h5>
-
-              <p class="light">By utilizing elements and principles of Material Design, we were able to create a framework that incorporates components and animations that provide more feedback to users. Additionally, a single underlying responsive system across all platforms allow for a more unified user experience.</p>
-            </div>
-          </div>
-
-          <div class="col s12 l4">
-            <div class="icon-block">
-              <h5 class="center">Virtual Reality</h5>
-
-              <p class="light">We have provided detailed documentation as well as specific code examples to help new users get started. We are also always open to feedback and can answer any questions a user may have about Materialize.</p>
-            </div>
-          </div>
-        </div>
-
+        <h4 class="center">Posts</h4>
       </div>
     </div>
 
@@ -64,7 +38,7 @@
       <div class="section no-pad-bot">
         <div class="container">
           <div class="row center">
-            <h5 class="header col s12 light">Develop native or web application across various of platforms</h5>
+            <h5 class="header col s12 light">Develop native or web applications across various of platforms</h5>
           </div>
         </div>
       </div>
@@ -76,9 +50,8 @@
 
         <div class="row">
           <div class="col s12 center">
-            <h3><i class="mdi-content-send brown-text"></i></h3>
             <h4>About Me</h4>
-            <p class="left-align light">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque id nunc nec volutpat. Etiam pellentesque tristique arcu, non consequat magna fermentum ac. Cras ut ultricies eros. Maecenas eros justo, ullamcorper a sapien id, viverra ultrices eros. Morbi sem neque, posuere et pretium eget, bibendum sollicitudin lacus. Aliquam eleifend sollicitudin diam, eu mattis nisl maximus sed. Nulla imperdiet semper molestie. Morbi massa odio, condimentum sed ipsum ac, gravida ultrices erat. Nullam eget dignissim mauris, non tristique erat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;</p>
+            <p class="left-align light">I am a software engineer who is currently specialized on web development. It is great to work with the latest Node JS features and experience frameworks such as Vue JS or React JS. Besides of Javascript, C# is another one of my most favourite programming languages. I have been developing ASP .NET applications and Windows UWP apps on Azure platform for few years, which are also quite interesting. It is a pity that I did not have many chances to deep into the virtual reality area after my graduation of university. It was really valuable experiences to work with all kinds of VR devices and hopefully I can do something fancy with them someday in the future.</p>
           </div>
         </div>
 
@@ -90,11 +63,11 @@
       <div class="section no-pad-bot">
         <div class="container">
           <div class="row center">
-            <h5 class="header col s12 light">A modern responsive front-end framework based on Material Design</h5>
+            <h5 class="header col s12 light">Make something amazing with Virtual Reality.</h5>
           </div>
         </div>
       </div>
-      <div class="parallax"><img src="./assets/banner-1.jpg" alt="Unsplashed background img 3"></div>
+      <div class="parallax"><img src="./assets/banner-3.jpg" alt="Unsplashed background img 3"></div>
     </div>
 
     <footer class="page-footer grey darken-4">
@@ -103,9 +76,9 @@
           <div class="col l3 s12">
             <h5 class="white-text">Contacts</h5>
             <ul>
-              <li><a class="white-text" href="mailto:haiming12322@qq.com">Email</a></li>
-              <li><a class="white-text" href="https://github.com/xuhaiming">Github</a></li>
-              <li><a class="white-text" href="https://www.linkedin.com/in/xu-haiming-48502869">LinkedIn</a></li>
+              <li><a class="white-text" target="_blank" href="mailto:haiming12322@qq.com">Email</a></li>
+              <li><a class="white-text" target="_blank" href="https://github.com/xuhaiming">Github</a></li>
+              <li><a class="white-text" target="_blank" href="https://www.linkedin.com/in/xu-haiming-48502869">LinkedIn</a></li>
             </ul>
           </div>
         </div>
@@ -147,6 +120,10 @@ p {
 
 .button-collapse {
   color: #26a69a;
+}
+
+.view-github {
+  margin-top: 2em;
 }
 
 .parallax-container {
