@@ -2,10 +2,7 @@
   <div id="app">
     <nav class="white" role="navigation">
       <div class="nav-wrapper container">
-        <a id="logo-container" href="#" class="brand-logo">Haiming Pages</a>
-        <ul class="right hide-on-med-and-down">
-          <li><a class="waves-effect waves-light" href="#">Posts</a></li>
-        </ul>
+        <a id="logo-container" href="#" class="brand-logo grey-text text-darken-3">Haiming Pages</a>
 
         <ul id="nav-mobile" class="side-nav">
           <li><a href="#">Navigation</a></li>
@@ -15,7 +12,7 @@
     </nav>
 
     <div id="index-banner" class="parallax-container valign-wrapper">
-      <div class="section no-pad-bot">
+      <div id="index-banner-section" class="section no-pad-bot hidden">
         <div class="container">
           <div class="row center">
             <h3 class="header center grey-text text-lighten-2">Welcome to Haiming Pages</h3>
@@ -29,21 +26,8 @@
 
     <div class="container">
       <div class="section">
-        <h4 class="center">Posts</h4>
+        <h4 id="post-title" class="center hidden">Posts</h4>
         <ul id="post-list" class="row">
-          <li class="col s12 m4">
-            <div class="card hoverable">
-              <div class="card-image">
-                <img src="./assets/logo.png">
-                <span class="card-title">Card Title</span>
-              </div>
-              <div class="card-content">
-                <p>I am a very simple card. I am good at containing small bits of information.
-                I am convenient because I require little markup to use effectively.</p>
-              </div>
-            </div>
-          </li>
-
           <li class="col s12 m4">
             <div class="card hoverable">
               <div class="card-image">
@@ -87,8 +71,8 @@
     </div>
 
 
-    <div class="parallax-container valign-wrapper">
-      <div class="section no-pad-bot">
+    <div id="middle-container" class="parallax-container valign-wrapper">
+      <div id="middle-section" class="section no-pad-bot hidden">
         <div class="container">
           <div class="row center">
             <h5 class="header col s12 light">Develop native or web applications across various of platforms</h5>
@@ -98,22 +82,20 @@
       <div class="parallax"><img src="./assets/banner-2.jpg" alt="Unsplashed background img 2"></div>
     </div>
 
-    <div class="container">
-      <div class="section">
-
+    <div id="about-me" class="container">
+      <div id="about-me-section" class="section hidden">
         <div class="row">
           <div class="col s12 center">
             <h4>About Me</h4>
             <p class="left-align light">I am a software engineer who is currently specialized on web development. It is great to work with the latest Node JS features and experience frameworks such as Vue JS or React JS. Besides of Javascript, C# is another one of my most favourite programming languages. I have been developing ASP .NET applications and Windows UWP apps on Azure platform for few years, which are also quite interesting. It is a pity that I did not have many chances to deep into the virtual reality area after my graduation of university. It was really valuable experiences to work with all kinds of VR devices and hopefully I can do something fancy with them someday in the future.</p>
           </div>
         </div>
-
       </div>
     </div>
 
 
-    <div class="parallax-container valign-wrapper">
-      <div class="section no-pad-bot">
+    <div id="bottom-container" class="parallax-container valign-wrapper">
+      <div id="bottom-section" class="section no-pad-bot hidden">
         <div class="container">
           <div class="row center">
             <h5 class="header col s12 light">Make something amazing with Virtual Reality.</h5>
@@ -157,9 +139,21 @@ export default {
     $('.button-collapse').sideNav()
     $('.parallax').parallax()
 
+    $('#index-banner-section').fadeIn('slow')
+    $('#post-title').fadeIn('slow')
+    Materialize.showStaggeredList($('#post-list'))
+
     var options = [{
-      selector: '#post-list', offset: 100, callback: el => {
-        Materialize.showStaggeredList($(el));
+      selector: '#middle-container', offset: 350, callback(el) {
+        $('#middle-section').fadeIn('slow')
+      }
+    }, {
+      selector: '#about-me', offset: 200, callback(el) {
+        $('#about-me-section').fadeIn('slow')
+      }
+    }, {
+      selector: '#bottom-container', offset: 350, callback(el) {
+        $('#bottom-section').fadeIn('slow')
       }
     }]
     Materialize.scrollFire(options)
@@ -168,11 +162,6 @@ export default {
 </script>
 
 <style>
-
-nav ul a,
-nav .brand-logo {
-  color: #444;
-}
 
 p {
   line-height: 2rem;
@@ -202,8 +191,16 @@ footer.page-footer {
   margin: 0;
 }
 
+.hidden {
+  display: none;
+}
+
 #post-list > li {
   opacity: 0;
+}
+
+#about-me {
+  min-height: 250px;
 }
 
 </style>
