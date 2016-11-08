@@ -30,6 +30,59 @@
     <div class="container">
       <div class="section">
         <h4 class="center">Posts</h4>
+        <ul id="post-list" class="row">
+          <li class="col s12 m4">
+            <div class="card hoverable">
+              <div class="card-image">
+                <img src="./assets/logo.png">
+                <span class="card-title">Card Title</span>
+              </div>
+              <div class="card-content">
+                <p>I am a very simple card. I am good at containing small bits of information.
+                I am convenient because I require little markup to use effectively.</p>
+              </div>
+            </div>
+          </li>
+
+          <li class="col s12 m4">
+            <div class="card hoverable">
+              <div class="card-image">
+                <img src="./assets/banner-1.jpg">
+                <span class="card-title">Card Title</span>
+              </div>
+              <div class="card-content">
+                <p>I am a very simple card. I am good at containing small bits of information.
+                I am convenient because I require little markup to use effectively.</p>
+              </div>
+            </div>
+          </li>
+
+          <li class="col s12 m4">
+            <div class="card hoverable">
+              <div class="card-image">
+                <img src="./assets/banner-2.jpg">
+                <span class="card-title">Card Title</span>
+              </div>
+              <div class="card-content">
+                <p>I am a very simple card. I am good at containing small bits of information.
+                I am convenient because I require little markup to use effectively.</p>
+              </div>
+            </div>
+          </li>
+
+          <li class="col s12 m4">
+            <div class="card hoverable">
+              <div class="card-image">
+                <img src="./assets/banner-3.jpg">
+                <span class="card-title">Card Title</span>
+              </div>
+              <div class="card-content">
+                <p>I am a very simple card. I am good at containing small bits of information.
+                I am convenient because I require little markup to use effectively.</p>
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -103,6 +156,13 @@ export default {
   mounted() {
     $('.button-collapse').sideNav()
     $('.parallax').parallax()
+
+    var options = [{
+      selector: '#post-list', offset: 100, callback: el => {
+        Materialize.showStaggeredList($(el));
+      }
+    }]
+    Materialize.scrollFire(options)
   }
 }
 </script>
@@ -140,6 +200,10 @@ p {
 
 footer.page-footer {
   margin: 0;
+}
+
+#post-list > li {
+  opacity: 0;
 }
 
 </style>
