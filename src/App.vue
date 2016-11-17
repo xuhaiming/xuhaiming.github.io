@@ -18,29 +18,6 @@ export default {
   components: {
     Navigation,
     FooterContainer
-  },
-  mounted() {
-    $('.button-collapse').sideNav()
-    $('.parallax').parallax()
-
-    $('#index-banner-section').fadeIn('slow')
-    $('#post-title').fadeIn('slow')
-    Materialize.showStaggeredList($('#post-list'))
-
-    var options = [{
-      selector: '#middle-container', offset: 350, callback(el) {
-        $('#middle-section').fadeIn('slow')
-      }
-    }, {
-      selector: '#about-me', offset: 200, callback(el) {
-        $('#about-me-section').fadeIn('slow')
-      }
-    }, {
-      selector: '#bottom-container', offset: 350, callback(el) {
-        $('#bottom-section').fadeIn('slow')
-      }
-    }]
-    Materialize.scrollFire(options)
   }
 }
 </script>
@@ -71,16 +48,12 @@ p {
   }
 }
 
+.parallax img {
+  display: block;
+}
+
 footer.page-footer {
   margin: 0;
-}
-
-.hidden {
-  display: none;
-}
-
-#post-list > li {
-  opacity: 0;
 }
 
 #about-me {

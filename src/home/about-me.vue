@@ -1,6 +1,6 @@
 <template>
     <div id="about-me" class="container">
-        <div id="about-me-section" class="section hidden">
+        <div id="about-me-section" class="section">
             <div class="row">
                 <div class="col s12 center">
                     <h4>About Me</h4>

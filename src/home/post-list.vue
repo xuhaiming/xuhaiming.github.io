@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="section">
-            <h4 id="post-title" class="center hidden">Posts</h4>
+            <h4 id="post-title" class="center">Posts</h4>
             <ul id="post-list" class="row">
                 <li class="col s12 m4">
                     <div class="card hoverable">

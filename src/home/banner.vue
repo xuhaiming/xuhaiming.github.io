@@ -1,6 +1,6 @@
 <template>
     <div id="index-banner" class="parallax-container valign-wrapper">
-        <div id="index-banner-section" class="section no-pad-bot hidden">
+        <div id="index-banner-section" class="section no-pad-bot">
             <div class="container">
                 <div class="row center">
                     <h3 class="header center grey-text text-lighten-2">Welcome to Haiming Pages</h3>
