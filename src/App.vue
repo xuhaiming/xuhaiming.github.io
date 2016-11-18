@@ -48,6 +48,12 @@ p {
   }
 }
 
+.vertical-center {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .parallax img {
   display: block;
 }

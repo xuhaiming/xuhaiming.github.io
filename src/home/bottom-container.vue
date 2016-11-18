@@ -1,6 +1,6 @@
 <template>
-    <div id="bottom-container" class="parallax-container valign-wrapper">
-        <div id="bottom-section" class="section no-pad-bot">
+    <div class="parallax-container">
+        <div class="section no-pad-bot vertical-center">
             <div class="container">
                 <div class="row center">
                     <h5 class="header col s12 light">Make something awesome with Virtual Reality.</h5>

@@ -1,6 +1,6 @@
 <template>
-    <div id="middle-container" class="parallax-container valign-wrapper">
-        <div id="middle-section" class="section no-pad-bot">
+    <div class="parallax-container">
+        <div class="section no-pad-bot vertical-center">
             <div class="container">
                 <div class="row center">
                     <h5 class="header col s12 light">Develop native or web applications across various of platforms</h5>
