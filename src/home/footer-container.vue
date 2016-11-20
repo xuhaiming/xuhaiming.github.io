@@ -14,7 +14,7 @@
         </div>
         <div class="footer-copyright">
             <div class="container">
-                Powered by <a class="brown-text text-lighten-3" href="https://github.com/xuhaiming/xuhaiming.github.io">Xu Haiming</a>
+                © 2016 <a class="brown-text text-lighten-3" target="_blank" href="https://github.com/xuhaiming/xuhaiming.github.io">Xu Haiming</a>, All rights reserved.
             </div>
         </div>
     </footer>
@@ -23,3 +23,11 @@
 <script>
     export default {}
 </script>
+
+<style>
+footer {
+    &.page-footer {
+      margin: 0;
+    }
+}
+</style>

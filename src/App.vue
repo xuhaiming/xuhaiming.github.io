@@ -1,21 +1,12 @@
 <template>
   <div id="app">
-    <navigation />
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Navigation from './home/navigation.vue'
-
 export default {
-  name: 'app',
-  data() {
-    return {}
-  },
-  components: {
-    Navigation
-  }
+  name: 'app'
 }
 </script>
 
@@ -53,14 +44,6 @@ p {
 
 .parallax img {
   display: block;
-}
-
-footer.page-footer {
-  margin: 0;
-}
-
-#about-me {
-  min-height: 250px;
 }
 
 .fade-enter-active, .fade-leave-active {

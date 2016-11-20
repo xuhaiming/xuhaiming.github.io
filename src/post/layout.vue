@@ -1,11 +1,52 @@
 <template>
     <transition name="fade">
         <div>
-            Post {{ $route.params.id }}
+            <navigation />
+            <div class="container">
+                <div class="post-page z-depth-2">
+                    <h1>{{ post.title }}</h1>
+                    <p>{{ post.date }}</p>
+                    <div v-html="content"></div>
+                </div>
+            </div>
+            <footer-container />
         </div>
     </transition>
 </template>
 
 <script>
-export default {}
+import axios from 'axios'
+import { markdown } from 'markdown'
+import posts from '../config/posts'
+import Navigation from '../home/navigation.vue'
+import FooterContainer from '../home/footer-container.vue'
+
+export default {
+    data() {
+        return {
+            post: posts.find(p => p.id === this.$route.params.id),
+            content: ''
+        }
+    },
+    components: {
+        Navigation,
+        FooterContainer
+    },
+    created() {
+        axios.get(`/markdowns/${this.$route.params.id}.md`)
+            .then(response => this.content = markdown.toHTML(response.data))
+    }
+}
 </script>
+
+<style>
+.post-page {
+    margin: 20px 0;
+    padding: 10px 20px 20px;
+
+    & h1 {
+        font-size: 1.8rem;
+        margin: 1rem 0;
+    }
+}
+</style>

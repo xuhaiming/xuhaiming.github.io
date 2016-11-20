@@ -16,12 +16,15 @@ const routes = [
 
 const router = new VueRouter({
   mode: 'history',
+  scrollBehavior() {
+    return { x: 0, y: 0 }
+  },
   routes
 })
 
 const store = new Vuex.Store({
   state: {
-    count: 1
+    count: 31
   },
   mutations: {
     increment (state) {
