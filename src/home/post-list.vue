@@ -6,10 +6,11 @@
                 <li v-for="post in posts" class="post col s12 m4" @click='onPostClick(post)'>
                     <div class="card hoverable">
                         <div class="card-image">
-                            <img src="../assets/banner-1.jpg">
+                            <img :src="`/src/assets/${post.id}/thumbnail.jpg`">
                         </div>
                         <div class="card-content">
                             <h5 class="post-title">{{post.title}}</h5>
+                            <p class="grey-text text-darken-3">{{post.date}}</p>
                             <p>{{post.description}}</p>
                         </div>
                     </div>
@@ -42,7 +43,7 @@ export default {
     }
 
     & .post-title {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
     }
 }
 

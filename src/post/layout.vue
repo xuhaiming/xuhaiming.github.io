@@ -16,7 +16,8 @@
 
 <script>
 import axios from 'axios'
-import { markdown } from 'markdown'
+import marked from 'marked'
+import hljs from 'highlightjs'
 import posts from '../config/posts'
 import Navigation from '../home/navigation.vue'
 import FooterContainer from '../home/footer-container.vue'
@@ -34,7 +35,14 @@ export default {
     },
     created() {
         axios.get(`/markdowns/${this.$route.params.id}.md`)
-            .then(response => this.content = markdown.toHTML(response.data))
+            .then(response => {
+                this.content = marked(response.data)
+                this.$nextTick(() => {
+                    this.$el.querySelectorAll('pre code').forEach(block => {
+                        hljs.highlightBlock(block)
+                    })
+                })
+            })
     }
 }
 </script>
@@ -48,5 +56,9 @@ export default {
         font-size: 1.8rem;
         margin: 1rem 0;
     }
+}
+
+code {
+    color: #1565C0;
 }
 </style>

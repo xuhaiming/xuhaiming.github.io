@@ -14,7 +14,7 @@
         </div>
         <div class="footer-copyright">
             <div class="container">
-                © 2016 <a class="brown-text text-lighten-3" target="_blank" href="https://github.com/xuhaiming/xuhaiming.github.io">Xu Haiming</a>, All rights reserved.
+                © 2016 <a class="brown-text text-lighten-3" target="_blank" href="https://github.com/xuhaiming/xuhaiming.github.io">Haiming Xu</a>, All rights reserved.
             </div>
         </div>
     </footer>

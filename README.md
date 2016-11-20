@@ -1,6 +1,6 @@
-# xuhaiming.github.io
+# Haiming Pages
 
-> Haiming's tech blog written in Vue JS 2.0
+> Haiming Xu's personal homepage written in Vue JS 2.0 and Materialize CSS.
 
 ## Build Setup
 

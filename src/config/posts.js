@@ -1,23 +1,13 @@
 const postList = [
   {
-    title: 'First Post',
-    date: '2016-11-18',
-    description: 'First post description'
-  },
-  {
-    title: 'Second Post',
-    date: '2016-11-19',
-    description: 'Second post description'
-  },
-  {
-    title: 'Third Post',
+    title: 'About Haiming Pages',
     date: '2016-11-20',
-    description: 'Third post description'
+    description: 'An introduction of the structure of current Haiming Pages.'
   }
 ]
 
 const computedPostList = postList.map(post => {
-  const convertedTitle = post.title.toLowerCase().replace(' ', '-')
+  const convertedTitle = post.title.toLowerCase().replace(/ /g, '-')
 
   return Object.assign(post, {
     id: `${post.date}-${convertedTitle}`
