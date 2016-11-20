@@ -1,43 +1,16 @@
 <template>
-    <div class="container">
+    <div class="container post-list">
         <div class="section">
-            <h4 id="post-title" class="center">Posts</h4>
-            <ul id="post-list" class="row">
-                <li class="col s12 m4">
+            <h4 class="center">Posts</h4>
+            <ul class="row">
+                <li v-for="post in posts" class="post col s12 m4" @click='onPostClick(post)'>
                     <div class="card hoverable">
                         <div class="card-image">
                             <img src="../assets/banner-1.jpg">
-                            <span class="card-title">Card Title</span>
                         </div>
                         <div class="card-content">
-                            <p>I am a very simple card. I am good at containing small bits of information.
-                                I am convenient because I require little markup to use effectively.</p>
-                        </div>
-                    </div>
-                </li>
-
-                <li class="col s12 m4">
-                    <div class="card hoverable">
-                        <div class="card-image">
-                            <img src="../assets/banner-2.jpg">
-                            <span class="card-title">Card Title</span>
-                        </div>
-                        <div class="card-content">
-                            <p>I am a very simple card. I am good at containing small bits of information.
-                                I am convenient because I require little markup to use effectively.</p>
-                        </div>
-                    </div>
-                </li>
-
-                <li class="col s12 m4">
-                    <div class="card hoverable">
-                        <div class="card-image">
-                            <img src="../assets/banner-3.jpg">
-                            <span class="card-title">Card Title</span>
-                        </div>
-                        <div class="card-content">
-                            <p>I am a very simple card. I am good at containing small bits of information.
-                                I am convenient because I require little markup to use effectively.</p>
+                            <h5 class="post-title">{{post.title}}</h5>
+                            <p>{{post.description}}</p>
                         </div>
                     </div>
                 </li>
@@ -47,5 +20,30 @@
 </template>
 
 <script>
-    export default {}
+import posts from '../config/posts'
+
+export default {
+    data() {
+        return { posts }
+    },
+    methods: {
+        onPostClick(post) {
+            this.$router.push(`post/${post.id}`)
+        }
+    }
+}
 </script>
+
+<style>
+
+.post-list {
+    & .post {
+        cursor: pointer;
+    }
+
+    & .post-title {
+        font-size: 1.4rem;
+    }
+}
+
+</style>

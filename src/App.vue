@@ -2,13 +2,11 @@
   <div id="app">
     <navigation />
     <router-view></router-view>
-    <footer-container />
   </div>
 </template>
 
 <script>
 import Navigation from './home/navigation.vue'
-import FooterContainer from './home/footer-container.vue'
 
 export default {
   name: 'app',
@@ -16,8 +14,7 @@ export default {
     return {}
   },
   components: {
-    Navigation,
-    FooterContainer
+    Navigation
   }
 }
 </script>
@@ -67,11 +64,11 @@ footer.page-footer {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .5s
+  transition: opacity .5s;
 }
 
 .fade-enter, .fade-leave-active {
-  opacity: 0
+  opacity: 0;
 }
 
 </style>

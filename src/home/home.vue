@@ -6,6 +6,7 @@
             <middle-container />
             <about-me />
             <bottom-container />
+            <footer-container />
         </div>
     </transition>
 </template>
@@ -16,6 +17,7 @@ import PostList from './post-list.vue'
 import MiddleContainer from './middle-container.vue'
 import AboutMe from './about-me.vue'
 import BottomContainer from './bottom-container.vue'
+import FooterContainer from './footer-container.vue'
 
 export default {
   data() {
@@ -26,7 +28,8 @@ export default {
     PostList,
     MiddleContainer,
     AboutMe,
-    BottomContainer
+    BottomContainer,
+    FooterContainer
   }
 }
 </script>

@@ -1,8 +1,9 @@
 <template>
     <nav class="white" role="navigation">
         <div class="nav-wrapper container">
-            <router-link to="/foo">Foo</router-link>
-            <a id="logo-container" href="#" class="brand-logo grey-text text-darken-3">Haiming Pages</a>
+            <router-link to="/">
+                <a id="logo-container" href="_self" class="brand-logo grey-text text-darken-3">Haiming Pages</a>
+            </router-link>
 
             <ul id="nav-mobile" class="side-nav">
                 <li><a href="#">Navigation</a></li>
