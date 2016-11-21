@@ -47,11 +47,12 @@ p {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
+  transition: all .8s;
 }
 
 .fade-enter, .fade-leave-active {
   opacity: 0;
+  transform: translateY(15px);
 }
 
 </style>
