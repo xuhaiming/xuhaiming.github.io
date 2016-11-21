@@ -1,14 +1,14 @@
 <template>
-    <transition name="fade">
-        <div>
-            <navigation />
-            <banner />
-            <post-list />
-            <middle-container />
-            <about-me />
-            <footer-container />
-        </div>
-    </transition>
+  <transition name="fade">
+    <div>
+      <navigation />
+      <banner />
+      <post-list />
+      <middle-container />
+      <about-me />
+      <footer-container />
+    </div>
+  </transition>
 </template>
 
 <script>

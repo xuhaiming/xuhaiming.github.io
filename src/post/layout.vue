@@ -1,17 +1,17 @@
 <template>
-    <transition name="fade">
-        <div>
-            <navigation />
-            <div class="container">
-                <div class="post-page z-depth-2">
-                    <h1>{{ post.title }}</h1>
-                    <p>{{ post.date }}</p>
-                    <div v-html="content"></div>
-                </div>
-            </div>
-            <footer-container />
+  <transition name="fade">
+    <div>
+      <navigation />
+      <div class="container">
+        <div class="post-page z-depth-2">
+          <h1>{{ post.title }}</h1>
+          <p>{{ post.date }}</p>
+          <div v-html="content"></div>
         </div>
-    </transition>
+      </div>
+      <footer-container />
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -23,42 +23,41 @@ import Navigation from '../home/navigation.vue'
 import FooterContainer from '../home/footer-container.vue'
 
 export default {
-    data() {
-        return {
-            post: posts.find(p => p.id === this.$route.params.id),
-            content: ''
-        }
-    },
-    components: {
-        Navigation,
-        FooterContainer
-    },
-    created() {
-        axios.get(`/markdowns/${this.$route.params.id}.md`)
-            .then(response => {
-                this.content = marked(response.data)
-                this.$nextTick(() => {
-                    this.$el.querySelectorAll('pre code').forEach(block => {
-                        hljs.highlightBlock(block)
-                    })
-                })
-            })
+  data() {
+    return {
+      post: posts.find(p => p.id === this.$route.params.id),
+      content: ''
     }
+  },
+  components: {
+    Navigation,
+    FooterContainer
+  },
+  created() {
+    axios.get(`/markdowns/${this.$route.params.id}.md`)
+      .then(response => {
+        this.content = marked(response.data)
+        this.$nextTick(() => {
+          this.$el.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightBlock(block)
+          })
+      })  
+    })
+  }
 }
 </script>
 
 <style>
-.post-page {
+  .post-page {
     margin: 20px 0;
     padding: 10px 20px 20px;
-
     & h1 {
-        font-size: 1.8rem;
-        margin: 1rem 0;
+      font-size: 1.8rem;
+      margin: 1rem 0;
     }
-}
-
-code {
+  }
+  
+  code {
     color: #1565C0;
-}
+  }
 </style>
