@@ -3,6 +3,11 @@ const postList = [
     title: 'About Haiming Pages',
     date: '2016-11-20',
     description: 'An introduction of the structure of current Haiming Pages.'
+  },
+  {
+    title: 'Display code using Highlight JS',
+    date: '2016-07-10',
+    description: 'An introduction of the structure of current Haiming Pages.'
   }
 ]
 
