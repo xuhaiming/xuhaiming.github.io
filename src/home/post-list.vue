@@ -30,7 +30,7 @@ export default {
   methods: {
     onPostClick(post) {
       this.$router.push(`post/${post.id}`)
-      window.scroll(0, 0);
+      window.scroll(0, 0)
     }
   }
 }
