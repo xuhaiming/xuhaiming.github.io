@@ -12,18 +12,14 @@
     "$": true
   },
   "plugins": [
-    "html"
+    "html",
+    "vue"
   ],
   "settings": {
     "html/indent": "+2"
   },
   "rules": {
-    "semi": ["error", "never"],
-    "quotes": ["error", "single"],
-    "array-bracket-spacing": ["error", "never"],
-    "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
-    "comma-dangle": ["error", "never"],
-    "comma-spacing": ["error", { "before": false, "after": true }],
-    "comma-style": ["error", "last"]
+    "no-var": 2,
+    "prefer-const": 2
   }
 }
