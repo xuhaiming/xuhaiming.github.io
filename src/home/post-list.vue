@@ -37,12 +37,12 @@ export default {
 </script>
 
 <style>
-  .post-list {
-    & .post {
-      cursor: pointer;
-    }
-    & .post-title {
-      font-size: 1.3rem;
-    }
+.post-list {
+  & .post {
+    cursor: pointer;
   }
+  & .post-title {
+    font-size: 1.3rem;
+  }
+}
 </style>

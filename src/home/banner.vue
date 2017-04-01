@@ -49,21 +49,41 @@ export default {
 </script>
 
 <style>
-  .banner {
-    & .title {
-      position: relative;
-      top: -50px;
-    }
+@import '../styles/core.css';
 
-    & .view-github {
-      position: relative;
-      top: 50px;
-      font-weight: bold;
-      cursor: pointer;
+.banner {
+  & .title {
+    position: relative;
+    top: -50px;
+    font-size: 2rem;
 
-      &_container {
-        width: 100%;
-      }
+    @media (width > 992px) {
+      font-size: 2.5rem;
     }
   }
+
+  & .description {
+    font-size: 1.3rem;
+
+    @media (width > 992px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  & .view-github {
+    position: relative;
+    top: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.5rem;
+
+    @media (width > 992px) {
+      font-size: 1.7rem;
+    }
+
+    &_container {
+      width: 100%;
+    }
+  }
+}
 </style>

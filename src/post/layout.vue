@@ -48,16 +48,19 @@ export default {
 </script>
 
 <style>
-  .post-page {
-    margin: 20px 0;
-    padding: 10px 20px 20px;
-    & h1 {
-      font-size: 1.8rem;
-      margin: 1rem 0;
-    }
+@import '../styles/core.css';
+
+.post-page {
+  margin: 20px 0;
+  padding: 10px 20px 20px;
+
+  & h1 {
+    font-size: 1.8rem;
+    margin: 1rem 0;
   }
-  
-  code {
-    color: #1565C0;
-  }
+}
+
+code {
+  color: var(--code-color);
+}
 </style>

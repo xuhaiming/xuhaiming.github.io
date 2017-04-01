@@ -26,9 +26,9 @@
 </script>
 
 <style>
-  footer {
-    &.page-footer {
-      margin: 0;
-    }
+footer {
+  &.page-footer {
+    margin: 0;
   }
+}
 </style>
