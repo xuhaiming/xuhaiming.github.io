@@ -52,6 +52,10 @@ export default {
 @import '../styles/core.css';
 
 .banner {
+  & .layer {
+    width: 100%;
+  }
+
   & .title {
     position: relative;
     top: -50px;

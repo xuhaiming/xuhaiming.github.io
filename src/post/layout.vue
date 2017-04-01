@@ -6,7 +6,24 @@
         <div class="post-page z-depth-2">
           <h1>{{ post.title }}</h1>
           <p>{{ post.date }}</p>
-          <div v-html="content"></div>
+          <div v-if="content" v-html="content"></div>
+
+          <div class="loader-container" v-else>
+            <div class="preloader-wrapper big active">
+              <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left">
+                  <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                  <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                  <div class="circle"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
       <footer-container />
@@ -57,6 +74,11 @@ export default {
   & h1 {
     font-size: 1.8rem;
     margin: 1rem 0;
+  }
+
+  & .loader-container {
+    padding: 20px;
+    text-align: center;
   }
 }
 
