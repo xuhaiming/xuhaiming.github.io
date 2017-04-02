@@ -23,25 +23,10 @@ p {
   margin-top: 2em;
 }
 
-.parallax-container {
-  min-height: 550px;
-  line-height: 0;
-  height: auto;
-  color: rgba(255, 255, 255, .9);
-  width: 100%;
-  & .section {
-    width: 100%;
-  }
-}
-
 .vertical-center {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-}
-
-.parallax img {
-  display: block;
 }
 
 .fade-enter-active,
