@@ -6,9 +6,9 @@
         <div class="post-page z-depth-2">
           <h1>{{ post.title }}</h1>
           <p>{{ post.date }}</p>
-          <div v-if="content" v-html="content"></div>
+          <div v-show="content" v-html="content"></div>
 
-          <div class="loader-container" v-else>
+          <div v-show="!content" class="loader-container">
             <div class="preloader-wrapper big active">
               <div class="spinner-layer spinner-blue-only">
                 <div class="circle-clipper left">
@@ -58,7 +58,7 @@ export default {
           this.$el.querySelectorAll('pre code').forEach(block => {
             hljs.highlightBlock(block)
           })
-      })  
+      })
     })
   }
 }
