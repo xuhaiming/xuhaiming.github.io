@@ -40,6 +40,7 @@ import Navigation from '../home/navigation.vue'
 import FooterContainer from '../home/footer-container.vue'
 
 export default {
+  name: 'postLayout',
   data() {
     return {
       post: posts.find(p => p.id === this.$route.params.id),

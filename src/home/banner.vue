@@ -1,28 +1,30 @@
 <template>
-  <div class="parallax-container banner">
-    <div class="section no-pad-bot vertical-center">
-      <div class="container">
-        <div class="row center" id="scene">
-          <div data-depth="0.60" class="layer">
-            <h3 class="title header center grey-text text-lighten-2">Welcome to Haiming Pages</h3>
-          </div>
-          <div data-depth="0.45" class="layer">
-            <h5 class="description header center col s12 light">This is Haiming Xu's personal homepage using Vue JS 2.0 and Materialize CSS hosted on Github Pages.</h5>
-          </div>
-          <div data-depth="0.50" class="layer view-github_container">
-            <h5 class="view-github header center col s12 light" @click="openGithub">View on Github</h5>  
-          </div>
+  <scroll-parallax image-src="banner-1.jpg" image-alt="Haiming Pages">
+    <div class="container banner">
+      <div class="row center" id="scene">
+        <div data-depth="0.60" class="layer">
+          <h3 class="title header center grey-text text-lighten-2">Welcome to Haiming Pages</h3>
+        </div>
+        <div data-depth="0.45" class="layer">
+          <h5 class="description header center col s12 light">This is Haiming Xu's personal homepage using Vue JS 2.0 and Materialize CSS hosted on Github Pages.</h5>
+        </div>
+        <div data-depth="0.50" class="layer view-github_container">
+          <h5 class="view-github header center col s12 light" @click="openGithub">View on Github</h5>
         </div>
       </div>
     </div>
-    <div class="parallax"><img src="../assets/banner-1.jpg" alt="Unsplashed background img 1"></div>
-  </div>
+  </scroll-parallax>
 </template>
 
 <script>
 import Parallax from '../libs/parallax'
+import ScrollParallax from '../components/scroll-parallax.vue'
 
 export default {
+  name: 'banner',
+  components: {
+    ScrollParallax
+  },
   mounted() {
     const scene = document.getElementById('scene')
     new Parallax(scene, {

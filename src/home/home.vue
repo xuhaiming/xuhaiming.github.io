@@ -20,6 +20,7 @@ import AboutMe from './about-me.vue'
 import FooterContainer from './footer-container.vue'
 
 export default {
+  name: 'home',
   data() {
     return {}
   },

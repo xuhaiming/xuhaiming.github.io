@@ -24,6 +24,7 @@
 import posts from '../config/posts'
 
 export default {
+  name: 'postList',
   data() {
     return { posts }
   },

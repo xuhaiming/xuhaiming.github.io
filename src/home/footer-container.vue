@@ -22,7 +22,9 @@
 </template>
 
 <script>
-    export default {}
+export default {
+  name: 'footerContainer'
+}
 </script>
 
 <style>
