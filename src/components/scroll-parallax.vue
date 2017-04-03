@@ -1,5 +1,5 @@
 <template>
-  <div class="parallax-container">
+  <div class="parallax-container" :class="customClassObject">
     <div class="section no-pad-bot vertical-center">
       <slot></slot>
     </div>
@@ -20,6 +20,9 @@ export default {
     imageAlt: {
       type: String,
       required: true
+    },
+    customClassObject: {
+      type: Object
     }
   },
   data() {
