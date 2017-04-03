@@ -2,7 +2,7 @@
   <scroll-parallax image-src="banner-2.jpg" image-alt="Responsive Image">
     <div class="container">
       <div class="row center">
-        <h5 class="header col s12 light">Develop native or web applications across various of platforms</h5>
+        <h5 class="header col s12 light">Develop applications across various of platforms and devices</h5>
       </div>
     </div>
   </scroll-parallax>

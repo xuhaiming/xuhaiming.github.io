@@ -11,6 +11,11 @@ export default {
 </script>
 
 <style>
+h2 {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
 p {
   line-height: 2rem;
 }
