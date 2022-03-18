@@ -1,7 +1,0 @@
-node_modules
-.vscode
-.DS_Store
-package.json
-README.md
-src/libs
-dist
