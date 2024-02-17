@@ -34,7 +34,7 @@ function Stars() {
     return array;
   });
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     ref.current.rotation.x -= delta / 20;
     ref.current.rotation.y -= delta / 30;
   });
