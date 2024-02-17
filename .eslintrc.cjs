@@ -3,11 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: [
-    "airbnb",
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-  ],
+  extends: ["airbnb", "plugin:@typescript-eslint/recommended", "prettier"],
   overrides: [],
   parserOptions: {
     ecmaVersion: "latest",
@@ -64,5 +60,7 @@ module.exports = {
     "no-param-reassign": [2, { props: false }],
     "consistent-return": "off",
     "import/order": ["off"],
+    "@typescript-eslint/no-explicit-any": "off",
+    "react/jsx-boolean-value": "off",
   },
-}
+};

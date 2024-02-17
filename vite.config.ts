@@ -1,12 +1,17 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
-import gltf from 'vite-plugin-gltf';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import gltf from "vite-plugin-gltf";
+import { draco } from "@gltf-transform/functions";
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), gltf()],
+  plugins: [
+    react(),
+    gltf({
+      transforms: [draco()],
+    }),
+  ],
   root: "src",
   build: {
-    outDir: "../"
-  }
-})
+    outDir: "../",
+  },
+});
