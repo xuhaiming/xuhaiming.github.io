@@ -9,6 +9,10 @@ import { FingerPrintIcon } from "@heroicons/react/24/solid";
 import { PageTitle } from "./widgets/layout";
 import bg from "./assets/bg2.jpg";
 import StarsModel from "./components/threeModels/StarsModel";
+import {
+  GalleryModel,
+  galleryImages,
+} from "./components/threeModels/GalleryModel";
 
 function App() {
   return (
@@ -94,29 +98,19 @@ function App() {
         </div>
       </section>
 
+      <div style={{ height: 500 }}>
+        <GalleryModel images={galleryImages} />
+      </div>
+
       <section className="px-4 pt-20 pb-48">
         <div className="container mx-auto">
-          <PageTitle section="Our Team" heading="Here are our heroes">
+          <PageTitle section="About Me" heading="My Experiences">
             According to the National Oceanic and Atmospheric Administration,
             Ted, Scambos, NSIDClead scentist, puts the potentially record
             maximum.
           </PageTitle>
         </div>
       </section>
-      <section className="relative bg-white py-24 px-4">
-        <div className="container mx-auto">
-          <PageTitle section="Co-Working" heading="Build something">
-            Put the potentially record low maximum sea ice extent tihs year down
-            to low ice. According to the National Oceanic and Atmospheric
-            Administration, Ted, Scambos.
-          </PageTitle>
-
-          <PageTitle section="Contact Us" heading="Want to work with us?">
-            Complete this form and we will get back to you in 24 hours.
-          </PageTitle>
-        </div>
-      </section>
-      <div className="bg-white">{/* <Footer /> */}</div>
     </>
   );
 }

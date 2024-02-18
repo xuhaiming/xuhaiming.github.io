@@ -8,15 +8,13 @@ import { Color, SRGBColorSpace } from "three";
 function Stars() {
   const ref = useRef<any>();
   const [sphere] = useState(() =>
-    inSphere(new Float32Array(5400), { radius: 1.5 })
+    inSphere(new Float32Array(6000), { radius: 1.1 })
   );
-  // Create a buffer for the colors
   const [colors] = useState(() => {
     const array = new Float32Array(sphere.length);
     for (let i = 0; i < sphere.length; i += 3) {
-      // Assign a random color to each point based on the temperature
-      const color = new Color(); // Use THREE.Color instead of Color
-      const temperature = Math.random() * 18000 + 4800; // A random value between 3000 and 25000
+      const color = new Color();
+      const temperature = Math.random() * 18000 + 4800;
 
       const hue =
         temperature < 5000
@@ -25,9 +23,9 @@ function Stars() {
             ? 0.08
             : temperature < 7000
               ? 0.15
-              : 0.6; // A value between 0 and 0.6 based on the temperature
-      const saturation = Math.random() * 0.2 + 0.8; // A random value between 0.8 and 1
-      const lightness = Math.random() * 0.2 + 0.2; // A random value between 0.8 and 1
+              : 0.6;
+      const saturation = Math.random() * 0.2 + 0.8;
+      const lightness = Math.random() * 0.2 + 0.2;
       color.setHSL(hue, saturation, lightness);
       color.toArray(array, i);
     }
@@ -35,8 +33,8 @@ function Stars() {
   });
 
   useFrame((_state, delta) => {
-    ref.current.rotation.x -= delta / 20;
-    ref.current.rotation.y -= delta / 30;
+    ref.current.rotation.x -= delta / 60;
+    ref.current.rotation.y -= delta / 90;
   });
 
   return (
@@ -50,7 +48,7 @@ function Stars() {
       >
         <PointMaterial
           transparent
-          vertexColors // Enable vertex colors for the material
+          vertexColors
           size={0.005}
           sizeAttenuation={true}
           depthWrite={false}
