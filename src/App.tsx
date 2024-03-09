@@ -8,13 +8,13 @@ import {
   CardFooter,
   Link,
 } from "@nextui-org/react";
-import { FingerPrintIcon } from "@heroicons/react/24/solid";
-import bg from "./assets/bg2.jpg";
-import StarsModel from "./components/threeModels/StarsModel";
+import StarsModel from "./components/ThreeModels/StarsModel";
 import {
   GalleryModel,
   galleryImages,
-} from "./components/threeModels/GalleryModel";
+} from "./components/ThreeModels/GalleryModel";
+import TechStacks from "./components/TechStacks";
+import bg from "./assets/bg2.jpg";
 
 function App() {
   return (
@@ -27,24 +27,24 @@ function App() {
         <div className="max-w-8xl container relative mx-auto">
           <div className="flex flex-wrap items-center">
             <div className="ml-auto mr-auto w-full px-4 text-center lg:w-8/12">
-              <div color="white" className="mb-6 font-black">
-                Haiming Pages
-              </div>
-              <div color="white" className="opacity-80">
+              <h1 className="mb-8 text-white text-5xl">Haiming Pages</h1>
+              <h2 className="text-white text-base opacity-80">
                 Welcome to my personal website created by Haiming Xu
-              </div>
+              </h2>
             </div>
           </div>
         </div>
       </div>
 
-      <section className="-mt-32 bg-white px-4 pb-20 pt-4">
+      <TechStacks />
+
+      <section className="hidden mt-32 bg-white px-4 pb-20 pt-4">
+        <div className="container mx-auto">
+          <div className="text-4xl text-center">About Me</div>
+        </div>
         <div className="container mx-auto">
           <div className="mt-32 flex flex-wrap items-center">
-            <div className="mx-auto -mt-8 w-full px-4 md:w-5/12">
-              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-gray-900 p-2 text-center shadow-lg">
-                <FingerPrintIcon className="h-8 w-8 text-white " />
-              </div>
+            <div className="mx-auto w-full px-4 md:w-5/12">
               <div className="mb-3 font-bold" color="blue-gray">
                 Working with us is a pleasure
               </div>
@@ -117,8 +117,14 @@ function App() {
         </div>
       </section>
 
-      <div style={{ height: 500 }}>
+      <div className="h-[300px] lg:h-[800px]">
         <GalleryModel images={galleryImages} />
+      </div>
+
+      <div className="py-8">
+        <div className="block text-center text-gray-800 text-sm">
+          © Haiming Pages {new Date().getFullYear()}
+        </div>
       </div>
     </>
   );
