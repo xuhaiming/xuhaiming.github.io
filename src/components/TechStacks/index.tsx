@@ -25,7 +25,7 @@ const getColumns = (groupNum: number) => {
 };
 
 const CONTAINER_HEIGHT = 600;
-const CONTENT_HEIGHT = 2120;
+const CONTENT_HEIGHT = 2220;
 
 const COLUMNS = getColumns(5);
 
@@ -57,7 +57,7 @@ function TechStacks() {
           style={{ height: CONTAINER_HEIGHT }}
           className="overflow-hidden px-8"
         >
-          <div className="flex justify-between ">
+          <div className="flex justify-between py-[50px]">
             {COLUMNS.map((column, index) => (
               <motion.div
                 key={Math.random().toString()}
