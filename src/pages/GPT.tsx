@@ -8,23 +8,26 @@ function GptPage() {
 
   const onSend = async () => {
     setIsSending(true);
-    const response = await fetch("http://localhost:3040/v1/chat/completions", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer my_gpt_auth",
-      },
-      method: "POST",
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        stream: false,
-      }),
-    });
+    const response = await fetch(
+      "https://haiminggpt35.azurewebsites.net/v1/chat/completions",
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer my_gpt_auth_${Math.random()}`,
+        },
+        method: "POST",
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          stream: false,
+        }),
+      }
+    );
 
     const responseJson = await response.json();
 
