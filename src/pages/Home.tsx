@@ -8,15 +8,15 @@ import {
   CardFooter,
   Link,
 } from "@nextui-org/react";
-import StarsModel from "./components/ThreeModels/StarsModel";
+import StarsModel from "../components/ThreeModels/StarsModel";
 import {
   GalleryModel,
   galleryImages,
-} from "./components/ThreeModels/GalleryModel";
-import TechStacks from "./components/TechStacks";
-import bg from "./assets/bg2.jpg";
+} from "../components/ThreeModels/GalleryModel";
+import TechStacks from "../components/TechStacks";
+import bg from "../assets/bg2.jpg";
 
-function App() {
+function Home() {
   return (
     <>
       <div className="relative flex h-screen content-center items-center justify-center pt-16 pb-32">
@@ -130,4 +130,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home;
