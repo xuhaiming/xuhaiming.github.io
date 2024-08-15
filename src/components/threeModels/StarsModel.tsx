@@ -11,11 +11,22 @@ interface StarsModelProps {
 }
 
 function TitleAndDescription({ title, description }: StarsModelProps) {
+  const titleRef = useRef<any>();
+  const descriptionRef = useRef<any>();
+
+  useFrame((state) => {
+    if (titleRef.current && descriptionRef.current) {
+      titleRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
+      descriptionRef.current.position.y = Math.cos(state.clock.elapsedTime * 0.5) * 0.05;
+    }
+  });
+
   return (
-    <group position={[0, 0, -0.5]}>
+    <group position={[0, 0, 0]}>
       <Text
-        position={[0, 0.2, 0]}
-        fontSize={0.1}
+        ref={titleRef}
+        position={[0, 0.4, 0]}
+        fontSize={0.15}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
@@ -23,12 +34,13 @@ function TitleAndDescription({ title, description }: StarsModelProps) {
         {title}
       </Text>
       <Text
-        position={[0, -0.1, 0]}
-        fontSize={0.04}
+        ref={descriptionRef}
+        position={[0, 0.1, 0]}
+        fontSize={0.06}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        maxWidth={1}
+        maxWidth={1.5}
         opacity={0.8}
       >
         {description}
@@ -93,7 +105,7 @@ function Stars() {
 
 export default function StarsModel({ title, description }: StarsModelProps) {
   return (
-    <Canvas camera={{ position: [0, 0, 1] }}>
+    <Canvas camera={{ position: [0, 0, 1.5] }}>
       <color attach="background" args={["black"]} />
       <Stars />
       <TitleAndDescription title={title} description={description} />

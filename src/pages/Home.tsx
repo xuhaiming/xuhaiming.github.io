@@ -26,7 +26,6 @@ function Home() {
             description="Welcome to my personal website created by Haiming Xu"
           />
         </div>
-        <div className="absolute top-0 h-full w-full bg-black/60 bg-cover bg-center" />
       </div>
 
       <TechStacks />
