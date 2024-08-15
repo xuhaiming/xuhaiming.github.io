@@ -1,9 +1,41 @@
 /* eslint-disable react/no-unknown-property, no-nested-ternary */
 import { useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
+import { Points, PointMaterial, Text } from "@react-three/drei";
 import { inSphere } from "maath/random";
 import { Color, SRGBColorSpace } from "three";
+
+interface StarsModelProps {
+  title: string;
+  description: string;
+}
+
+function TitleAndDescription({ title, description }: StarsModelProps) {
+  return (
+    <group position={[0, 0, -0.5]}>
+      <Text
+        position={[0, 0.2, 0]}
+        fontSize={0.1}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {title}
+      </Text>
+      <Text
+        position={[0, -0.1, 0]}
+        fontSize={0.04}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={1}
+        opacity={0.8}
+      >
+        {description}
+      </Text>
+    </group>
+  );
+}
 
 function Stars() {
   const ref = useRef<any>();
@@ -59,11 +91,12 @@ function Stars() {
   );
 }
 
-export default function StarsModel() {
+export default function StarsModel({ title, description }: StarsModelProps) {
   return (
     <Canvas camera={{ position: [0, 0, 1] }}>
       <color attach="background" args={["black"]} />
       <Stars />
+      <TitleAndDescription title={title} description={description} />
     </Canvas>
   );
 }

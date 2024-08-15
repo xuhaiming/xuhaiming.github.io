@@ -21,19 +21,12 @@ function Home() {
     <>
       <div className="relative flex h-screen content-center items-center justify-center pt-16 pb-32">
         <div className="absolute top-0 h-full w-full">
-          <StarsModel />
+          <StarsModel
+            title="Haiming Pages"
+            description="Welcome to my personal website created by Haiming Xu"
+          />
         </div>
         <div className="absolute top-0 h-full w-full bg-black/60 bg-cover bg-center" />
-        <div className="max-w-8xl container relative mx-auto">
-          <div className="flex flex-wrap items-center">
-            <div className="ml-auto mr-auto w-full px-4 text-center lg:w-8/12">
-              <h1 className="mb-8 text-white text-5xl">Haiming Pages</h1>
-              <h2 className="text-white text-base opacity-80">
-                Welcome to my personal website created by Haiming Xu
-              </h2>
-            </div>
-          </div>
-        </div>
       </div>
 
       <TechStacks />
