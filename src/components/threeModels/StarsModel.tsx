@@ -16,8 +16,10 @@ function TitleAndDescription({ title, description }: StarsModelProps) {
 
   useFrame((state) => {
     if (titleRef.current && descriptionRef.current) {
-      titleRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
-      descriptionRef.current.position.y = Math.cos(state.clock.elapsedTime * 0.5) * 0.05;
+      titleRef.current.position.y =
+        Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
+      descriptionRef.current.position.y =
+        Math.cos(state.clock.elapsedTime * 0.5) * 0.05;
     }
   });
 
@@ -26,7 +28,7 @@ function TitleAndDescription({ title, description }: StarsModelProps) {
       <Text
         ref={titleRef}
         position={[0, 0.4, 0]}
-        fontSize={0.15}
+        fontSize={0.12}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
@@ -41,7 +43,6 @@ function TitleAndDescription({ title, description }: StarsModelProps) {
         anchorX="center"
         anchorY="middle"
         maxWidth={1.5}
-        opacity={0.8}
       >
         {description}
       </Text>
