@@ -1,9 +1,9 @@
 /* eslint-disable react/no-unknown-property, no-nested-ternary */
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Points, PointMaterial, Text, useTexture } from "@react-three/drei";
 import { inSphere } from "maath/random";
-import { Color, AdditiveBlending } from "three";
+import { Color, AdditiveBlending, CanvasTexture, Mesh, Points as ThreePoints } from "three";
 
 interface StarsModelProps {
   title: string;
@@ -11,8 +11,8 @@ interface StarsModelProps {
 }
 
 function TitleAndDescription({ title, description }: StarsModelProps) {
-  const titleRef = useRef<any>();
-  const descriptionRef = useRef<any>();
+  const titleRef = useRef<Mesh>(null);
+  const descriptionRef = useRef<Mesh>(null);
 
   useFrame((state) => {
     if (titleRef.current && descriptionRef.current) {
@@ -85,25 +85,25 @@ function blackbodyToHex(temperature: number): number {
   return (r << 16) | (g << 8) | b;
 }
 
-function createStarTexture() {
+const createStarTexture = useCallback(() => {
   const canvas = document.createElement('canvas');
   canvas.width = 32;
   canvas.height = 32;
   const ctx = canvas.getContext('2d');
-  const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.3)');
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, 32, 32);
-  return canvas;
-}
+  if (ctx) {
+    const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.3)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 32, 32);
+  }
+  return new CanvasTexture(canvas);
+}, []);
 
 function Stars() {
-  const ref = useRef<any>();
-  const [sphere] = useState(() =>
-    inSphere(new Float32Array(6000), { radius: 1.1 })
-  );
+  const ref = useRef<ThreePoints>(null);
+  const [sphere] = useState(() => inSphere(new Float32Array(6000), { radius: 1.1 }));
   const [colors, setColors] = useState(() => {
     const array = new Float32Array(sphere.length);
     for (let i = 0; i < sphere.length; i += 3) {
@@ -118,16 +118,19 @@ function Stars() {
   const starTexture = useTexture(createStarTexture());
 
   useFrame((_state, delta) => {
-    ref.current.rotation.x -= delta / 60;
-    ref.current.rotation.y -= delta / 90;
-
-    for (let i = 0; i < colors.length; i += 3) {
-      const twinkle = Math.random() * 0.1 + 0.9;
-      colors[i] *= twinkle;
-      colors[i + 1] *= twinkle;
-      colors[i + 2] *= twinkle;
+    if (ref.current) {
+      ref.current.rotation.x -= delta / 60;
+      ref.current.rotation.y -= delta / 90;
     }
-    setColors([...colors]);
+
+    const newColors = new Float32Array(colors);
+    for (let i = 0; i < newColors.length; i += 3) {
+      const twinkle = Math.random() * 0.1 + 0.9;
+      newColors[i] *= twinkle;
+      newColors[i + 1] *= twinkle;
+      newColors[i + 2] *= twinkle;
+    }
+    setColors(newColors);
   });
 
   return (
