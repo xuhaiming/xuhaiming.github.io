@@ -16,7 +16,7 @@ function TitleAndDescription({ title, description }: StarsModelProps) {
       <Text
         position={[0, 0.2, 0]}
         fontSize={0.1}
-        color="white"
+        color="#ffffff"
         anchorX="center"
         anchorY="middle"
       >
@@ -25,7 +25,7 @@ function TitleAndDescription({ title, description }: StarsModelProps) {
       <Text
         position={[0, -0.1, 0]}
         fontSize={0.04}
-        color="white"
+        color="#ffffff"
         anchorX="center"
         anchorY="middle"
         maxWidth={1}
