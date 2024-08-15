@@ -4,7 +4,6 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Points, PointMaterial, Text, useTexture } from "@react-three/drei";
 import { inSphere } from "maath/random";
 import { Color, AdditiveBlending } from "three";
-import starImg from "../../assets/bg1.jpg";
 
 interface StarsModelProps {
   title: string;
@@ -86,6 +85,20 @@ function blackbodyToHex(temperature: number): number {
   return (r << 16) | (g << 8) | b;
 }
 
+function createStarTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.3)');
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 32, 32);
+  return canvas;
+}
+
 function Stars() {
   const ref = useRef<any>();
   const [sphere] = useState(() =>
@@ -102,7 +115,7 @@ function Stars() {
     return array;
   });
 
-  const starTexture = useTexture(starImg);
+  const starTexture = useTexture(createStarTexture());
 
   useFrame((_state, delta) => {
     ref.current.rotation.x -= delta / 60;
