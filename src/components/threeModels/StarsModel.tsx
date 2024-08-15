@@ -4,6 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Points, PointMaterial, Text, useTexture } from "@react-three/drei";
 import { inSphere } from "maath/random";
 import { Color, AdditiveBlending } from "three";
+import starImg from "../../assets/bg1.jpg";
 
 interface StarsModelProps {
   title: string;
@@ -56,11 +57,29 @@ function blackbodyToHex(temperature: number): number {
 
   if (x <= 66) {
     r = 255;
-    g = Math.min(Math.max(Math.round(99.4708025861 * Math.log(x) - 161.1195681661), 0), 255);
-    b = x <= 19 ? 0 : Math.min(Math.max(Math.round(138.5177312231 * Math.log(x - 10) - 305.0447927307), 0), 255);
+    g = Math.min(
+      Math.max(Math.round(99.4708025861 * Math.log(x) - 161.1195681661), 0),
+      255
+    );
+    b =
+      x <= 19
+        ? 0
+        : Math.min(
+            Math.max(
+              Math.round(138.5177312231 * Math.log(x - 10) - 305.0447927307),
+              0
+            ),
+            255
+          );
   } else {
-    r = Math.min(Math.max(Math.round(329.698727446 * Math.pow(x - 60, -0.1332047592)), 0), 255);
-    g = Math.min(Math.max(Math.round(288.1221695283 * Math.pow(x - 60, -0.0755148492)), 0), 255);
+    r = Math.min(
+      Math.max(Math.round(329.698727446 * Math.pow(x - 60, -0.1332047592)), 0),
+      255
+    );
+    g = Math.min(
+      Math.max(Math.round(288.1221695283 * Math.pow(x - 60, -0.0755148492)), 0),
+      255
+    );
     b = 255;
   }
 
@@ -83,12 +102,12 @@ function Stars() {
     return array;
   });
 
-  const starTexture = useTexture("/star.png");
+  const starTexture = useTexture(starImg);
 
   useFrame((_state, delta) => {
     ref.current.rotation.x -= delta / 60;
     ref.current.rotation.y -= delta / 90;
-    
+
     for (let i = 0; i < colors.length; i += 3) {
       const twinkle = Math.random() * 0.1 + 0.9;
       colors[i] *= twinkle;
