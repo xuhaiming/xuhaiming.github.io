@@ -8,11 +8,11 @@ import {
   CardFooter,
   Link,
 } from "@nextui-org/react";
-import StarsModel from "../components/ThreeModels/StarsModel";
+import StarsModel from "../components/threeModels/StarsModel";
 import {
   GalleryModel,
   galleryImages,
-} from "../components/ThreeModels/GalleryModel";
+} from "../components/threeModels/GalleryModel";
 import TechStacks from "../components/TechStacks";
 import bg from "../assets/bg2.jpg";
 
