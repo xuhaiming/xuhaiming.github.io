@@ -50,7 +50,7 @@ function TechStacks() {
   const ICON_SIZE = 170;
 
   return (
-    <section className="bg-red">
+    <section className="bg-white">
       <div className="container mx-auto py-32">
         <div className="text-4xl text-center mb-24">My Technical Stacks</div>
 

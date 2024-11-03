@@ -9,10 +9,10 @@ import {
   Link,
 } from "@nextui-org/react";
 import StarsModel from "../components/threeModels/StarsModel";
-import {
-  GalleryModel,
-  galleryImages,
-} from "../components/threeModels/GalleryModel";
+// import {
+//   GalleryModel,
+//   galleryImages,
+// } from "../components/threeModels/GalleryModel";
 import TechStacks from "../components/TechStacks";
 import bg from "../assets/bg2.jpg";
 
@@ -27,9 +27,9 @@ function Home() {
 
       <TechStacks />
 
-      <div className="h-[300px] lg:h-[800px]">
+      {/* <div className="h-[300px] lg:h-[800px]">
         <GalleryModel images={galleryImages} />
-      </div>
+      </div> */}
 
       <section className="hidden mt-32 bg-white px-4 pb-20 pt-4">
         <div className="container mx-auto">
@@ -110,7 +110,7 @@ function Home() {
         </div>
       </section>
 
-      <div className="py-8">
+      <div className="py-8 bg-white">
         <div className="block text-center text-gray-800 text-sm">
           © Haiming Pages {new Date().getFullYear()}
         </div>
