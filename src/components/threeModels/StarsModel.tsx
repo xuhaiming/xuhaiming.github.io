@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property, no-nested-ternary */
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Points, PointMaterial, Text } from "@react-three/drei";
 import { inSphere } from "maath/random";
@@ -97,31 +97,83 @@ function Stars() {
   );
 }
 
+function TextArea() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0, z: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check if device has orientation support and screen resolution
+    const isMobileDevice = window.DeviceOrientationEvent !== undefined;
+    const isMobileResolution = window.innerWidth <= 768; // Common mobile breakpoint
+    setIsMobile(isMobileDevice && isMobileResolution);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      const beta = event.beta ? event.beta : 0; // X-axis rotation (-180 to 180)
+      const gamma = event.gamma ? event.gamma : 0; // Y-axis rotation (-90 to 90)
+
+      // Convert orientation angles to normalized coordinates
+      const x = (gamma / 90) * 100;
+      const y = (beta / 180) * 100;
+      const z = Math.abs(x * y) * 500;
+
+      setMousePosition({ x, y, z });
+    };
+
+    window.addEventListener("deviceorientation", handleOrientation);
+    return () =>
+      window.removeEventListener("deviceorientation", handleOrientation);
+  }, [isMobile]);
+
+  useFrame(({ mouse }) => {
+    if (isMobile) return; // Skip mouse tracking on mobile
+
+    // Convert mouse coordinates from [-1, 1] to desired text movement range
+    const x = mouse.x * 100; // Adjust multiplier to control movement range
+    const y = mouse.y * 100;
+    const z = Math.abs(mouse.x * mouse.y) * 500; // Z movement based on x/y position
+    setMousePosition({ x, y, z });
+  });
+
+  return (
+    <group position={[0, 0.2, -999]}>
+      <Text
+        fontSize={50}
+        color="#f5f5f5"
+        anchorX="center"
+        anchorY="middle"
+        position={[mousePosition.x, mousePosition.y, mousePosition.z]}
+        fillOpacity={0.9}
+        strokeWidth={1}
+        strokeColor="#bdbdbd"
+      >
+        Haiming Pages
+      </Text>
+      <Text
+        fontSize={25}
+        color="#f5f5f5"
+        anchorX="center"
+        anchorY="middle"
+        position={[mousePosition.x, mousePosition.y - 80, mousePosition.z]}
+        fillOpacity={0.7}
+        strokeWidth={0.5}
+        strokeColor="#bdbdbd"
+      >
+        Welcome to my personal website created by Haiming Xu
+      </Text>
+    </group>
+  );
+}
+
 export default function StarsModel() {
   return (
     <Canvas camera={{ position: [0, 0, 1] }}>
       <color attach="background" args={["black"]} />
       <Stars />
-      <group position={[0, 0.2, -16]}>
-        <Text
-          fontSize={1}
-          color="white"
-          anchorX="center"
-          anchorY="middle"
-          position={[0, 0, 0]}
-        >
-          Haiming Pages
-        </Text>
-        <Text
-          fontSize={0.5}
-          color="white"
-          anchorX="center"
-          anchorY="middle"
-          position={[0, -1.5, 0]}
-        >
-          Welcome to my personal website created by Haiming Xu
-        </Text>
-      </group>
+      <TextArea />
     </Canvas>
   );
 }
