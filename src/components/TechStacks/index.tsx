@@ -24,7 +24,7 @@ const getColumns = (groupNum: number) => {
   return result;
 };
 
-const CONTAINER_HEIGHT = 600;
+const CONTAINER_HEIGHT = window.innerHeight - 256 - 40 - 96;
 const CONTENT_HEIGHT = 2220;
 
 const COLUMNS = getColumns(5);
@@ -36,12 +36,14 @@ function TechStacks() {
     offset: ["start end", "end start"],
   });
   const moveY = useTransform(
-    () => -scrollYProgress.get() * (CONTENT_HEIGHT - CONTAINER_HEIGHT)
+    scrollYProgress,
+    [0, 1],
+    [0, -(CONTENT_HEIGHT - CONTAINER_HEIGHT)]
   );
   const moveReverseY = useTransform(
-    () =>
-      -CONTENT_HEIGHT +
-      scrollYProgress.get() * (CONTENT_HEIGHT + CONTAINER_HEIGHT)
+    scrollYProgress,
+    [0, 1],
+    [-CONTENT_HEIGHT, CONTAINER_HEIGHT]
   );
 
   const CARD_SIZE = 200;
@@ -60,13 +62,14 @@ function TechStacks() {
           <div className="flex justify-between py-[50px]">
             {COLUMNS.map((column, index) => (
               <motion.div
-                key={Math.random().toString()}
+                // eslint-disable-next-line react/no-array-index-key
+                key={`key-${index}`}
                 className="relative"
                 style={{ y: index % 2 ? moveY : moveReverseY }}
               >
                 {column.map((item) => (
                   <Card
-                    key={Math.random().toString()}
+                    key={item.text}
                     isFooterBlurred
                     radius="lg"
                     className="border-none my-8"

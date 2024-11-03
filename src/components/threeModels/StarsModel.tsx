@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property, no-nested-ternary */
 import { useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
+import { Points, PointMaterial, Text } from "@react-three/drei";
 import { inSphere } from "maath/random";
 import { Color, SRGBColorSpace } from "three";
 
@@ -14,18 +14,56 @@ function Stars() {
     const array = new Float32Array(sphere.length);
     for (let i = 0; i < sphere.length; i += 3) {
       const color = new Color();
-      const temperature = Math.random() * 18000 + 4800;
+      // Temperature range for main sequence stars (in Kelvin)
+      const temperature = Math.random() * 48000 + 2000; // From red dwarfs (~2000K) to hottest blue giants (~50000K)
 
-      const hue =
-        temperature < 5000
-          ? 0
-          : temperature < 6000
-            ? 0.08
-            : temperature < 7000
-              ? 0.15
-              : 0.6;
-      const saturation = Math.random() * 0.2 + 0.8;
-      const lightness = Math.random() * 0.2 + 0.2;
+      // Convert temperature to RGB using more realistic stellar classification
+      let hue;
+      let saturation;
+      let lightness;
+
+      if (temperature < 3500) {
+        // Class M (Deep Red)
+        hue = 0;
+        saturation = 0.95;
+        lightness = 0.4;
+      } else if (temperature < 5000) {
+        // Class K (Orange-Red)
+        hue = 0.05;
+        saturation = 0.9;
+        lightness = 0.5;
+      } else if (temperature < 6000) {
+        // Class G (Yellow)
+        hue = 0.15;
+        saturation = 0.85;
+        lightness = 0.6;
+      } else if (temperature < 7500) {
+        // Class F (Yellow-White)
+        hue = 0.17;
+        saturation = 0.7;
+        lightness = 0.7;
+      } else if (temperature < 10000) {
+        // Class A (White with blue tint)
+        hue = 0.6;
+        saturation = 0.3;
+        lightness = 0.8;
+      } else if (temperature < 30000) {
+        // Class B (Blue-White)
+        hue = 0.6;
+        saturation = 0.6;
+        lightness = 0.75;
+      } else {
+        // Class O (Bright Blue)
+        hue = 0.65;
+        saturation = 0.8;
+        lightness = 0.7;
+      }
+
+      // Add some random variation to make stars more unique
+      hue += (Math.random() - 0.5) * 0.05;
+      saturation *= 0.9 + Math.random() * 0.2;
+      lightness *= 0.9 + Math.random() * 0.2;
+
       color.setHSL(hue, saturation, lightness);
       color.toArray(array, i);
     }
@@ -64,6 +102,26 @@ export default function StarsModel() {
     <Canvas camera={{ position: [0, 0, 1] }}>
       <color attach="background" args={["black"]} />
       <Stars />
+      <group position={[0, 0.2, -16]}>
+        <Text
+          fontSize={1}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          position={[0, 0, 0]}
+        >
+          Haiming Pages
+        </Text>
+        <Text
+          fontSize={0.5}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          position={[0, -1.5, 0]}
+        >
+          Welcome to my personal website created by Haiming Xu
+        </Text>
+      </group>
     </Canvas>
   );
 }

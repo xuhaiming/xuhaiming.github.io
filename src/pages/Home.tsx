@@ -23,20 +23,13 @@ function Home() {
         <div className="absolute top-0 h-full w-full">
           <StarsModel />
         </div>
-        <div className="absolute top-0 h-full w-full bg-black/60 bg-cover bg-center" />
-        <div className="max-w-8xl container relative mx-auto">
-          <div className="flex flex-wrap items-center">
-            <div className="ml-auto mr-auto w-full px-4 text-center lg:w-8/12">
-              <h1 className="mb-8 text-white text-5xl">Haiming Pages</h1>
-              <h2 className="text-white text-base opacity-80">
-                Welcome to my personal website created by Haiming Xu
-              </h2>
-            </div>
-          </div>
-        </div>
       </div>
 
       <TechStacks />
+
+      <div className="h-[300px] lg:h-[800px]">
+        <GalleryModel images={galleryImages} />
+      </div>
 
       <section className="hidden mt-32 bg-white px-4 pb-20 pt-4">
         <div className="container mx-auto">
@@ -116,10 +109,6 @@ function Home() {
           </div>
         </div>
       </section>
-
-      <div className="h-[300px] lg:h-[800px]">
-        <GalleryModel images={galleryImages} />
-      </div>
 
       <div className="py-8">
         <div className="block text-center text-gray-800 text-sm">
