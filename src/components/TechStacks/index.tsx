@@ -54,7 +54,7 @@ function TechStacks() {
   const ICON_SIZE = isMobileResolution() ? 70 : 170;
 
   return (
-    <SectionLayout>
+    <SectionLayout title="My Technical Stacks">
       <div
         ref={ref}
         style={{ height: CONTAINER_HEIGHT }}
@@ -73,7 +73,7 @@ function TechStacks() {
                   key={item.text}
                   isFooterBlurred
                   radius="lg"
-                  className="border-none my-8"
+                  className="border-none my-8 bg-gray-50"
                   style={{ width: CARD_SIZE, height: CARD_SIZE }}
                 >
                   <div
@@ -85,13 +85,13 @@ function TechStacks() {
                   <CardFooter
                     className={`justify-center before:bg-white/10 border-white/20 overflow-hidden absolute before:rounded-xl rounded-large bottom-0 shadow-small z-10 ${isMobileResolution() ? "p-1" : "p-3"}`}
                   >
-                    <p className="font-medium text-black">
+                    <div className="font-medium text-black">
                       <div
                         className={isMobileResolution() ? "text-sm" : "text-md"}
                       >
                         {item.text}
                       </div>
-                    </p>
+                    </div>
                   </CardFooter>
                 </Card>
               ))}

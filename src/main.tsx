@@ -9,7 +9,11 @@ import "./index.css";
 const router = createHashRouter([
   {
     path: "/",
-    element: <Home />,
+    element: (
+      <main className="dark text-foreground bg-background">
+        <Home />
+      </main>
+    ),
   },
   {
     path: "/gpt",

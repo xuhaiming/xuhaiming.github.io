@@ -114,7 +114,7 @@ function TextArea() {
   return (
     <group position={[0, 0.2, -999]}>
       <Text
-        fontSize={50}
+        fontSize={80}
         color="#f5f5f5"
         anchorX="center"
         anchorY="middle"
@@ -126,11 +126,11 @@ function TextArea() {
         Haiming Pages
       </Text>
       <Text
-        fontSize={25}
+        fontSize={40}
         color="#f5f5f5"
         anchorX="center"
         anchorY="middle"
-        position={[mousePosition.x, mousePosition.y - 80, mousePosition.z]}
+        position={[mousePosition.x, mousePosition.y - 120, mousePosition.z]}
         fillOpacity={0.7}
         strokeWidth={0.5}
         strokeColor="#bdbdbd"
