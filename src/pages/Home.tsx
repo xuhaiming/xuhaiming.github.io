@@ -6,6 +6,7 @@ import StarsModel from "../components/threeModels/StarsModel";
 import TechStacks from "../components/TechStacks";
 import MyProjects from "../components/MyProjects";
 import AboutMe from "../components/AboutMe";
+import MyProfile from "../components/MyProfile";
 
 function Home() {
   return (
@@ -18,6 +19,8 @@ function Home() {
 
       <TechStacks />
 
+      <MyProfile />
+
       <MyProjects />
 
       {/* <div className="h-[300px] lg:h-[800px]">
@@ -26,8 +29,8 @@ function Home() {
 
       <AboutMe />
 
-      <div className="py-8 bg-gray-100">
-        <div className="block text-center text-gray-800 text-sm">
+      <div className="py-8 bg-gray-900">
+        <div className="block text-center text-gray-50 text-sm">
           © Haiming Pages {new Date().getFullYear()}
         </div>
       </div>

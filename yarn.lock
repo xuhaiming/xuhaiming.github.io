@@ -5880,6 +5880,7 @@ __metadata:
     prettier: "npm:^3.2.5"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
+    react-responsive-3d-carousel: "npm:^2.1.1"
     react-router-dom: "npm:^6.22.3"
     tailwindcss: "npm:^3.4.1"
     three: "npm:^0.161.0"
@@ -7679,6 +7680,15 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/dcd523ada602bd0a839c2032cadf0b3e4af55ee85acefee3760976a9cceaa4606927801b093bbb8bf3c2989c71e048f5428c2c6eb9e6681762e86356833d039b
+  languageName: node
+  linkType: hard
+
+"react-responsive-3d-carousel@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "react-responsive-3d-carousel@npm:2.1.1"
+  peerDependencies:
+    react: ">=17.0.0"
+  checksum: 10c0/65e311547d03ee87257e43edff3ef82e4c053193888f7fa4dd2d7bc750b052f74077ed9d61e1254a601cb6efbb5969e8e907cacd795fe27491b56b9d35732625
   languageName: node
   linkType: hard
 

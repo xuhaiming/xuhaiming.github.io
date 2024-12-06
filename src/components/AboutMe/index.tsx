@@ -30,7 +30,7 @@ function AboutMe() {
               Additionally, I have contributed to AI-driven image and video
               generation projects using advanced tools such as Stable Diffusion
               (SD1.5, SDXL, Flux). I have also worked extensively with ComfyUI
-              workflows, including Lora training, ControlNet, IP Adapter, etc.
+              workflows, including Lora, ControlNet, IP Adapter, etc.
             </div>
           </div>
           <div className="mx-auto mt-24 flex w-full justify-center px-4 md:w-4/12 lg:mt-0">
