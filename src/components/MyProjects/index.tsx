@@ -16,7 +16,7 @@ const projectCards = [
   },
   {
     title: "E-Commerce",
-    description: "ToC E-Commerce marketplace websites like Shopee, Burberry",
+    description: "ToC E-Commerce marketplace websites such as Shopee, Burberry",
     image: Project2,
     bgColor: "bg-gradient-to-br from-[#3d2f2a] to-[#4e3b33]",
   },

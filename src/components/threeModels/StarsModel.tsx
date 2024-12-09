@@ -100,9 +100,10 @@ function Stars() {
 
 function TextArea() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0, z: 0 });
+  const isMobile = isMobileResolution();
 
   useFrame(({ mouse }) => {
-    if (isMobileResolution()) return; // Skip mouse tracking on mobile
+    if (isMobile) return; // Skip mouse tracking on mobile
 
     // Convert mouse coordinates from [-1, 1] to desired text movement range
     const x = mouse.x * 100; // Adjust multiplier to control movement range
@@ -114,7 +115,7 @@ function TextArea() {
   return (
     <group position={[0, 0.2, -999]}>
       <Text
-        fontSize={80}
+        fontSize={isMobile ? 50 : 80}
         color="#f5f5f5"
         anchorX="center"
         anchorY="middle"
@@ -126,11 +127,15 @@ function TextArea() {
         Haiming Pages
       </Text>
       <Text
-        fontSize={40}
+        fontSize={isMobile ? 25 : 40}
         color="#f5f5f5"
         anchorX="center"
         anchorY="middle"
-        position={[mousePosition.x, mousePosition.y - 120, mousePosition.z]}
+        position={[
+          mousePosition.x,
+          mousePosition.y - (isMobile ? 90 : 120),
+          mousePosition.z,
+        ]}
         fillOpacity={0.7}
         strokeWidth={0.5}
         strokeColor="#bdbdbd"
