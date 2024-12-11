@@ -74,21 +74,21 @@ function MyProjects() {
     <SectionLayout title="My Projects" backgroundStyle="special">
       <div className="text-center text-black text-lg mb-24 px-4">
         <div>
-          Over the past several years, I have designed and built many successful
-          full-stack applications using the latest technologies. I have created
-          powerful e-commerce systems that work across multiple servers, and
-          built advanced tax calculation systems that can handle large amounts
-          of data quickly and accurately.
+          Over the past several years, I have developed a diverse range of
+          applications, including AI-powered enrichment systems, e-commerce
+          platforms, tax management systems, and media labeling solutions
+          utilizing low-code concepts.
         </div>
 
         <br />
 
         <div>
-          I am skilled at building fast and reliable web applications using
-          React, Node.js, and cloud technologies. Recently, I have worked
-          extensively with AI technologies, creating smart systems using GPT
-          models, fine tuning AI to understand text and images, gathering web
-          data automatically, and building smart search systems with RAG.
+          I possess expertise in developing high-performance and robust web
+          applications utilizing React, Node.js, and cloud computing
+          technologies. Recently, I have been extensively engaged in AI related
+          projects, architecting intelligent systems with GPT models,
+          fine-tuning AI to comprehend text and images, automating web data
+          extraction, and constructing advanced search systems using RAG.
         </div>
       </div>
       <div className="px-4">
