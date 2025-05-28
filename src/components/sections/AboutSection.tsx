@@ -236,7 +236,7 @@ const AboutSection = forwardRef((props, ref) => {
                 playsInline
                 preload="metadata"
               >
-                <source src="/compressed.mp4" type="video/mp4" />
+                <source src="/assets/compressed.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </AspectRatio>

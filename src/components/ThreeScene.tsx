@@ -43,9 +43,9 @@ const HeroScene = () => {
 
     const textureLoader = new THREE.TextureLoader(loadingManager);
     const texturePaths = [
-      "/textures/globe2.jpeg",
-      "./textures/globe2.jpeg",
-      "../public/textures/globe2.jpeg",
+      "/assets/globe2.jpeg",
+      "./assets/globe2.jpeg",
+      "../public/assets/globe2.jpeg",
     ];
 
     let loadAttempted = false;
@@ -490,7 +490,7 @@ const AvatarModel = () => {
   const [hasError, setHasError] = useState(false);
 
   // Always call the hook - React hooks must be called unconditionally
-  const gltf = useGLTF("/avatar1.glb");
+  const gltf = useGLTF("/assets/avatar1.glb");
 
   useEffect(() => {
     // Handle any loading errors
@@ -519,7 +519,7 @@ const AvatarModel = () => {
 };
 
 // Preload the avatar model for better performance
-useGLTF.preload("/avatar1.glb");
+useGLTF.preload("/assets/avatar1.glb");
 
 const SkillsScene = () => {
   const cubesRef = useRef<THREE.Group>(null);
@@ -629,7 +629,11 @@ const ProjectsScene = ({
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
-    const projectImages = ["/project1.png", "/project2.png", "/project3.png"];
+    const projectImages = [
+      "/assets/project1.png",
+      "/assets/project2.png",
+      "/assets/project3.png",
+    ];
 
     const loadedTextures: THREE.Texture[] = [];
     let loadedCount = 0;
@@ -992,12 +996,12 @@ const ContactScene = () => {
 
     const textureLoader = new THREE.TextureLoader(loadingManager);
     const textureSources = [
-      "/haiming_linkedin.png",
-      "/haiming_linkedin.png",
-      "/haiming_linkedin.png",
-      "/haiming_linkedin.png",
-      "/haiming_linkedin.png",
-      "/haiming_linkedin.png",
+      "/assets/haiming_linkedin.png",
+      "/assets/haiming_linkedin.png",
+      "/assets/haiming_linkedin.png",
+      "/assets/haiming_linkedin.png",
+      "/assets/haiming_linkedin.png",
+      "/assets/haiming_linkedin.png",
     ];
 
     const glowSize = 128;
