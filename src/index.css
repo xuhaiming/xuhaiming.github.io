@@ -1,7 +1,95 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 240 30% 5%;
+    --foreground: 210 40% 98%;
+
+    --card: 240 30% 5%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 30% 5%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 185 100% 50%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 260 100% 60%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 240 30% 10%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 326 72% 70%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 30% 15%;
+    --input: 240 30% 15%;
+    --ring: 185 100% 50%;
+
+    --radius: 0.5rem;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background-color: #000;
+  @apply bg-space-dark text-white min-h-screen font-sans overflow-x-hidden;
+  overscroll-behavior: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-space;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-neon-blue/50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neon-blue;
+}
+
+.text-gradient {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink;
+}
+
+.clip-card {
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+}
+
+.parallax-layer {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.parallax-text {
+  transform: translateZ(0);
+  transition: transform 0.3s ease;
+}
+
+/* Video Skeleton Animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(200%) skewX(-12deg); }
+}
+
+.video-skeleton-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+.video-skeleton-delay-200 {
+  animation-delay: 200ms;
 }

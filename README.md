@@ -1,3 +1,3 @@
 # Haiming Pages
 
-Personal web page for Haiming Xu.
+The 3D & AI Portfolio Website developed by Haiming Xu
