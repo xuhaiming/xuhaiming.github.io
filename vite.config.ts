@@ -8,6 +8,10 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  root: "src",
+  build: {
+    outDir: "../",
+  },
   plugins: [react()].filter(Boolean),
   resolve: {
     alias: {

@@ -20,10 +20,10 @@ const ContactSection = forwardRef((props, ref) => {
   const profile = {
     name: "Haiming Xu",
     title: "Creative Software Engineer",
-    bio: "Passionate about creating immersive digital experiences that blend cutting-edge technology with beautiful design. With 8+ years of experience in web development and 3D visualization, I help brands stand out with memorable digital solutions.",
+    bio: "A creative software engineer dedicated to crafting immersive digital experiences by integrating cutting-edge technology with elegant design. My expertise in web development and diverse software engineering disciplines enables me to deliver distinctive digital solutions that elevate brand presence.",
     location: "Singapore",
     email: "haiming12322@gmail.com",
-    availability: "Available for freelance projects",
+    availability: "Passion for innovation projects",
     links: {
       github: "https://github.com/xuhaiming",
       linkedin: "https://www.linkedin.com/in/xu-haiming-48502869",
@@ -195,18 +195,12 @@ const ContactSection = forwardRef((props, ref) => {
                   Interactive Portfolio
                 </h3>
                 <p className="text-white/70">
-                  Explore my creative universe through this interactive 3D
-                  visualization. Each element represents a project or skill in
-                  my portfolio.
+                  Scan the QR code on the 3D model to view my detailed LinkedIn
+                  profile.
                 </p>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {[
-                    "WebGL",
-                    "Three.js",
-                    "React Three Fiber",
-                    "Interactive Design",
-                  ].map((tech, i) => (
+                  {["React", "Next.js", "TypeScript", "LLM"].map((tech, i) => (
                     <span
                       key={i}
                       className="inline-block px-3 py-1 text-xs rounded-full bg-space border border-neon-blue/30 hover:border-neon-blue hover:bg-neon-blue/10 transition-colors duration-300"

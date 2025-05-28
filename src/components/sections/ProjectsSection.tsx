@@ -8,23 +8,34 @@ import React, {
 import ThreeScene from "../ThreeScene";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const projects = [
+interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+}
+
+const projects: Project[] = [
   {
-    title: "Immersive 3D Portfolio",
+    title: "AI-powered Product Management System",
     description:
-      "A personal portfolio website with interactive 3D elements and animations",
-    tags: ["Three.js", "React", "WebGL"],
+      "A sophisticated Product Information Management (PIM) system leveraging AI for automated data enrichment, dynamic image generation, and seamless multi-channel content distribution.",
+    tags: ["LLM", "Next.js", "AWS"],
   },
   {
     title: "E-commerce Platform",
     description:
-      "A fully responsive e-commerce platform with animations and modern UI",
-    tags: ["React", "Framer Motion", "Stripe"],
+      "Engineered and delivered robust e-commerce solutions for prominent brands like Shopee and Burberry, focusing on user experience and scalability.",
+    tags: [
+      "Design System",
+      "Performance Optimization",
+      "Scalable Project Architecture",
+    ],
   },
   {
-    title: "Data Visualization Dashboard",
-    description: "Interactive dashboard with real-time data visualization",
-    tags: ["D3.js", "React", "WebSockets"],
+    title: "Training Data Labeling Platform",
+    description:
+      "Developed a comprehensive data labeling platform to streamline the creation of high-quality training datasets for artificial intelligence models.",
+    tags: ["Low Code", "Dynamic Form", "Tencent Cloud"],
   },
 ];
 
@@ -139,7 +150,7 @@ const ProjectsSection = forwardRef((props, ref) => {
               <div
                 ref={sceneRef}
                 className="mt-[-4px]"
-                style={{ height: "608px" }}
+                style={{ height: "684px" }}
               >
                 <ThreeScene
                   sceneType="projects"

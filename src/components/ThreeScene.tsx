@@ -629,11 +629,7 @@ const ProjectsScene = ({
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
-    const projectImages = [
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=1280&h=720",
-      "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&q=80&w=1280&h=720",
-      "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&q=80&w=1280&h=720",
-    ];
+    const projectImages = ["/project1.png", "/project2.png", "/project3.png"];
 
     const loadedTextures: THREE.Texture[] = [];
     let loadedCount = 0;
@@ -891,14 +887,14 @@ const ProjectsScene = ({
 
   return (
     <>
-      <ambientLight intensity={0.3} />
-      <directionalLight position={[5, 5, 5]} intensity={0.8} />
+      <ambientLight intensity={0.8} />
+      <directionalLight position={[5, 5, 5]} intensity={1.2} />
       <directionalLight
         position={[-5, -5, -5]}
-        intensity={0.4}
-        color="#8B5CF6"
+        intensity={0.6}
+        color="#ffffff"
       />
-      <pointLight position={[0, 0, 3]} intensity={0.5} color="#00EEFF" />
+      <pointLight position={[0, 0, 3]} intensity={0.3} color="#ffffff" />
 
       <group ref={groupRef}>
         {loading
@@ -934,16 +930,13 @@ const ProjectsScene = ({
                 {/* Main card with texture */}
                 <mesh>
                   <planeGeometry args={[1, 1, 5, 5]} />
-                  <meshStandardMaterial
+                  <meshBasicMaterial
                     map={textures[i]}
                     transparent
                     opacity={1}
                     side={THREE.DoubleSide}
-                    metalness={0.4}
-                    roughness={0.6}
-                  >
-                    {envMap && <primitive attach="envMap" object={envMap} />}
-                  </meshStandardMaterial>
+                    toneMapped={false}
+                  />
                 </mesh>
 
                 {/* Glowing border for selected card */}
@@ -999,12 +992,12 @@ const ContactScene = () => {
 
     const textureLoader = new THREE.TextureLoader(loadingManager);
     const textureSources = [
-      "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&q=80&w=512&h=512",
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80&w=512&h=512",
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=512&h=512",
-      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80&w=512&h=512",
-      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=512&h=512",
-      "https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&q=80&w=512&h=512",
+      "/haiming_linkedin.png",
+      "/haiming_linkedin.png",
+      "/haiming_linkedin.png",
+      "/haiming_linkedin.png",
+      "/haiming_linkedin.png",
+      "/haiming_linkedin.png",
     ];
 
     const glowSize = 128;

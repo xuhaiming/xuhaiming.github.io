@@ -173,10 +173,10 @@ const AboutSection = forwardRef((props, ref) => {
 
           <div className="md:order-1 space-y-6">
             {[
-              "Hello! I'm a passionate creative developer with expertise in building immersive web experiences.",
-              "With a background in both design and development, I bring a unique perspective to every project, focusing on both aesthetics and functionality.",
-              "I specialize in interactive 3D animations, responsive web design, and creating memorable user experiences that leave a lasting impression.",
-              "When I'm not coding, you can find me exploring new design trends, experimenting with motion graphics, or contributing to open-source projects.",
+              "I am currently serving as the Lead Frontend Engineer at Trustana, where I spearhead the development of AI-driven applications.",
+              "Throughout my career, I have collaborated with renowned companies such as Shopee, Tencent, Burberry, ThoughtWorks, Phillips, and more.",
+              "My expertise predominantly lies in frontend technologies including React, Next.js, and Node.js. However, I also possess substantial experience with backend and AI-related technologies such as AWS serverless architecture, MongoDB, AI agents leveraging OpenAI APIs, Gemini, RAG, and prompt engineering.",
+              "Additionally, I have contributed to AI-driven image, 3D and video generation projects using advanced tools such as Stable Diffusion, Hunyuan, Wan 2.1, Flux. I have also worked extensively with ComfyUI workflows, including Lora, ControlNet, IP Adapter, etc.",
             ].map((text, index) => (
               <p
                 key={index}
@@ -241,7 +241,7 @@ const AboutSection = forwardRef((props, ref) => {
               </video>
             </AspectRatio>
             <p className="text-center text-sm text-gray-400 mt-4">
-              Interactive 3D portfolio demo reel
+              AI generated video with trained LoRA models
             </p>
           </div>
         </div>

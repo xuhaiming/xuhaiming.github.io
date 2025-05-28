@@ -82,8 +82,8 @@ const HeroSection = forwardRef((props, ref) => {
           ref={titleRef}
           className="text-4xl md:text-7xl font-bold mb-6 parallax-text"
         >
-          Creative <span className="text-gradient">Developer</span> <br />&{" "}
-          <span className="text-neon-purple">Designer</span>
+          Creative <span className="text-gradient">Fullstack</span> <br />
+          App <span className="text-neon-purple">Developer</span>
         </h1>
 
         <p

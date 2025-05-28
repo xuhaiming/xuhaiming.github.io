@@ -31,40 +31,40 @@ const skills = [
     items: [
       {
         name: "React",
-        value: 90,
+        value: 100,
         description:
-          "Extensive experience with hooks, context API, and React Router",
+          "Extensive experience with hooks, context API, server components",
       },
       {
-        name: "Three.js",
-        value: 80,
-        description: "Creating immersive 3D scenes and animations for the web",
-      },
-      {
-        name: "CSS/SASS",
-        value: 85,
-        description: "Advanced styling with animations and responsive design",
-      },
-      {
-        name: "JavaScript",
+        name: "Next.js",
         value: 95,
-        description: "Expert knowledge of ES6+ features and best practices",
+        description: "Server-side rendering, routing, and API integration",
+      },
+      {
+        name: "Styling",
+        value: 90,
+        description: "Tailwind CSS, CSS Modules, CSS in JS, SASS, LESS",
+      },
+      {
+        name: "Bundling",
+        value: 90,
+        description: "Webpack, Vite, Rollup, Parcel, etc.",
       },
       {
         name: "TypeScript",
-        value: 85,
+        value: 95,
         description:
           "Building type-safe applications for better maintainability",
       },
       {
-        name: "HTML5",
-        value: 95,
-        description: "Semantic markup and accessibility standards",
+        name: "Monorepos",
+        value: 90,
+        description: "Yarn workspace, PNPM,Lerna, Nx, Turborepo, etc.",
       },
     ],
   },
   {
-    category: "Design",
+    category: "Cloud",
     icon: Compass,
     color: "bg-gradient-to-br from-neon-purple to-neon-pink",
     chartColor: "#F471B5",
@@ -72,30 +72,35 @@ const skills = [
       "Creating visually appealing and user-friendly interfaces with a focus on user experience.",
     items: [
       {
-        name: "UI/UX",
+        name: "AWS",
         value: 85,
-        description: "User-centered design principles and interaction patterns",
-      },
-      {
-        name: "Motion Graphics",
-        value: 75,
-        description: "Creating engaging animations and visual effects",
-      },
-      {
-        name: "3D Modeling",
-        value: 70,
-        description: "Designing basic 3D assets for web applications",
-      },
-      {
-        name: "Figma",
-        value: 90,
-        description: "Collaborative design and prototyping workflows",
-      },
-      {
-        name: "Adobe Suite",
-        value: 80,
         description:
-          "Photoshop, Illustrator, and After Effects for graphic design",
+          "AWS Amplify, S3, Lambda, Step Functions, API Gateway, etc.",
+      },
+      {
+        name: "Google Firebase",
+        value: 80,
+        description: "Firebase Auth, Firestore, Storage, Functions, etc.",
+      },
+      {
+        name: "Supabase",
+        value: 85,
+        description: "Supabase Auth, Postgres, Storage, Functions, etc.",
+      },
+      {
+        name: "Vercel",
+        value: 90,
+        description: "Vercel AI SDK, Edge Functions, etc.",
+      },
+      {
+        name: "Azure",
+        value: 80,
+        description: "Azure App Service, Storage, Functions, Cosmos DB, etc.",
+      },
+      {
+        name: "Tencent Cloud",
+        value: 80,
+        description: "Tencent Cloud Serverless, Storage, Functions, etc.",
       },
     ],
   },
@@ -109,28 +114,33 @@ const skills = [
     items: [
       {
         name: "Node.js",
-        value: 80,
+        value: 100,
         description: "Server-side JavaScript with Express and RESTful APIs",
       },
       {
         name: "Express",
-        value: 85,
+        value: 95,
         description: "Creating scalable web applications and APIs",
       },
       {
         name: "MongoDB",
-        value: 75,
+        value: 85,
         description: "Document-based database design and optimization",
       },
       {
-        name: "GraphQL",
-        value: 70,
-        description: "Building efficient APIs with precise data fetching",
+        name: "Serverless",
+        value: 85,
+        description: "AWS Lambda, Step Functions, API Gateway",
       },
       {
-        name: "Firebase",
+        name: "FastAPI",
+        value: 80,
+        description: "Python-based web framework for building APIs",
+      },
+      {
+        name: "LLM",
         value: 85,
-        description: "Real-time databases, authentication, and cloud functions",
+        description: "OpenAI, Gemini, RAG, Prompt Engineering, etc.",
       },
     ],
   },
@@ -189,16 +199,54 @@ const EnhancedRadarChart = ({
             onMouseLeave={() => setActiveSkill(null)}
           />
           <Tooltip
-            contentStyle={{
-              backgroundColor: "rgba(20, 20, 50, 0.9)",
-              borderColor: "rgba(255, 255, 255, 0.1)",
-              borderRadius: "8px",
-              color: "#ffffff",
-              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                const data = payload[0].payload;
+                return (
+                  <div
+                    style={{
+                      backgroundColor: "rgba(20, 20, 50, 0.9)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "8px",
+                      color: "#ffffff",
+                      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                      padding: "12px",
+                      maxWidth: "250px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        color: "#ffffff",
+                        fontWeight: "bold",
+                        margin: "0 0 4px 0",
+                      }}
+                    >
+                      {data.name}
+                    </p>
+                    <p
+                      style={{
+                        color: "#00EEFF",
+                        margin: "0 0 8px 0",
+                        fontSize: 12,
+                      }}
+                    >
+                      Proficiency: {data.value}%
+                    </p>
+                    <p
+                      style={{
+                        color: "rgba(255, 255, 255, 0.8)",
+                        margin: "0",
+                        fontSize: "12px",
+                        lineHeight: "1.4",
+                      }}
+                    >
+                      {data.description}
+                    </p>
+                  </div>
+                );
+              }
+              return null;
             }}
-            itemStyle={{ color: "#ffffff" }}
-            labelStyle={{ color: "#ffffff", fontWeight: "bold" }}
-            formatter={(value) => [`${value}%`, "Proficiency"]}
           />
           <Legend />
         </RadarChart>
