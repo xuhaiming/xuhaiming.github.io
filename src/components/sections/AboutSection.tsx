@@ -160,7 +160,7 @@ const AboutSection = forwardRef((props, ref) => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div className="md:order-2 relative h-[400px] w-full">
+          <div className="md:order-2 relative h-[500px] w-full">
             <div className="absolute inset-0">
               <ThreeScene sceneType="about" />
             </div>
