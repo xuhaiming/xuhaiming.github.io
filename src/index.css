@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -82,8 +81,12 @@ body {
 
 /* Video Skeleton Animations */
 @keyframes shimmer {
-  0% { transform: translateX(-100%) skewX(-12deg); }
-  100% { transform: translateX(200%) skewX(-12deg); }
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-12deg);
+  }
 }
 
 .video-skeleton-shimmer {
@@ -92,4 +95,48 @@ body {
 
 .video-skeleton-delay-200 {
   animation-delay: 200ms;
+}
+
+/* Mobile Video Optimizations */
+@media (max-width: 768px) {
+  video {
+    /* Prevent video from expanding on mobile */
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover;
+
+    /* Prevent touch interactions that might interfere */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    user-select: none;
+
+    /* Ensure proper rendering on mobile */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* iOS Safari specific fixes */
+  video::-webkit-media-controls {
+    display: none !important;
+  }
+
+  video::-webkit-media-controls-enclosure {
+    display: none !important;
+  }
+}
+
+/* Prevent video controls on all devices when not needed */
+video[controls="false"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+video[controls="false"]::-webkit-media-controls {
+  display: none !important;
+}
+
+video[controls="false"]::-webkit-media-controls-enclosure {
+  display: none !important;
 }

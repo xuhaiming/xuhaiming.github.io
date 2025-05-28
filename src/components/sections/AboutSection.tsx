@@ -7,7 +7,9 @@ import React, {
 } from "react";
 import ThreeScene from "../ThreeScene";
 import VideoSkeleton from "../VideoSkeleton";
+import VideoFallback from "../VideoFallback";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useMobileVideo } from "@/hooks/use-mobile-video";
 
 const AboutSection = forwardRef((props, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,6 +20,17 @@ const AboutSection = forwardRef((props, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoCanPlay, setVideoCanPlay] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+
+  // Use mobile video hook for better mobile support
+  const {
+    isMobileDevice,
+    isIOSDevice,
+    canAutoplay,
+    getVideoAttributes,
+    getVideoStyles,
+    playVideo,
+  } = useMobileVideo();
 
   // Expose the section ref
   useImperativeHandle(ref, () => sectionRef.current);
@@ -126,24 +139,53 @@ const AboutSection = forwardRef((props, ref) => {
       setVideoCanPlay(false);
     };
 
+    const handleError = (e: Event) => {
+      console.error("Video error:", e);
+      setVideoLoaded(false);
+      setVideoCanPlay(false);
+      setVideoError(true);
+    };
+
+    const handleLoadedMetadata = () => {
+      console.log("Video metadata loaded");
+      // Force display of first frame on iOS Safari
+      if (video.currentTime === 0) {
+        video.currentTime = 0.001;
+      }
+    };
+
     video.addEventListener("loadeddata", handleLoadedData);
     video.addEventListener("canplay", handleCanPlay);
     video.addEventListener("loadstart", handleLoadStart);
+    video.addEventListener("error", handleError);
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
 
     return () => {
       video.removeEventListener("loadeddata", handleLoadedData);
       video.removeEventListener("canplay", handleCanPlay);
       video.removeEventListener("loadstart", handleLoadStart);
+      video.removeEventListener("error", handleError);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
   }, []);
 
-  // Reset video when section becomes visible
+  // Reset video when section becomes visible with better mobile handling
   useEffect(() => {
     if (isVisible && videoRef.current && videoCanPlay) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
+      playVideo(videoRef.current);
     }
-  }, [isVisible, videoCanPlay]);
+  }, [isVisible, videoCanPlay, playVideo]);
+
+  // Function to retry video loading
+  const retryVideo = () => {
+    setVideoError(false);
+    setVideoLoaded(false);
+    setVideoCanPlay(false);
+
+    if (videoRef.current) {
+      videoRef.current.load();
+    }
+  };
 
   return (
     <section
@@ -222,21 +264,31 @@ const AboutSection = forwardRef((props, ref) => {
               className="bg-space-light rounded-lg overflow-hidden relative"
             >
               {/* Show skeleton while video is loading */}
-              {!videoCanPlay && <VideoSkeleton />}
+              {!videoCanPlay && !videoError && <VideoSkeleton />}
 
-              {/* Video element with streaming support */}
+              {/* Show fallback when video fails */}
+              {videoError && (
+                <VideoFallback
+                  onRetry={retryVideo}
+                  message={
+                    isMobileDevice
+                      ? "Video not supported on this mobile device"
+                      : "Video failed to load"
+                  }
+                />
+              )}
+
+              {/* Video element with enhanced mobile support */}
               <video
                 ref={videoRef}
                 className={`w-full h-full object-cover transition-opacity duration-500 ${
-                  videoCanPlay ? "opacity-100" : "opacity-0"
+                  videoCanPlay && !videoError ? "opacity-100" : "opacity-0"
                 }`}
-                autoPlay
-                muted
                 loop
-                playsInline
-                preload="metadata"
+                {...getVideoAttributes()}
+                style={getVideoStyles()}
               >
-                <source src="/assets/compressed.mp4" type="video/mp4" />
+                <source src="/assets/compressed.mp4#t=0.001" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </AspectRatio>

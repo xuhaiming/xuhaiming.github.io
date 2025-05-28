@@ -447,10 +447,14 @@ const AboutScene = () => {
 
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 5, 5]} intensity={0.8} color="#ffffff" />
-      <directionalLight position={[-5, 5, 5]} intensity={0.4} color="#00eeff" />
-      <pointLight position={[0, 2, 2]} intensity={0.6} color="#8B5CF6" />
+      <ambientLight intensity={1.2} />
+      <directionalLight position={[5, 5, 5]} intensity={1.5} color="#ffffff" />
+      <directionalLight position={[-5, 5, 5]} intensity={1.0} color="#ffffff" />
+      <directionalLight position={[0, 5, -5]} intensity={0.8} color="#ffffff" />
+      <pointLight position={[0, 2, 2]} intensity={1.2} color="#ffffff" />
+      <pointLight position={[2, 0, 2]} intensity={0.8} color="#ffffff" />
+      <pointLight position={[-2, 0, 2]} intensity={0.8} color="#ffffff" />
+      <hemisphereLight args={["#ffffff", "#444444", 0.6]} />
 
       <group
         ref={modelRef}
@@ -496,24 +500,62 @@ const AvatarModel = () => {
     // Handle any loading errors
     if (!gltf.scene) {
       setHasError(true);
+    } else {
+      // Traverse the model and brighten materials
+      gltf.scene.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          if (child.material) {
+            // If it's an array of materials
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material) => {
+                if (
+                  material instanceof THREE.MeshStandardMaterial ||
+                  material instanceof THREE.MeshPhysicalMaterial
+                ) {
+                  // Increase the material brightness
+                  material.color.multiplyScalar(0.8);
+                  material.emissiveIntensity = 0.1;
+                  material.metalness = Math.min(material.metalness * 0.8, 1);
+                  material.roughness = Math.max(material.roughness * 0.7, 0.1);
+                  material.needsUpdate = true;
+                }
+              });
+            } else {
+              // Single material
+              const material = child.material;
+              if (
+                material instanceof THREE.MeshStandardMaterial ||
+                material instanceof THREE.MeshPhysicalMaterial
+              ) {
+                // Increase the material brightness
+                material.color.multiplyScalar(0.8);
+                material.emissiveIntensity = 0.1;
+                material.metalness = Math.min(material.metalness * 0.8, 1);
+                material.roughness = Math.max(material.roughness * 0.7, 0.1);
+                material.needsUpdate = true;
+              }
+            }
+          }
+        }
+      });
     }
   }, [gltf.scene]);
 
-  // if (hasError) {
-  //   // Fallback to torus knot if model fails to load
-  //   return (
-  //     <mesh>
-  //       <torusKnotGeometry args={[1, 0.3, 128, 32]} />
-  //       <meshStandardMaterial
-  //         color="#8B5CF6"
-  //         metalness={0.7}
-  //         roughness={0.2}
-  //         emissive="#8B5CF6"
-  //         emissiveIntensity={0.3}
-  //       />
-  //     </mesh>
-  //   );
-  // }
+  if (hasError) {
+    // Fallback to torus knot if model fails to load
+    return (
+      <mesh>
+        <torusKnotGeometry args={[1, 0.3, 128, 32]} />
+        <meshStandardMaterial
+          color="#8B5CF6"
+          metalness={0.7}
+          roughness={0.2}
+          emissive="#8B5CF6"
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+    );
+  }
 
   return <primitive object={gltf.scene} />;
 };
