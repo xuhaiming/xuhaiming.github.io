@@ -448,12 +448,12 @@ const AboutScene = () => {
   return (
     <>
       <ambientLight intensity={1.2} />
-      <directionalLight position={[5, 5, 5]} intensity={1.5} color="#ffffff" />
-      <directionalLight position={[-5, 5, 5]} intensity={1.0} color="#ffffff" />
-      <directionalLight position={[0, 5, -5]} intensity={0.8} color="#ffffff" />
-      <pointLight position={[0, 2, 2]} intensity={1.2} color="#ffffff" />
+      <directionalLight position={[5, 5, 5]} intensity={0.3} color="#ffffff" />
+      <directionalLight position={[-5, 5, 5]} intensity={0.3} color="#ffffff" />
+      <directionalLight position={[0, 5, -5]} intensity={0} color="#ffffff" />
+      <pointLight position={[0, 2, 2]} intensity={0.7} color="#ffffff" />
       <pointLight position={[2, 0, 2]} intensity={0.8} color="#ffffff" />
-      <pointLight position={[-2, 0, 2]} intensity={0.8} color="#ffffff" />
+      <pointLight position={[-2, 0, 2]} intensity={0.9} color="#ffffff" />
       <hemisphereLight args={["#ffffff", "#444444", 0.6]} />
 
       <group
