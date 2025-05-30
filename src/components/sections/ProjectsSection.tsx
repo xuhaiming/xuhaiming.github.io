@@ -1,10 +1,5 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import React, { useRef, useState } from "react";
+import { motion, useMotionTemplate, useMotionValue, useSpring, Variants } from "framer-motion";
 import ThreeScene from "../ThreeScene";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -39,202 +34,238 @@ const projects: Project[] = [
   },
 ];
 
-const ProjectsSection = forwardRef((props, ref) => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const projectRefs = useRef<(HTMLDivElement | null)[]>([]);
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 50, scale: 0.9 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { 
+      type: "spring",
+      stiffness: 100,
+      damping: 15,
+      duration: 0.6
+    }
+  }
+};
+
+const ProjectCard = ({ project, index, isSelected, onClick }: any) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  const xSpring = useSpring(x, { stiffness: 300, damping: 30 });
+  const ySpring = useSpring(y, { stiffness: 300, damping: 30 });
+  
+  const spotlight = useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(0, 238, 255, 0.15), transparent 80%)`;
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    const clientX = e.clientX - rect.left;
+    const clientY = e.clientY - rect.top;
+    
+    const xPct = clientX / width - 0.5;
+    const yPct = clientY / height - 0.5;
+    
+    x.set(yPct * 20); // Increased tilt range
+    y.set(xPct * -20);
+    mouseX.set(clientX);
+    mouseY.set(clientY);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      variants={cardVariants}
+      style={{ 
+        transformStyle: "preserve-3d", 
+        rotateX: xSpring, 
+        rotateY: ySpring 
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      className={`relative bg-space-light/80 backdrop-blur-xl p-6 md:p-8 rounded-xl border transition-all duration-500 cursor-pointer group perspective-1000 overflow-hidden ${
+        isSelected
+          ? "border-neon-blue/60 shadow-[0_0_50px_-10px_rgba(0,238,255,0.3)]"
+          : "border-neon-blue/20 hover:border-neon-blue/50"
+      }`}
+    >
+      {/* Spotlight Effect */}
+      <motion.div
+        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100 z-30"
+        style={{ background: spotlight }}
+      />
+
+      {/* Background Gradient Effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-neon-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0" />
+
+      <div style={{ transform: "translateZ(50px)" }} className="relative z-20">
+        <h3 className="text-xl md:text-2xl font-bold mb-3 text-neon-blue group-hover:text-white transition-colors duration-300">
+          {project.title}
+        </h3>
+        <p className="text-white/70 mb-6 text-sm md:text-base leading-relaxed group-hover:text-white/90 transition-colors duration-300">
+          {project.description}
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          {project.tags.map((tag: string) => (
+            <span
+              key={tag}
+              className="bg-space-dark/50 px-3 py-1 rounded-full text-xs font-medium text-neon-purple border border-neon-purple/20 group-hover:border-neon-purple/40 transition-colors duration-300 shadow-[0_0_10px_-5px_rgba(176,38,255,0.3)]"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+      
+      {isSelected && (
+        <motion.div
+          layoutId="active-glow"
+          className="absolute inset-0 rounded-xl bg-gradient-to-r from-neon-blue/10 to-neon-purple/10 pointer-events-none z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        />
+      )}
+    </motion.div>
+  );
+};
+
+const ProjectsSection = () => {
   const sceneRef = useRef<HTMLDivElement>(null);
   const [selectedProject, setSelectedProject] = useState(1);
-  const [isVisible, setIsVisible] = useState(false);
   const isMobile = useIsMobile();
-
-  // Expose the section ref
-  useImperativeHandle(ref, () => sectionRef.current);
-
-  // Reset animations when visibility changes
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const handleVisibilityChange = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      setIsVisible(customEvent.detail.isVisible);
-
-      if (customEvent.detail.isVisible) {
-        // Reset project card animations
-        projectRefs.current.forEach((project, index) => {
-          if (project) {
-            project.style.opacity = "0";
-            project.style.transform = `translateX(${
-              index % 2 === 0 ? -30 : 30
-            }px)`;
-          }
-        });
-      }
-    };
-
-    section.addEventListener("visibility-change", handleVisibilityChange);
-    return () => {
-      section.removeEventListener("visibility-change", handleVisibilityChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current || !isVisible) return;
-
-      // Calculate section scroll progress
-      const sectionRect = sectionRef.current.getBoundingClientRect();
-      const sectionTop = sectionRect.top;
-      const sectionBottom = sectionRect.bottom;
-      const viewportHeight = window.innerHeight;
-      const sectionScrollProgress = Math.min(
-        Math.max(1 - (sectionBottom - viewportHeight) / sectionRect.height, 0),
-        1
-      );
-
-      // Project cards animation
-      projectRefs.current.forEach((project, index) => {
-        if (project) {
-          // Scale the project visibility based on overall section progress
-          const visibilityThreshold = 0.8;
-          const numProjects = projectRefs.current.length;
-          const staggeredAppearance =
-            (index / (numProjects + 1)) * visibilityThreshold;
-
-          const projectProgress = Math.min(
-            Math.max(
-              (sectionScrollProgress - staggeredAppearance) /
-                (visibilityThreshold - staggeredAppearance),
-              0
-            ),
-            1
-          );
-
-          project.style.opacity = projectProgress.toString();
-          project.style.transform = `translateX(${
-            (1 - projectProgress) * (index % 2 === 0 ? -30 : 30)
-          }px)`;
-        }
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    // Call immediately to set initial state
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isVisible]);
 
   return (
     <section
       id="projects"
-      className="min-h-screen py-16 md:py-20 relative bg-space"
-      ref={sectionRef}
-      data-in-view={isVisible ? "true" : "false"}
+      className="min-h-screen py-20 md:py-28 relative bg-space overflow-hidden"
     >
-      <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-space-dark to-transparent z-10" />
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-space-dark to-transparent z-10 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-space-dark to-transparent z-10 pointer-events-none" />
+      
+      {/* Dynamic Background Blobs */}
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{ 
+          duration: 8, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+        className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-neon-purple/10 rounded-full blur-[120px] pointer-events-none" 
+      />
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.1, 1],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{ 
+          duration: 10, 
+          repeat: Infinity, 
+          ease: "easeInOut",
+          delay: 1
+        }}
+        className="absolute bottom-1/4 left-0 w-[600px] h-[600px] bg-neon-blue/10 rounded-full blur-[120px] pointer-events-none" 
+      />
 
       <div className="container mx-auto px-4 relative z-20">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-12 md:mb-16 text-gradient text-center">
-          Featured Projects
-        </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-16 md:mb-24"
+        >
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-white to-neon-purple inline-block"
+          >
+            Featured Projects
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-white/60 text-lg max-w-2xl mx-auto"
+          >
+            A selection of my recent work, showcasing complex systems and user-centric applications.
+          </motion.p>
+        </motion.div>
 
         <div
           className={`grid grid-cols-1 ${
             isMobile ? "" : "lg:grid-cols-5"
-          } gap-6 md:gap-8`}
+          } gap-8 lg:gap-12 items-start`}
         >
           {/* 3D Scene - Only show on desktop */}
           {!isMobile && (
-            <div className="lg:col-span-2">
-              <div
+            <div className="lg:col-span-2 sticky top-24">
+              <motion.div
                 ref={sceneRef}
-                className="mt-[-4px]"
-                style={{ height: "684px" }}
+                className="h-[600px] w-full"
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.2, type: "spring" }}
               >
-                <ThreeScene
-                  sceneType="projects"
-                  className="rounded-lg overflow-hidden border border-neon-purple/30 h-full"
-                  selectedProject={selectedProject}
-                />
-              </div>
+                <div className="relative h-full w-full rounded-2xl overflow-hidden border border-neon-purple/20 bg-space-light/30 backdrop-blur-sm shadow-2xl shadow-neon-purple/10">
+                  <ThreeScene
+                    sceneType="projects"
+                    className="h-full w-full"
+                    selectedProject={selectedProject}
+                  />
+                  
+                  {/* Decorative overlay for the 3D scene */}
+                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-space-dark/50 to-transparent" />
+                </div>
+              </motion.div>
             </div>
           )}
 
           {/* Projects List */}
-          <div
+          <motion.div
             className={`${
               isMobile ? "col-span-1" : "lg:col-span-3"
-            } space-y-8 md:space-y-12`}
+            } space-y-6 md:space-y-8`}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ staggerChildren: 0.2 }}
           >
             {projects.map((project, index) => (
-              <div
+              <ProjectCard
                 key={project.title}
-                ref={(el) => (projectRefs.current[index] = el)}
-                className={`relative bg-space-light p-4 md:p-6 rounded-lg border transition-all duration-700 transform hover:scale-105 opacity-0 cursor-pointer ${
-                  selectedProject === index
-                    ? "border-neon-blue/30"
-                    : "border-neon-blue/30 hover:border-neon-blue/60"
-                }`}
-                style={{
-                  transitionDelay: `${index * 200}ms`,
-                  transform: `translateX(${index % 2 === 0 ? -30 : 30}px)`,
-                }}
+                project={project}
+                index={index}
+                isSelected={selectedProject === index}
                 onClick={() => setSelectedProject(index)}
-              >
-                <h3 className="text-xl md:text-2xl font-bold mb-2 text-neon-blue">
-                  {project.title}
-                </h3>
-                <p className="text-white/70 mb-4 text-sm md:text-base">
-                  {project.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-space px-2 md:px-3 py-1 rounded-full text-xs text-neon-purple"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Desktop selection indicator */}
-                {!isMobile && (
-                  <div
-                    className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
-                      selectedProject === index ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    <div
-                      className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-pink to-transparent opacity-70 animate-pulse"
-                      style={{ animationDuration: "3s" }}
-                    ></div>
-                    <div
-                      className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-pink to-transparent opacity-70 animate-pulse"
-                      style={{ animationDuration: "4s" }}
-                    ></div>
-                    <div
-                      className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-neon-pink to-transparent opacity-70 animate-pulse"
-                      style={{ animationDuration: "3.5s" }}
-                    ></div>
-                    <div
-                      className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-neon-pink to-transparent opacity-70 animate-pulse"
-                      style={{ animationDuration: "2.5s" }}
-                    ></div>
-                  </div>
-                )}
-              </div>
+              />
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
-
-      <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-space-dark to-transparent z-10" />
     </section>
   );
-});
+};
 
-ProjectsSection.displayName = "ProjectsSection";
 export default ProjectsSection;

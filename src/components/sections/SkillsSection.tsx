@@ -31,13 +31,13 @@ const skills = [
     items: [
       {
         name: "React",
-        value: 100,
+        value: 95,
         description:
           "Extensive experience with hooks, context API, server components",
       },
       {
         name: "Next.js",
-        value: 95,
+        value: 90,
         description: "Server-side rendering, routing, and API integration",
       },
       {
@@ -47,7 +47,7 @@ const skills = [
       },
       {
         name: "Bundling",
-        value: 90,
+        value: 80,
         description: "Webpack, Vite, Rollup, Parcel, etc.",
       },
       {
@@ -58,7 +58,7 @@ const skills = [
       },
       {
         name: "Monorepos",
-        value: 90,
+        value: 85,
         description: "Yarn workspace, PNPM,Lerna, Nx, Turborepo, etc.",
       },
     ],
@@ -79,17 +79,17 @@ const skills = [
       },
       {
         name: "Google Firebase",
-        value: 80,
+        value: 75,
         description: "Firebase Auth, Firestore, Storage, Functions, etc.",
       },
       {
         name: "Supabase",
-        value: 85,
+        value: 80,
         description: "Supabase Auth, Postgres, Storage, Functions, etc.",
       },
       {
         name: "Vercel",
-        value: 90,
+        value: 80,
         description: "Vercel AI SDK, Edge Functions, etc.",
       },
       {
@@ -99,7 +99,7 @@ const skills = [
       },
       {
         name: "Tencent Cloud",
-        value: 80,
+        value: 75,
         description: "Tencent Cloud Serverless, Storage, Functions, etc.",
       },
     ],
@@ -114,17 +114,17 @@ const skills = [
     items: [
       {
         name: "Node.js",
-        value: 100,
+        value: 90,
         description: "Server-side JavaScript with Express and RESTful APIs",
       },
       {
         name: "Express",
-        value: 95,
+        value: 90,
         description: "Creating scalable web applications and APIs",
       },
       {
         name: "MongoDB",
-        value: 85,
+        value: 75,
         description: "Document-based database design and optimization",
       },
       {
@@ -134,7 +134,7 @@ const skills = [
       },
       {
         name: "FastAPI",
-        value: 80,
+        value: 70,
         description: "Python-based web framework for building APIs",
       },
       {
@@ -479,29 +479,30 @@ const SkillsSection = forwardRef((props, ref) => {
       <div className="container mx-auto px-4 relative z-20 h-full flex flex-col">
         {/* Always render content structure to maintain height */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : -20 }}
-          transition={{ duration: 0.7 }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center mb-8 md:mb-10"
         >
-          <div className="inline-block mb-2">
-            <motion.div
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-neon-blue/20 flex items-center justify-center border border-neon-blue/40 mb-4 mx-auto"
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 1, ease: "easeInOut" }}
-            >
-              <ChartBar className="w-5 h-5 md:w-6 md:h-6 text-neon-blue" />
-            </motion.div>
-          </div>
-
-          <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6">
-            <span className="text-gradient">My Skills</span>
-          </h2>
-          <p className="text-white/70 max-w-2xl mx-auto mb-4 md:mb-6 text-sm md:text-base px-4">
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-white to-neon-purple inline-block"
+          >
+            My Skills
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-white/70 max-w-2xl mx-auto mb-4 md:mb-6 text-sm md:text-base px-4"
+          >
             An interactive visualization of my technical expertise across
             various domains. Hover over the radar chart to see detailed
             information about each skill.
-          </p>
+          </motion.p>
           <div className="w-16 md:w-20 h-1 bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink mx-auto rounded-full" />
 
           <div className="mt-6 md:mt-8 flex justify-center gap-2 md:gap-3 flex-wrap px-4">

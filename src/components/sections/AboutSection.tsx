@@ -1,122 +1,36 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import ThreeScene from "../ThreeScene";
 import VideoSkeleton from "../VideoSkeleton";
 import VideoFallback from "../VideoFallback";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useMobileVideo } from "@/hooks/use-mobile-video";
 
-const AboutSection = forwardRef((props, ref) => {
+const AboutSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  const textRefs = useRef<(HTMLParagraphElement | null)[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const isInView = useInView(sectionRef, { once: false, amount: 0.3 });
+  
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoCanPlay, setVideoCanPlay] = useState(false);
   const [videoError, setVideoError] = useState(false);
 
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const yImage = useTransform(scrollYProgress, [0, 1], [100, -100]);
+
   // Use mobile video hook for better mobile support
   const {
     isMobileDevice,
-    isIOSDevice,
-    canAutoplay,
     getVideoAttributes,
     getVideoStyles,
     playVideo,
   } = useMobileVideo();
 
-  // Expose the section ref
-  useImperativeHandle(ref, () => sectionRef.current);
-
-  // Reset animations when visibility changes
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const handleVisibilityChange = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      setIsVisible(customEvent.detail.isVisible);
-
-      if (customEvent.detail.isVisible) {
-        // Reset animations when section becomes visible
-        if (imageRef.current) {
-          imageRef.current.style.transform = "translateY(0)";
-        }
-
-        // Reset text animations
-        textRefs.current.forEach((textRef, index) => {
-          if (textRef) {
-            textRef.style.opacity = "0";
-            textRef.style.transform = "translateY(30px)";
-          }
-        });
-      }
-    };
-
-    section.addEventListener("visibility-change", handleVisibilityChange);
-    return () => {
-      section.removeEventListener("visibility-change", handleVisibilityChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current || !isVisible) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const scrollPercentage = Math.min(
-        Math.max(
-          (window.innerHeight - rect.top) / (window.innerHeight + rect.height),
-          0
-        ),
-        1
-      );
-
-      // Parallax for image
-      if (imageRef.current) {
-        imageRef.current.style.transform = `translateY(${
-          scrollPercentage * -50
-        }px)`;
-      }
-
-      // Staggered text animation
-      textRefs.current.forEach((textRef, index) => {
-        if (textRef) {
-          const delay = index * 0.1;
-          const startPoint = delay;
-          const endPoint = startPoint + 0.3;
-
-          let opacity = 0;
-          let translateY = 30;
-
-          if (scrollPercentage > startPoint) {
-            const textScrollPercentage = Math.min(
-              (scrollPercentage - startPoint) / (endPoint - startPoint),
-              1
-            );
-            opacity = textScrollPercentage;
-            translateY = 30 * (1 - textScrollPercentage);
-          }
-
-          textRef.style.opacity = opacity.toString();
-          textRef.style.transform = `translateY(${translateY}px)`;
-        }
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    // Call immediately to set initial state
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isVisible]);
 
   // Handle video loading events
   useEffect(() => {
@@ -171,10 +85,10 @@ const AboutSection = forwardRef((props, ref) => {
 
   // Reset video when section becomes visible with better mobile handling
   useEffect(() => {
-    if (isVisible && videoRef.current && videoCanPlay) {
+    if (isInView && videoRef.current && videoCanPlay) {
       playVideo(videoRef.current);
     }
-  }, [isVisible, videoCanPlay, playVideo]);
+  }, [isInView, videoCanPlay, playVideo]);
 
   // Function to retry video loading
   const retryVideo = () => {
@@ -187,19 +101,43 @@ const AboutSection = forwardRef((props, ref) => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  };
+
   return (
     <section
       id="about"
       ref={sectionRef}
       className="min-h-screen py-20 relative bg-space"
-      data-in-view={isVisible ? "true" : "false"}
     >
       <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-space-dark to-transparent z-10" />
 
       <div className="container mx-auto px-4 relative z-20" ref={containerRef}>
-        <h2 className="text-3xl md:text-5xl font-bold mb-16 text-gradient text-center">
+        <motion.h2 
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-3xl md:text-5xl font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-white to-neon-purple inline-block text-center"
+        >
           About Me
-        </h2>
+        </motion.h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div className="md:order-2 relative h-[500px] w-full">
@@ -207,32 +145,37 @@ const AboutSection = forwardRef((props, ref) => {
               <ThreeScene sceneType="about" />
             </div>
 
-            <div
-              ref={imageRef}
+            <motion.div
+              style={{ y: yImage }}
               className="absolute inset-0 flex items-center justify-center pointer-events-none"
             />
           </div>
 
-          <div className="md:order-1 space-y-6">
+          <motion.div 
+            className="md:order-1 space-y-6"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
             {[
               "I am currently serving as the Lead Frontend Engineer at Trustana, where I spearhead the development of AI-driven applications.",
               "Throughout my career, I have collaborated with renowned companies such as Shopee, Tencent, Burberry, ThoughtWorks, Phillips, and more.",
               "My expertise predominantly lies in frontend technologies including React, Next.js, and Node.js. However, I also possess substantial experience with backend and AI-related technologies such as AWS serverless architecture, MongoDB, AI agents leveraging OpenAI APIs, Gemini, RAG, and prompt engineering.",
-              "Additionally, I have contributed to AI-driven image, 3D and video generation projects using advanced tools such as Stable Diffusion, Hunyuan, Wan 2.1, Flux. I have also worked extensively with ComfyUI workflows, including Lora, ControlNet, IP Adapter, etc.",
+              "Additionally, I have contributed to AI-driven image, 3D and video generation projects using advanced tools such as Stable Diffusion, Hunyuan, Wan Video, Flux. I have also worked extensively with ComfyUI workflows, including Lora, ControlNet, IP Adapter, etc.",
             ].map((text, index) => (
-              <p
+              <motion.p
                 key={index}
-                ref={(el) => (textRefs.current[index] = el)}
-                className="text-lg opacity-0 transition-all duration-500"
-                style={{ transitionDelay: `${index * 100}ms` }}
+                variants={itemVariants}
+                className="text-lg"
               >
                 {text}
-              </p>
+              </motion.p>
             ))}
 
-            <div
-              ref={(el) => (textRefs.current[4] = el)}
-              className="flex flex-wrap gap-3 opacity-0 transition-all duration-500"
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-wrap gap-3"
             >
               {[
                 "Creative",
@@ -243,17 +186,23 @@ const AboutSection = forwardRef((props, ref) => {
               ].map((trait) => (
                 <span
                   key={trait}
-                  className="bg-space-light px-3 py-1 rounded-full text-sm text-neon-blue"
+                  className="bg-space-light px-3 py-1 rounded-full text-sm text-neon-blue border border-neon-blue/20"
                 >
                   {trait}
                 </span>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Video Section */}
-        <div className="mt-24 mb-8">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="mt-24 mb-8"
+        >
           <h3 className="text-2xl md:text-3xl font-bold mb-8 text-gradient text-center">
             See My Work In Action
           </h3>
@@ -261,7 +210,7 @@ const AboutSection = forwardRef((props, ref) => {
           <div className="max-w-4xl mx-auto">
             <AspectRatio
               ratio={16 / 9}
-              className="bg-space-light rounded-lg overflow-hidden relative"
+              className="bg-space-light rounded-lg overflow-hidden relative shadow-2xl shadow-neon-blue/10 border border-white/5"
             >
               {/* Show skeleton while video is loading */}
               {!videoCanPlay && !videoError && <VideoSkeleton />}
@@ -296,13 +245,12 @@ const AboutSection = forwardRef((props, ref) => {
               AI generated video with trained LoRA models
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-space-dark to-transparent z-10" />
     </section>
   );
-});
+};
 
-AboutSection.displayName = "AboutSection";
 export default AboutSection;
