@@ -31,13 +31,13 @@ const skills = [
     items: [
       {
         name: "React",
-        value: 100,
+        value: 95,
         description:
           "Extensive experience with hooks, context API, server components",
       },
       {
         name: "Next.js",
-        value: 95,
+        value: 90,
         description: "Server-side rendering, routing, and API integration",
       },
       {
@@ -47,7 +47,7 @@ const skills = [
       },
       {
         name: "Bundling",
-        value: 90,
+        value: 80,
         description: "Webpack, Vite, Rollup, Parcel, etc.",
       },
       {
@@ -58,7 +58,7 @@ const skills = [
       },
       {
         name: "Monorepos",
-        value: 90,
+        value: 85,
         description: "Yarn workspace, PNPM,Lerna, Nx, Turborepo, etc.",
       },
     ],
@@ -79,17 +79,17 @@ const skills = [
       },
       {
         name: "Google Firebase",
-        value: 80,
+        value: 75,
         description: "Firebase Auth, Firestore, Storage, Functions, etc.",
       },
       {
         name: "Supabase",
-        value: 85,
+        value: 80,
         description: "Supabase Auth, Postgres, Storage, Functions, etc.",
       },
       {
         name: "Vercel",
-        value: 90,
+        value: 80,
         description: "Vercel AI SDK, Edge Functions, etc.",
       },
       {
@@ -99,7 +99,7 @@ const skills = [
       },
       {
         name: "Tencent Cloud",
-        value: 80,
+        value: 75,
         description: "Tencent Cloud Serverless, Storage, Functions, etc.",
       },
     ],
@@ -114,17 +114,17 @@ const skills = [
     items: [
       {
         name: "Node.js",
-        value: 100,
+        value: 90,
         description: "Server-side JavaScript with Express and RESTful APIs",
       },
       {
         name: "Express",
-        value: 95,
+        value: 90,
         description: "Creating scalable web applications and APIs",
       },
       {
         name: "MongoDB",
-        value: 85,
+        value: 75,
         description: "Document-based database design and optimization",
       },
       {
@@ -134,7 +134,7 @@ const skills = [
       },
       {
         name: "FastAPI",
-        value: 80,
+        value: 70,
         description: "Python-based web framework for building APIs",
       },
       {
