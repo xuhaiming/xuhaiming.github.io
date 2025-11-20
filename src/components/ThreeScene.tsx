@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, Suspense } from "react";
 import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, useGLTF } from "@react-three/drei";
 import { cn } from "@/lib/utils";
 import AvatarPlaceholder from "./AvatarPlaceholder";
@@ -613,6 +613,8 @@ const ProjectsScene = ({
 
   const [textures, setTextures] = useState<THREE.Texture[]>([]);
   const [loading, setLoading] = useState(true);
+  // Add state to track if textures are fully ready to be displayed
+  const [ready, setReady] = useState(false);
 
   const [targetRotations, setTargetRotations] = useState<THREE.Euler[]>([]);
   const [currentRotations, setCurrentRotations] = useState<THREE.Euler[]>([]);
@@ -623,6 +625,7 @@ const ProjectsScene = ({
 
   // Environment map for reflections
   const [envMap, setEnvMap] = useState<THREE.Texture | null>(null);
+  const { gl } = useThree();
 
   // Glow effect texture
   const [glowTexture, setGlowTexture] = useState<THREE.Texture | null>(null);
@@ -654,7 +657,7 @@ const ProjectsScene = ({
     }
 
     // Create environment map
-    const pmremGenerator = new THREE.PMREMGenerator(new THREE.WebGLRenderer());
+    const pmremGenerator = new THREE.PMREMGenerator(gl);
     pmremGenerator.compileEquirectangularShader();
 
     const cubeRenderTarget = pmremGenerator.fromScene(new THREE.Scene(), 0.04);
@@ -667,7 +670,7 @@ const ProjectsScene = ({
       if (cubeRenderTarget) cubeRenderTarget.dispose();
       pmremGenerator.dispose();
     };
-  }, []);
+  }, [gl]);
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
@@ -680,6 +683,9 @@ const ProjectsScene = ({
     const loadedTextures: THREE.Texture[] = [];
     let loadedCount = 0;
 
+    // Pre-fill with nulls to maintain order
+    for(let i=0; i<projectImages.length; i++) loadedTextures.push(null as any);
+
     projectImages.forEach((url, index) => {
       loader.load(
         url,
@@ -687,6 +693,7 @@ const ProjectsScene = ({
           texture.minFilter = THREE.LinearFilter;
           texture.magFilter = THREE.LinearFilter;
           texture.anisotropy = 16;
+          texture.colorSpace = THREE.SRGBColorSpace; // Ensure correct color space
 
           loadedTextures[index] = texture;
           loadedCount++;
@@ -694,57 +701,22 @@ const ProjectsScene = ({
           if (loadedCount === projectImages.length) {
             setTextures(loadedTextures);
             setLoading(false);
+            // Add a small delay before showing to ensure everything is rendered
+            setTimeout(() => setReady(true), 100);
           }
         },
         undefined,
         (error) => {
           console.error("Error loading project texture:", error);
-          setLoading(false);
+          // Even on error, we should probably proceed or show placeholders
+          loadedCount++;
+          if (loadedCount === projectImages.length) {
+             setLoading(false);
+             setReady(true);
+          }
         }
       );
     });
-
-    // Create particle effect for the scene
-    const particleCount = 400;
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
-    const sizes = new Float32Array(particleCount);
-
-    const colorPalette = [
-      new THREE.Color("#00EEFF").multiplyScalar(1.5),
-      new THREE.Color("#8B5CF6").multiplyScalar(1.5),
-      new THREE.Color("#F471B5").multiplyScalar(1.5),
-    ];
-
-    for (let i = 0; i < particleCount; i++) {
-      // Create a spherical distribution of particles
-      const radius = 5 + Math.random() * 8;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.random() * Math.PI * 2;
-
-      // Convert spherical to cartesian coordinates
-      positions[i * 3] = radius * Math.sin(theta) * Math.cos(phi);
-      positions[i * 3 + 1] = radius * Math.sin(theta) * Math.sin(phi);
-      positions[i * 3 + 2] = radius * Math.cos(theta);
-
-      // Random sizes with bias toward smaller particles
-      sizes[i] = 0.05 + Math.random() * Math.random() * 0.15;
-
-      // Random color from palette
-      const color =
-        colorPalette[Math.floor(Math.random() * colorPalette.length)];
-      colors[i * 3] = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
-
-      // Make some particles white for a star-like effect
-      if (Math.random() > 0.9) {
-        colors[i * 3] = 1;
-        colors[i * 3 + 1] = 1;
-        colors[i * 3 + 2] = 1;
-        sizes[i] *= 1.5;
-      }
-    }
 
     return () => {
       loadedTextures.forEach((texture) => texture?.dispose());
@@ -849,10 +821,21 @@ const ProjectsScene = ({
     secondaryCardWidth,
   ]);
 
+  // Animation ref for opacity transition
+  const opacityRef = useRef(0);
+
   useFrame(({ clock }) => {
     const elapsedTime = clock.getElapsedTime();
 
+    // Smooth opacity transition
+    if (ready) {
+      opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, 1, 0.05);
+    }
+
     if (groupRef.current) {
+      // Apply opacity to the entire group if possible, or handle per object
+      // Since we can't easily set opacity on a group, we'll do it in the materials
+      
       // Add a floating animation to the entire group
       groupRef.current.position.y = Math.sin(elapsedTime * 0.5) * 0.1;
 
@@ -943,66 +926,59 @@ const ProjectsScene = ({
       <pointLight position={[0, 0, 3]} intensity={0.3} color="#ffffff" />
 
       <group ref={groupRef}>
-        {loading
-          ? // Loading placeholders with glowing effect
-            [0, 1, 2].map((i) => (
-              <mesh
-                key={i}
-                position={currentPositions[i] || [0, 0, 0]}
-                rotation={currentRotations[i] || [0, 0, 0]}
-                scale={currentScales[i] || [1, 1, 1]}
-              >
-                <planeGeometry args={[1, 1]} />
-                <meshStandardMaterial
-                  color="#8B5CF6"
+        {/* Always render the cards structure, but fade in the content */}
+        {[0, 1, 2].map((i) => (
+          <group
+            key={i}
+            position={currentPositions[i] || [0, 0, 0]}
+            rotation={currentRotations[i] || [0, 0, 0]}
+            scale={currentScales[i] || [1, 1, 1]}
+          >
+            {/* Main card with texture or placeholder */}
+            <mesh>
+              <planeGeometry args={[1, 1, 5, 5]} />
+              {loading || !textures[i] ? (
+                 // Placeholder material
+                 <meshStandardMaterial
+                  color="#1a1a2e"
                   emissive="#8B5CF6"
-                  emissiveIntensity={0.5}
+                  emissiveIntensity={0.2}
                   transparent
                   opacity={0.8}
                   side={THREE.DoubleSide}
                 >
                   {envMap && <primitive attach="envMap" object={envMap} />}
                 </meshStandardMaterial>
-              </mesh>
-            ))
-          : // Actual project cards with enhanced materials
-            textures.map((texture, i) => (
-              <group
-                key={i}
-                position={currentPositions[i] || [0, 0, 0]}
-                rotation={currentRotations[i] || [0, 0, 0]}
-                scale={currentScales[i] || [1, 1, 1]}
-              >
-                {/* Main card with texture */}
-                <mesh>
-                  <planeGeometry args={[1, 1, 5, 5]} />
+              ) : (
+                // Actual texture material
+                <meshBasicMaterial
+                  map={textures[i]}
+                  transparent
+                  opacity={ready ? 1 : 0} // Hard switch for now, but could be lerped if we passed opacityRef
+                  side={THREE.DoubleSide}
+                  toneMapped={false}
+                />
+              )}
+            </mesh>
+
+            {/* Glowing border for selected card */}
+            {i === selectedProject && (
+              <>
+                <mesh position={[0, 0, -0.01]} scale={[1.05, 1.05, 1]}>
+                  <planeGeometry args={[1, 1]} />
                   <meshBasicMaterial
-                    map={textures[i]}
+                    color={
+                      i === 0 ? "#00EEFF" : i === 1 ? "#8B5CF6" : "#F471B5"
+                    }
                     transparent
-                    opacity={1}
-                    side={THREE.DoubleSide}
-                    toneMapped={false}
+                    opacity={0.2}
+                    side={THREE.BackSide}
                   />
                 </mesh>
-
-                {/* Glowing border for selected card */}
-                {i === selectedProject && (
-                  <>
-                    <mesh position={[0, 0, -0.01]} scale={[1.05, 1.05, 1]}>
-                      <planeGeometry args={[1, 1]} />
-                      <meshBasicMaterial
-                        color={
-                          i === 0 ? "#00EEFF" : i === 1 ? "#8B5CF6" : "#F471B5"
-                        }
-                        transparent
-                        opacity={0.2}
-                        side={THREE.BackSide}
-                      />
-                    </mesh>
-                  </>
-                )}
-              </group>
-            ))}
+              </>
+            )}
+          </group>
+        ))}
       </group>
 
       {/* Global fog for depth effect */}
