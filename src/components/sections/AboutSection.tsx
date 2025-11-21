@@ -130,11 +130,11 @@ const AboutSection = () => {
 
       <div className="container mx-auto px-4 relative z-20" ref={containerRef}>
         <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl md:text-5xl font-bold mb-16 text-gradient text-center"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-3xl md:text-5xl font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-white to-neon-purple inline-block text-center"
         >
           About Me
         </motion.h2>
@@ -162,7 +162,7 @@ const AboutSection = () => {
               "I am currently serving as the Lead Frontend Engineer at Trustana, where I spearhead the development of AI-driven applications.",
               "Throughout my career, I have collaborated with renowned companies such as Shopee, Tencent, Burberry, ThoughtWorks, Phillips, and more.",
               "My expertise predominantly lies in frontend technologies including React, Next.js, and Node.js. However, I also possess substantial experience with backend and AI-related technologies such as AWS serverless architecture, MongoDB, AI agents leveraging OpenAI APIs, Gemini, RAG, and prompt engineering.",
-              "Additionally, I have contributed to AI-driven image, 3D and video generation projects using advanced tools such as Stable Diffusion, Hunyuan, Wan 2.1, Flux. I have also worked extensively with ComfyUI workflows, including Lora, ControlNet, IP Adapter, etc.",
+              "Additionally, I have contributed to AI-driven image, 3D and video generation projects using advanced tools such as Stable Diffusion, Hunyuan, Wan Video, Flux. I have also worked extensively with ComfyUI workflows, including Lora, ControlNet, IP Adapter, etc.",
             ].map((text, index) => (
               <motion.p
                 key={index}

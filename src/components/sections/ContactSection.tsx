@@ -70,26 +70,33 @@ const ContactSection = () => {
       <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-space to-transparent z-10" />
 
       <div className="container mx-auto px-4 relative z-20">
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-3xl md:text-5xl font-bold mb-6 text-gradient text-center"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-16"
         >
-          Get In Touch
-        </motion.h2>
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-3xl md:text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-white to-neon-purple inline-block"
+          >
+            Get In Touch
+          </motion.h2>
 
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="text-white/70 text-center max-w-2xl mx-auto mb-16"
-        >
-          Let's collaborate to bring your digital vision to life. I'm always
-          open to discussing new projects, creative ideas, or opportunities to
-          be part of your vision.
-        </motion.p>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-white/70 text-lg max-w-2xl mx-auto"
+          >
+            Let's collaborate to bring your digital vision to life. I'm always
+            open to discussing new projects, creative ideas, or opportunities to
+            be part of your vision.
+          </motion.p>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left side - Profile information */}

@@ -106,7 +106,7 @@ const HeroSection = () => {
 
         <motion.p
           style={{ y: ySubtitle, opacity }}
-          className="text-xl md:text-2xl mb-8 max-w-lg text-white/80 h-[64px] md:h-[auto]"
+          className="text-xl md:text-2xl mb-8 max-w-lg text-white/80 min-h-[100px] md:min-h-0 md:h-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
@@ -150,29 +150,30 @@ const HeroSection = () => {
         </motion.div>
       </div>
 
-      <motion.div 
-        className="absolute bottom-0 md:bottom-10 left-1/2 -translate-x-1/2 z-20"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="flex flex-col items-center ">
-          <p className="text-sm mb-2 text-white/70">Scroll Down</p>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-neon-blue"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
-        </div>
-      </motion.div>
+      <div className="absolute bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-20">
+        <motion.div 
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="flex flex-col items-center ">
+            <p className="text-sm mb-2 text-white/70">Scroll Down</p>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-neon-blue"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+              />
+            </svg>
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 };

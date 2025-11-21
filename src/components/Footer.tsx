@@ -21,7 +21,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center md:items-end">
           <div className="mb-4 md:mb-0 relative">
             <a href="#" className="text-2xl font-bold text-gradient group">
-              HaimingPages
+              Haiming Pages
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink group-hover:w-full transition-all duration-300 ease-out"></span>
             </a>
             <p className="text-white/60 mt-2">
@@ -29,7 +29,7 @@ const Footer = () => {
             </p>
           </div>
 
-          <div className="flex flex-col items-center md:items-end">
+          <div className="flex flex-col items-center mt-4 md:items-end md:mt-0">
             <p className="text-white/60">© {currentYear} All Rights Reserved</p>
           </div>
         </div>

@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect, Suspense } from "react";
+import React, { useRef, useState, useEffect, Suspense, useMemo } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, useGLTF } from "@react-three/drei";
+import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { cn } from "@/lib/utils";
 import AvatarPlaceholder from "./AvatarPlaceholder";
 
@@ -11,21 +12,186 @@ interface ThreeSceneProps {
   selectedProject?: number;
 }
 
+const ShootingStar = () => {
+  const mesh = useRef<THREE.Mesh>(null);
+  const [active, setActive] = useState(false);
+  
+  // Reset star position and trajectory
+  const reset = () => {
+    if (!mesh.current) return;
+    
+    const startX = (Math.random() - 0.5) * 40;
+    const startY = (Math.random() - 0.5) * 40;
+    const startZ = (Math.random() - 0.5) * 20 - 10; // Push back a bit
+    
+    mesh.current.position.set(startX, startY, startZ);
+    
+    // Random velocity vector
+    const speed = 0.5 + Math.random() * 1.5;
+    const angle = Math.random() * Math.PI * 2;
+    mesh.current.userData.velocity = new THREE.Vector3(
+      Math.cos(angle) * speed,
+      Math.sin(angle) * speed,
+      0
+    );
+    
+    // Stretch it to look like a streak
+    mesh.current.scale.set(0.1, 0.1, 0.1);
+    setActive(true);
+  };
+
+  useFrame(() => {
+    if (!mesh.current) return;
+
+    if (active) {
+      mesh.current.position.add(mesh.current.userData.velocity);
+      
+      // Orient the mesh to face the direction of movement
+      const target = mesh.current.position.clone().add(mesh.current.userData.velocity);
+      mesh.current.lookAt(target);
+      
+      // Stretch based on speed for streak effect
+      const speed = mesh.current.userData.velocity.length();
+      mesh.current.scale.z = 1 + speed * 3;
+      mesh.current.scale.x = 0.1;
+      mesh.current.scale.y = 0.1;
+      
+      // Reset if out of bounds
+      if (
+        Math.abs(mesh.current.position.x) > 25 || 
+        Math.abs(mesh.current.position.y) > 25
+      ) {
+        setActive(false);
+      }
+    } else {
+      // Random chance to spawn
+      if (Math.random() < 0.005) {
+        reset();
+      }
+    }
+  });
+
+  return (
+    <mesh ref={mesh} visible={active} rotation={[Math.PI / 2, 0, 0]}>
+      {/* Use a cylinder for a rounder streak */}
+      <cylinderGeometry args={[0.05, 0.05, 1, 8]} />
+      <meshBasicMaterial color="#00EEFF" transparent opacity={0.8} />
+    </mesh>
+  );
+};
+
+const StarField = () => {
+  const count = 6000;
+  const mesh = useRef<THREE.Points>(null);
+  
+  // Create a simple circle texture for the stars
+  const starTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    const context = canvas.getContext('2d');
+    if (context) {
+      context.beginPath();
+      context.arc(16, 16, 14, 0, Math.PI * 2);
+      context.fillStyle = 'white';
+      context.fill();
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+  }, []);
+
+  const particles = useMemo(() => {
+    const temp = [];
+    for (let i = 0; i < count; i++) {
+      const x = (Math.random() - 0.5) * 60;
+      const y = (Math.random() - 0.5) * 60;
+      // Extended Z range to bring more stars in front of the globe (which is at 0)
+      // Camera is typically at z=10. 
+      // Range: -20 to +15
+      const z = (Math.random() - 0.5) * 35 - 2.5; 
+      temp.push(x, y, z);
+    }
+    return new Float32Array(temp);
+  }, [count]);
+
+  const colors = useMemo(() => {
+    const temp = [];
+    const colorPalette = [
+      new THREE.Color("#00EEFF"),
+      new THREE.Color("#8B5CF6"),
+      new THREE.Color("#F471B5"),
+      new THREE.Color("#ffffff"),
+    ];
+    
+    for (let i = 0; i < count; i++) {
+      const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+      temp.push(color.r, color.g, color.b);
+    }
+    return new Float32Array(temp);
+  }, [count]);
+
+  const sizes = useMemo(() => {
+    const temp = [];
+    for (let i = 0; i < count; i++) {
+      temp.push(Math.random() * 0.15 + 0.05);
+    }
+    return new Float32Array(temp);
+  }, [count]);
+
+  useFrame(({ clock }) => {
+    if (mesh.current) {
+      mesh.current.rotation.y = clock.getElapsedTime() * 0.02;
+      mesh.current.rotation.z = clock.getElapsedTime() * 0.005;
+    }
+  });
+
+  return (
+    <>
+      <points ref={mesh}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={particles.length / 3}
+            array={particles}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            count={colors.length / 3}
+            array={colors}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-size"
+            count={sizes.length}
+            array={sizes}
+            itemSize={1}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.2} // Slightly larger to account for circle texture transparency
+          sizeAttenuation={true}
+          depthWrite={false}
+          vertexColors
+          transparent
+          opacity={0.9}
+          blending={THREE.AdditiveBlending}
+          map={starTexture}
+          alphaTest={0.001}
+        />
+      </points>
+      {/* Shooting Stars */}
+      {Array.from({ length: 5 }).map((_, i) => (
+        <ShootingStar key={i} />
+      ))}
+    </>
+  );
+};
+
 const HeroScene = () => {
-  const galaxyRef = useRef<THREE.Group>(null);
-  const particlesRef = useRef<THREE.Points>(null);
   const sphereRef = useRef<THREE.Mesh>(null);
   const ringRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Sprite>(null);
-  const pointsCount = 3000;
-
-  // Particle animation properties
-  const [particles, setParticles] = useState<{
-    positions: Float32Array;
-    colors: Float32Array;
-    sizes: Float32Array;
-    velocity: Float32Array;
-  } | null>(null);
 
   // Use a fallback texture in case the main one fails to load
   const [textureError, setTextureError] = useState(false);
@@ -206,102 +372,8 @@ const HeroScene = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const positions = new Float32Array(pointsCount * 3);
-    const colors = new Float32Array(pointsCount * 3);
-    const sizes = new Float32Array(pointsCount);
-    const velocity = new Float32Array(pointsCount * 3);
-
-    const colorPalette = [
-      new THREE.Color("#00EEFF").multiplyScalar(1.5),
-      new THREE.Color("#8B5CF6").multiplyScalar(1.5),
-      new THREE.Color("#F471B5").multiplyScalar(1.5),
-      new THREE.Color("#9b87f5").multiplyScalar(1.5),
-      new THREE.Color("#0EA5E9").multiplyScalar(1.5),
-      new THREE.Color("#D946EF").multiplyScalar(1.5),
-    ];
-
-    for (let i = 0; i < pointsCount; i++) {
-      const radius = Math.random() * 10;
-      const spinAngle = radius * 0.5;
-      const branchAngle = ((i % 3) * Math.PI * 2) / 3;
-
-      const randomX =
-        Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? -1 : 1);
-      const randomY =
-        Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? -1 : 1);
-      const randomZ =
-        Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? -1 : 1);
-
-      positions[i * 3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
-      positions[i * 3 + 1] = randomY * 0.5;
-      positions[i * 3 + 2] =
-        Math.sin(branchAngle + spinAngle) * radius + randomZ;
-
-      velocity[i * 3] = (Math.random() - 0.5) * 0.01;
-      velocity[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
-      velocity[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
-
-      sizes[i] = 0.05 + Math.random() * 0.15;
-
-      const colorIndex = Math.floor(Math.random() * colorPalette.length);
-      const color = colorPalette[colorIndex];
-
-      const distanceFromCenter = Math.sqrt(
-        positions[i * 3] ** 2 +
-          positions[i * 3 + 1] ** 2 +
-          positions[i * 3 + 2] ** 2
-      );
-
-      const mixColor =
-        distanceFromCenter < 3
-          ? new THREE.Color("#F471B5")
-          : new THREE.Color("#00EEFF");
-
-      color.lerp(mixColor, Math.min(distanceFromCenter / 10, 1));
-
-      if (Math.random() > 0.9) {
-        colors[i * 3] = 1;
-        colors[i * 3 + 1] = 1;
-        colors[i * 3 + 2] = 1;
-      } else {
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
-      }
-    }
-
-    setParticles({ positions, colors, sizes, velocity });
-  }, []);
-
   useFrame(({ clock }) => {
     const elapsedTime = clock.getElapsedTime();
-
-    if (galaxyRef.current) {
-      galaxyRef.current.rotation.y = elapsedTime * 0.05;
-      galaxyRef.current.rotation.x = Math.sin(elapsedTime * 0.025) * 0.1;
-    }
-
-    if (particlesRef.current && particles) {
-      const positions = particlesRef.current.geometry.attributes.position
-        .array as Float32Array;
-
-      for (let i = 0; i < pointsCount; i++) {
-        const i3 = i * 3;
-
-        positions[i3] += Math.sin(elapsedTime * 0.5 + i * 0.1) * 0.001;
-        positions[i3 + 1] += Math.cos(elapsedTime * 0.5 + i * 0.1) * 0.001;
-        positions[i3 + 2] += Math.sin(elapsedTime * 0.5 + i * 0.05) * 0.001;
-
-        positions[i3] += particles.velocity[i3] * Math.sin(elapsedTime * 0.2);
-        positions[i3 + 1] +=
-          particles.velocity[i3 + 1] * Math.cos(elapsedTime * 0.2);
-        positions[i3 + 2] +=
-          particles.velocity[i3 + 2] * Math.sin(elapsedTime * 0.2);
-      }
-
-      particlesRef.current.geometry.attributes.position.needsUpdate = true;
-    }
 
     if (sphereRef.current) {
       sphereRef.current.rotation.y = elapsedTime * 0.05;
@@ -325,25 +397,6 @@ const HeroScene = () => {
     }
   });
 
-  const textureLoggedRef = useRef(false);
-
-  useEffect(() => {
-    if (texture && !textureLoggedRef.current) {
-      console.log("Texture details:", {
-        uuid: texture.uuid,
-        size: `${texture.image?.width || "unknown"} x ${
-          texture.image?.height || "unknown"
-        }`,
-        format: texture.format,
-        type: texture.type,
-        minFilter: texture.minFilter,
-        magFilter: texture.magFilter,
-        anisotropy: texture.anisotropy,
-      });
-      textureLoggedRef.current = true;
-    }
-  }, [texture]);
-
   return (
     <>
       <ambientLight intensity={0.4} />
@@ -351,42 +404,10 @@ const HeroScene = () => {
       <directionalLight position={[-5, 5, 5]} intensity={0.3} color="#ffffff" />
       <hemisphereLight args={["#ffffff", "#000000", 0.3]} />
       <color attach="background" args={["#000000"]} />
-      <group ref={galaxyRef}>
-        {particles && (
-          <points ref={particlesRef}>
-            <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={particles.positions.length / 3}
-                array={particles.positions}
-                itemSize={3}
-              />
-              <bufferAttribute
-                attach="attributes-color"
-                count={particles.colors.length / 3}
-                array={particles.colors}
-                itemSize={3}
-              />
-              <bufferAttribute
-                attach="attributes-size"
-                count={particles.sizes.length}
-                array={particles.sizes}
-                itemSize={1}
-              />
-            </bufferGeometry>
-            <pointsMaterial
-              size={0.1}
-              sizeAttenuation={true}
-              depthWrite={false}
-              vertexColors
-              transparent
-              opacity={0.8}
-              blending={THREE.AdditiveBlending}
-              map={glowTexture || undefined}
-              alphaTest={0.001}
-            />
-          </points>
-        )}
+      
+      <group>
+        <StarField />
+        
         <mesh ref={sphereRef}>
           <sphereGeometry args={[1, 128, 128]} />
           {texture ? (
@@ -414,12 +435,13 @@ const HeroScene = () => {
             />
           )}
         </mesh>
+        
         {glowTexture && (
           <sprite ref={glowRef} scale={[3, 3, 3]}>
             <spriteMaterial
               map={glowTexture}
               transparent
-              opacity={0.7}
+              opacity={0.5}
               color="#9b87f5"
               blending={THREE.AdditiveBlending}
               depthWrite={false}
@@ -427,17 +449,22 @@ const HeroScene = () => {
           </sprite>
         )}
       </group>
-      <fog attach="fog" args={["#070726", 8, 30]} />
+      
+      <EffectComposer>
+        <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={300} intensity={1.5} />
+        <Vignette eskil={false} offset={0.1} darkness={1.1} />
+      </EffectComposer>
+      
+      <fog attach="fog" args={["#070726", 5, 40]} />
     </>
   );
 };
 
 const AboutScene = () => {
   const modelRef = useRef<THREE.Group>(null);
-  const [isDragging, setIsDragging] = useState(false);
 
   useFrame(({ clock }) => {
-    if (modelRef.current && !isDragging) {
+    if (modelRef.current) {
       modelRef.current.rotation.y = clock.getElapsedTime() * 0.6;
       // Add subtle floating animation
       modelRef.current.position.y =
@@ -458,9 +485,6 @@ const AboutScene = () => {
 
       <group
         ref={modelRef}
-        onPointerDown={() => setIsDragging(true)}
-        onPointerUp={() => setIsDragging(false)}
-        onPointerOut={() => setIsDragging(false)}
         scale={[3.6, 3.6, 3.6]} // Adjust scale as needed
         position={[0, -1, 0]} // Adjust position as needed
       >
@@ -474,20 +498,6 @@ const AboutScene = () => {
     </>
   );
 };
-
-// Loading fallback component - keeping the old one as backup
-const LoadingFallback = () => (
-  <mesh>
-    <boxGeometry args={[1, 2, 0.5]} />
-    <meshStandardMaterial
-      color="#8B5CF6"
-      emissive="#8B5CF6"
-      emissiveIntensity={0.2}
-      transparent
-      opacity={0.7}
-    />
-  </mesh>
-);
 
 // Separate component for the avatar model with error handling
 const AvatarModel = () => {
@@ -1358,7 +1368,7 @@ const ThreeScene = ({
           autoRotate={sceneType !== "about" && sceneType !== "projects"}
           autoRotateSpeed={0.5}
           rotateSpeed={0.5}
-          enabled={sceneType !== "projects"}
+          enabled={sceneType !== "projects" && sceneType !== "about"}
         />
       </Canvas>
     </div>

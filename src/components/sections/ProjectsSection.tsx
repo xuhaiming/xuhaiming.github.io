@@ -53,21 +53,30 @@ const ProjectCard = ({ project, index, isSelected, onClick }: any) => {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const xSpring = useSpring(x);
-  const ySpring = useSpring(y);
-  const transform = useMotionTemplate`rotateX(${xSpring}deg) rotateY(${ySpring}deg)`;
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  const xSpring = useSpring(x, { stiffness: 300, damping: 30 });
+  const ySpring = useSpring(y, { stiffness: 300, damping: 30 });
+  
+  const spotlight = useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(0, 238, 255, 0.15), transparent 80%)`;
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(yPct * 10);
-    y.set(xPct * -10);
+    
+    const clientX = e.clientX - rect.left;
+    const clientY = e.clientY - rect.top;
+    
+    const xPct = clientX / width - 0.5;
+    const yPct = clientY / height - 0.5;
+    
+    x.set(yPct * 20); // Increased tilt range
+    y.set(xPct * -20);
+    mouseX.set(clientX);
+    mouseY.set(clientY);
   };
 
   const handleMouseLeave = () => {
@@ -79,20 +88,30 @@ const ProjectCard = ({ project, index, isSelected, onClick }: any) => {
     <motion.div
       ref={ref}
       variants={cardVariants}
-      style={{ transformStyle: "preserve-3d", transform }}
+      style={{ 
+        transformStyle: "preserve-3d", 
+        rotateX: xSpring, 
+        rotateY: ySpring 
+      }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      className={`relative bg-space-light p-6 md:p-8 rounded-xl border transition-all duration-500 cursor-pointer group perspective-1000 overflow-hidden ${
+      className={`relative bg-space-light/80 backdrop-blur-xl p-6 md:p-8 rounded-xl border transition-all duration-500 cursor-pointer group perspective-1000 overflow-hidden ${
         isSelected
-          ? "border-neon-blue/60 shadow-[0_0_40px_-10px_rgba(0,238,255,0.4)]"
-          : "border-neon-blue/20 hover:border-neon-blue/50 hover:shadow-[0_0_20px_-5px_rgba(0,238,255,0.2)]"
+          ? "border-neon-blue/60 shadow-[0_0_50px_-10px_rgba(0,238,255,0.3)]"
+          : "border-neon-blue/20 hover:border-neon-blue/50"
       }`}
     >
-      {/* Background Gradient Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-neon-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      {/* Spotlight Effect */}
+      <motion.div
+        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100 z-30"
+        style={{ background: spotlight }}
+      />
 
-      <div style={{ transform: "translateZ(20px)" }} className="relative z-10">
+      {/* Background Gradient Effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-neon-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0" />
+
+      <div style={{ transform: "translateZ(50px)" }} className="relative z-20">
         <h3 className="text-xl md:text-2xl font-bold mb-3 text-neon-blue group-hover:text-white transition-colors duration-300">
           {project.title}
         </h3>
@@ -104,7 +123,7 @@ const ProjectCard = ({ project, index, isSelected, onClick }: any) => {
           {project.tags.map((tag: string) => (
             <span
               key={tag}
-              className="bg-space-dark/50 px-3 py-1 rounded-full text-xs font-medium text-neon-purple border border-neon-purple/20 group-hover:border-neon-purple/40 transition-colors duration-300"
+              className="bg-space-dark/50 px-3 py-1 rounded-full text-xs font-medium text-neon-purple border border-neon-purple/20 group-hover:border-neon-purple/40 transition-colors duration-300 shadow-[0_0_10px_-5px_rgba(176,38,255,0.3)]"
             >
               {tag}
             </span>
@@ -115,7 +134,7 @@ const ProjectCard = ({ project, index, isSelected, onClick }: any) => {
       {isSelected && (
         <motion.div
           layoutId="active-glow"
-          className="absolute inset-0 rounded-xl bg-gradient-to-r from-neon-blue/10 to-neon-purple/10 pointer-events-none"
+          className="absolute inset-0 rounded-xl bg-gradient-to-r from-neon-blue/10 to-neon-purple/10 pointer-events-none z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -140,9 +159,32 @@ const ProjectsSection = () => {
       <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-space-dark to-transparent z-10 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-space-dark to-transparent z-10 pointer-events-none" />
       
-      {/* Subtle background glow */}
-      <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-neon-purple/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 left-0 w-[500px] h-[500px] bg-neon-blue/5 rounded-full blur-[100px] pointer-events-none" />
+      {/* Dynamic Background Blobs */}
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{ 
+          duration: 8, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+        className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-neon-purple/10 rounded-full blur-[120px] pointer-events-none" 
+      />
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.1, 1],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{ 
+          duration: 10, 
+          repeat: Infinity, 
+          ease: "easeInOut",
+          delay: 1
+        }}
+        className="absolute bottom-1/4 left-0 w-[600px] h-[600px] bg-neon-blue/10 rounded-full blur-[120px] pointer-events-none" 
+      />
 
       <div className="container mx-auto px-4 relative z-20">
         <motion.div
@@ -152,12 +194,22 @@ const ProjectsSection = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center mb-16 md:mb-24"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gradient inline-block">
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-white to-neon-purple inline-block"
+          >
             Featured Projects
-          </h2>
-          <p className="text-white/60 text-lg max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-white/60 text-lg max-w-2xl mx-auto"
+          >
             A selection of my recent work, showcasing complex systems and user-centric applications.
-          </p>
+          </motion.p>
         </motion.div>
 
         <div
