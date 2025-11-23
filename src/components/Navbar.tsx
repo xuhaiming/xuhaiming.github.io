@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import GradientText from "./GradientText";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -19,13 +20,19 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? "bg-space-dark/80 backdrop-blur-md py-3" : "bg-black py-5"
-      }`}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? "bg-space-dark/80 backdrop-blur-md py-3" : "bg-black py-5"
+        }`}
     >
       <div className="container mx-auto flex justify-between items-center px-4">
-        <a href="#hero" className="text-2xl font-bold text-gradient">
-          Haiming Pages
+        <a href="#hero">
+          <GradientText
+            colors={["#00EEFF", "#8B5CF6", "#F471B5", "#00EEFF", "#8B5CF6", "#F471B5"]}
+            animationSpeed={10}
+            showBorder={false}
+            className="text-2xl font-bold"
+          >
+            Haiming Pages
+          </GradientText>
         </a>
 
         <nav className="hidden md:flex space-x-10">
