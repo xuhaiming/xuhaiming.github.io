@@ -118,40 +118,40 @@ const HeroSection = () => {
         </motion.p>
 
         <motion.div
-           style={{ y: ySubtitle, opacity }}
-           initial={{ opacity: 0, scale: 0.8 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ delay: 1.5, duration: 0.5 }}
+          style={{ y: ySubtitle, opacity }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
         >
-            <MagneticButton
+          <MagneticButton
             onClick={() =>
-                document
+              document
                 .getElementById("about")
                 ?.scrollIntoView({ behavior: "smooth" })
             }
             className="group flex self-center md:self-start items-center gap-2 bg-neon-blue/10 hover:bg-neon-blue/20 border border-neon-blue text-neon-blue py-3 px-6 rounded-full transition-colors duration-300 w-fit"
-            >
+          >
             About Me
             <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 transform group-hover:translate-x-1 transition-transform"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 transform group-hover:translate-x-1 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-                <path
+              <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
                 d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
+              />
             </svg>
-            </MagneticButton>
+          </MagneticButton>
         </motion.div>
       </div>
 
       <div className="absolute bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-20">
-        <motion.div 
+        <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >

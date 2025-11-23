@@ -15,17 +15,17 @@ interface ThreeSceneProps {
 const ShootingStar = () => {
   const mesh = useRef<THREE.Mesh>(null);
   const [active, setActive] = useState(false);
-  
+
   // Reset star position and trajectory
   const reset = () => {
     if (!mesh.current) return;
-    
+
     const startX = (Math.random() - 0.5) * 40;
     const startY = (Math.random() - 0.5) * 40;
     const startZ = (Math.random() - 0.5) * 20 - 10; // Push back a bit
-    
+
     mesh.current.position.set(startX, startY, startZ);
-    
+
     // Random velocity vector
     const speed = 0.5 + Math.random() * 1.5;
     const angle = Math.random() * Math.PI * 2;
@@ -34,7 +34,7 @@ const ShootingStar = () => {
       Math.sin(angle) * speed,
       0
     );
-    
+
     // Stretch it to look like a streak
     mesh.current.scale.set(0.1, 0.1, 0.1);
     setActive(true);
@@ -45,20 +45,20 @@ const ShootingStar = () => {
 
     if (active) {
       mesh.current.position.add(mesh.current.userData.velocity);
-      
+
       // Orient the mesh to face the direction of movement
       const target = mesh.current.position.clone().add(mesh.current.userData.velocity);
       mesh.current.lookAt(target);
-      
+
       // Stretch based on speed for streak effect
       const speed = mesh.current.userData.velocity.length();
       mesh.current.scale.z = 1 + speed * 3;
       mesh.current.scale.x = 0.1;
       mesh.current.scale.y = 0.1;
-      
+
       // Reset if out of bounds
       if (
-        Math.abs(mesh.current.position.x) > 25 || 
+        Math.abs(mesh.current.position.x) > 25 ||
         Math.abs(mesh.current.position.y) > 25
       ) {
         setActive(false);
@@ -83,7 +83,7 @@ const ShootingStar = () => {
 const StarField = () => {
   const count = 6000;
   const mesh = useRef<THREE.Points>(null);
-  
+
   // Create a simple circle texture for the stars
   const starTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -108,7 +108,7 @@ const StarField = () => {
       // Extended Z range to bring more stars in front of the globe (which is at 0)
       // Camera is typically at z=10. 
       // Range: -20 to +15
-      const z = (Math.random() - 0.5) * 35 - 2.5; 
+      const z = (Math.random() - 0.5) * 35 - 2.5;
       temp.push(x, y, z);
     }
     return new Float32Array(temp);
@@ -122,7 +122,7 @@ const StarField = () => {
       new THREE.Color("#F471B5"),
       new THREE.Color("#ffffff"),
     ];
-    
+
     for (let i = 0; i < count; i++) {
       const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
       temp.push(color.r, color.g, color.b);
@@ -319,7 +319,7 @@ const HeroScene = () => {
             lerp(u, grad(p[A], x, y), grad(p[B], x - 1, y)),
             lerp(u, grad(p[A + 1], x, y - 1), grad(p[B + 1], x - 1, y - 1))
           ) *
-            0.5 +
+          0.5 +
           0.5
         );
       };
@@ -404,10 +404,10 @@ const HeroScene = () => {
       <directionalLight position={[-5, 5, 5]} intensity={0.3} color="#ffffff" />
       <hemisphereLight args={["#ffffff", "#000000", 0.3]} />
       <color attach="background" args={["#000000"]} />
-      
+
       <group>
         <StarField />
-        
+
         <mesh ref={sphereRef}>
           <sphereGeometry args={[1, 128, 128]} />
           {texture ? (
@@ -435,7 +435,7 @@ const HeroScene = () => {
             />
           )}
         </mesh>
-        
+
         {glowTexture && (
           <sprite ref={glowRef} scale={[3, 3, 3]}>
             <spriteMaterial
@@ -449,12 +449,12 @@ const HeroScene = () => {
           </sprite>
         )}
       </group>
-      
+
       <EffectComposer>
         <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={300} intensity={1.5} />
         <Vignette eskil={false} offset={0.1} darkness={1.1} />
       </EffectComposer>
-      
+
       <fog attach="fog" args={["#070726", 5, 40]} />
     </>
   );
@@ -463,12 +463,15 @@ const HeroScene = () => {
 const AboutScene = () => {
   const modelRef = useRef<THREE.Group>(null);
 
+  const [isAvatarLoaded, setIsAvatarLoaded] = useState(false);
+
   useFrame(({ clock }) => {
     if (modelRef.current) {
       modelRef.current.rotation.y = clock.getElapsedTime() * 0.6;
-      // Add subtle floating animation
-      modelRef.current.position.y =
-        Math.sin(clock.getElapsedTime() * 0.5) * 0.1;
+      // Add subtle floating animation relative to the base position
+      // Only apply the -2 offset when the avatar is loaded
+      const baseY = isAvatarLoaded ? -2 : -0.5;
+      modelRef.current.position.y = baseY + Math.sin(clock.getElapsedTime() * 0.5) * 0.1;
     }
   });
 
@@ -486,10 +489,10 @@ const AboutScene = () => {
       <group
         ref={modelRef}
         scale={[3.6, 3.6, 3.6]} // Adjust scale as needed
-        position={[0, -1, 0]} // Adjust position as needed
+        position={[0, 0, 0]} // Adjust position as needed
       >
         <Suspense fallback={<AvatarPlaceholder />}>
-          <AvatarModel />
+          <AvatarModel onLoaded={() => setIsAvatarLoaded(true)} />
         </Suspense>
       </group>
 
@@ -500,17 +503,20 @@ const AboutScene = () => {
 };
 
 // Separate component for the avatar model with error handling
-const AvatarModel = () => {
+const AvatarModel = ({ onLoaded }: { onLoaded?: () => void }) => {
   const [hasError, setHasError] = useState(false);
 
   // Always call the hook - React hooks must be called unconditionally
-  const gltf = useGLTF("/assets/avatar1.glb");
+  const gltf = useGLTF("/assets/avatar2.glb");
 
   useEffect(() => {
     // Handle any loading errors
     if (!gltf.scene) {
       setHasError(true);
     } else {
+      // Notify parent that model is loaded
+      onLoaded?.();
+
       // Traverse the model and brighten materials
       gltf.scene.traverse((child) => {
         if (child instanceof THREE.Mesh) {
@@ -522,11 +528,11 @@ const AvatarModel = () => {
                   material instanceof THREE.MeshStandardMaterial ||
                   material instanceof THREE.MeshPhysicalMaterial
                 ) {
-                  // Increase the material brightness
-                  material.color.multiplyScalar(0.8);
-                  material.emissiveIntensity = 0.1;
-                  material.metalness = Math.min(material.metalness * 0.8, 1);
-                  material.roughness = Math.max(material.roughness * 0.7, 0.1);
+                  // Make material more natural (less shiny, less metallic)
+                  material.color.multiplyScalar(0.9); // Slightly less bright than before
+                  material.emissiveIntensity = 0; // Remove emissive for natural look
+                  material.metalness = 0.1; // Low metalness for skin/cloth
+                  material.roughness = 0.8; // High roughness for matte finish
                   material.needsUpdate = true;
                 }
               });
@@ -537,11 +543,11 @@ const AvatarModel = () => {
                 material instanceof THREE.MeshStandardMaterial ||
                 material instanceof THREE.MeshPhysicalMaterial
               ) {
-                // Increase the material brightness
-                material.color.multiplyScalar(0.8);
-                material.emissiveIntensity = 0.1;
-                material.metalness = Math.min(material.metalness * 0.8, 1);
-                material.roughness = Math.max(material.roughness * 0.7, 0.1);
+                // Make material more natural (less shiny, less metallic)
+                material.color.multiplyScalar(0.9); // Slightly less bright than before
+                material.emissiveIntensity = 0; // Remove emissive for natural look
+                material.metalness = 0.1; // Low metalness for skin/cloth
+                material.roughness = 0.8; // High roughness for matte finish
                 material.needsUpdate = true;
               }
             }
@@ -694,7 +700,7 @@ const ProjectsScene = ({
     let loadedCount = 0;
 
     // Pre-fill with nulls to maintain order
-    for(let i=0; i<projectImages.length; i++) loadedTextures.push(null as any);
+    for (let i = 0; i < projectImages.length; i++) loadedTextures.push(null as any);
 
     projectImages.forEach((url, index) => {
       loader.load(
@@ -721,8 +727,8 @@ const ProjectsScene = ({
           // Even on error, we should probably proceed or show placeholders
           loadedCount++;
           if (loadedCount === projectImages.length) {
-             setLoading(false);
-             setReady(true);
+            setLoading(false);
+            setReady(true);
           }
         }
       );
@@ -845,7 +851,7 @@ const ProjectsScene = ({
     if (groupRef.current) {
       // Apply opacity to the entire group if possible, or handle per object
       // Since we can't easily set opacity on a group, we'll do it in the materials
-      
+
       // Add a floating animation to the entire group
       groupRef.current.position.y = Math.sin(elapsedTime * 0.5) * 0.1;
 
@@ -948,8 +954,8 @@ const ProjectsScene = ({
             <mesh>
               <planeGeometry args={[1, 1, 5, 5]} />
               {loading || !textures[i] ? (
-                 // Placeholder material
-                 <meshStandardMaterial
+                // Placeholder material
+                <meshStandardMaterial
                   color="#1a1a2e"
                   emissive="#8B5CF6"
                   emissiveIntensity={0.2}
