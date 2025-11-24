@@ -1368,14 +1368,15 @@ const ThreeScene = ({
           sceneType={sceneType}
           selectedProject={selectedProject}
         />
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          autoRotate={sceneType !== "about" && sceneType !== "projects"}
-          autoRotateSpeed={0.5}
-          rotateSpeed={0.5}
-          enabled={sceneType !== "projects" && sceneType !== "about"}
-        />
+        {sceneType !== "projects" && sceneType !== "about" && (
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            autoRotate={true}
+            autoRotateSpeed={0.5}
+            rotateSpeed={0.5}
+          />
+        )}
       </Canvas>
     </div>
   );
