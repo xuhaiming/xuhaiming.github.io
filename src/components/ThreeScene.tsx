@@ -22,11 +22,10 @@ const ShootingStar = () => {
 
     const startX = (Math.random() - 0.5) * 40;
     const startY = (Math.random() - 0.5) * 40;
-    const startZ = (Math.random() - 0.5) * 20 - 10; // Push back a bit
+    const startZ = (Math.random() - 0.5) * 20 - 10;
 
     mesh.current.position.set(startX, startY, startZ);
 
-    // Random velocity vector
     const speed = 0.5 + Math.random() * 1.5;
     const angle = Math.random() * Math.PI * 2;
     mesh.current.userData.velocity = new THREE.Vector3(
@@ -35,7 +34,6 @@ const ShootingStar = () => {
       0
     );
 
-    // Stretch it to look like a streak
     mesh.current.scale.set(0.1, 0.1, 0.1);
     setActive(true);
   };
@@ -46,17 +44,14 @@ const ShootingStar = () => {
     if (active) {
       mesh.current.position.add(mesh.current.userData.velocity);
 
-      // Orient the mesh to face the direction of movement
       const target = mesh.current.position.clone().add(mesh.current.userData.velocity);
       mesh.current.lookAt(target);
 
-      // Stretch based on speed for streak effect
       const speed = mesh.current.userData.velocity.length();
       mesh.current.scale.z = 1 + speed * 3;
       mesh.current.scale.x = 0.1;
       mesh.current.scale.y = 0.1;
 
-      // Reset if out of bounds
       if (
         Math.abs(mesh.current.position.x) > 25 ||
         Math.abs(mesh.current.position.y) > 25
@@ -64,7 +59,6 @@ const ShootingStar = () => {
         setActive(false);
       }
     } else {
-      // Random chance to spawn
       if (Math.random() < 0.005) {
         reset();
       }
@@ -73,7 +67,6 @@ const ShootingStar = () => {
 
   return (
     <mesh ref={mesh} visible={active} rotation={[Math.PI / 2, 0, 0]}>
-      {/* Use a cylinder for a rounder streak */}
       <cylinderGeometry args={[0.05, 0.05, 1, 8]} />
       <meshBasicMaterial color="#00EEFF" transparent opacity={0.8} />
     </mesh>
@@ -84,7 +77,7 @@ const StarField = () => {
   const count = 6000;
   const mesh = useRef<THREE.Points>(null);
 
-  // Create a simple circle texture for the stars
+  // Create a simple circle texture for the stars - MEMOIZED
   const starTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 32;
@@ -100,14 +93,20 @@ const StarField = () => {
     return texture;
   }, []);
 
+  // Cleanup texture on unmount
+  useEffect(() => {
+    return () => {
+      if (starTexture) {
+        starTexture.dispose();
+      }
+    };
+  }, [starTexture]);
+
   const particles = useMemo(() => {
     const temp = [];
     for (let i = 0; i < count; i++) {
       const x = (Math.random() - 0.5) * 60;
       const y = (Math.random() - 0.5) * 60;
-      // Extended Z range to bring more stars in front of the globe (which is at 0)
-      // Camera is typically at z=10. 
-      // Range: -20 to +15
       const z = (Math.random() - 0.5) * 35 - 2.5;
       temp.push(x, y, z);
     }
@@ -145,6 +144,18 @@ const StarField = () => {
     }
   });
 
+  // Cleanup geometry on unmount
+  useEffect(() => {
+    return () => {
+      if (mesh.current?.geometry) {
+        mesh.current.geometry.dispose();
+      }
+      if (mesh.current?.material && 'dispose' in mesh.current.material) {
+        (mesh.current.material as THREE.Material).dispose();
+      }
+    };
+  }, []);
+
   return (
     <>
       <points ref={mesh}>
@@ -169,7 +180,7 @@ const StarField = () => {
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.2} // Slightly larger to account for circle texture transparency
+          size={0.2}
           sizeAttenuation={true}
           depthWrite={false}
           vertexColors
@@ -193,18 +204,20 @@ const HeroScene = () => {
   const ringRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Sprite>(null);
 
-  // Use a fallback texture in case the main one fails to load
   const [textureError, setTextureError] = useState(false);
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [glowTexture, setGlowTexture] = useState<THREE.Texture | null>(null);
   const [noiseTexture, setNoiseTexture] = useState<THREE.Texture | null>(null);
 
-  // Load textures
+  // Load textures with proper cleanup
   useEffect(() => {
+    let isMounted = true;
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onError = (url) => {
       console.error(`Error loading texture from ${url}`);
-      setTextureError(true);
+      if (isMounted) {
+        setTextureError(true);
+      }
     };
 
     const textureLoader = new THREE.TextureLoader(loadingManager);
@@ -214,12 +227,14 @@ const HeroScene = () => {
       "../public/assets/globe2.jpeg",
     ];
 
-    let loadAttempted = false;
-
     const attemptTextureLoad = (pathIndex = 0) => {
-      if (pathIndex >= texturePaths.length) {
-        console.error("All texture load attempts failed");
-        setTextureError(true);
+      if (!isMounted || pathIndex >= texturePaths.length) {
+        if (pathIndex >= texturePaths.length) {
+          console.error("All texture load attempts failed");
+          if (isMounted) {
+            setTextureError(true);
+          }
+        }
         return;
       }
 
@@ -229,6 +244,10 @@ const HeroScene = () => {
       textureLoader.load(
         path,
         (loadedTexture) => {
+          if (!isMounted) {
+            loadedTexture.dispose();
+            return;
+          }
           console.log(`Texture loaded successfully from: ${path}`);
           loadedTexture.wrapS = THREE.ClampToEdgeWrapping;
           loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
@@ -243,7 +262,6 @@ const HeroScene = () => {
           loadedTexture.anisotropy = 16;
           loadedTexture.needsUpdate = true;
           setTexture(loadedTexture);
-          loadAttempted = true;
         },
         (progressEvent) => {
           console.log(`Loading texture progress from ${path}:`, progressEvent);
@@ -255,9 +273,7 @@ const HeroScene = () => {
       );
     };
 
-    if (!loadAttempted) {
-      attemptTextureLoad();
-    }
+    attemptTextureLoad();
 
     const glowSize = 128;
     const canvas = document.createElement("canvas");
@@ -277,8 +293,12 @@ const HeroScene = () => {
       gradient.addColorStop(1, "rgba(255,255,255,0)");
       context.fillStyle = gradient;
       context.fillRect(0, 0, glowSize, glowSize);
-      const glowTexture = new THREE.CanvasTexture(canvas);
-      setGlowTexture(glowTexture);
+      const glowTex = new THREE.CanvasTexture(canvas);
+      if (isMounted) {
+        setGlowTexture(glowTex);
+      } else {
+        glowTex.dispose();
+      }
     }
 
     const noiseSize = 256;
@@ -356,16 +376,21 @@ const HeroScene = () => {
       noiseData[i + 3] = 255;
     }
 
-    const noiseTexture = new THREE.DataTexture(
+    const noiseTex = new THREE.DataTexture(
       noiseData,
       noiseSize,
       noiseSize,
       THREE.RGBAFormat
     );
-    noiseTexture.needsUpdate = true;
-    setNoiseTexture(noiseTexture);
+    noiseTex.needsUpdate = true;
+    if (isMounted) {
+      setNoiseTexture(noiseTex);
+    } else {
+      noiseTex.dispose();
+    }
 
     return () => {
+      isMounted = false;
       if (texture) texture.dispose();
       if (glowTexture) glowTexture.dispose();
       if (noiseTexture) noiseTexture.dispose();
@@ -468,8 +493,6 @@ const AboutScene = () => {
   useFrame(({ clock }) => {
     if (modelRef.current) {
       modelRef.current.rotation.y = clock.getElapsedTime() * 0.6;
-      // Add subtle floating animation relative to the base position
-      // Only apply the -2 offset when the avatar is loaded
       const baseY = isAvatarLoaded ? -2 : -0.5;
       modelRef.current.position.y = baseY + Math.sin(clock.getElapsedTime() * 0.5) * 0.1;
     }
@@ -488,66 +511,56 @@ const AboutScene = () => {
 
       <group
         ref={modelRef}
-        scale={[3.6, 3.6, 3.6]} // Adjust scale as needed
-        position={[0, 0, 0]} // Adjust position as needed
+        scale={[3.6, 3.6, 3.6]}
+        position={[0, 0, 0]}
       >
         <Suspense fallback={<AvatarPlaceholder />}>
           <AvatarModel onLoaded={() => setIsAvatarLoaded(true)} />
         </Suspense>
       </group>
 
-      {/* Add some atmospheric fog */}
       <fog attach="fog" args={["#070726", 5, 15]} />
     </>
   );
 };
 
-// Separate component for the avatar model with error handling
 const AvatarModel = ({ onLoaded }: { onLoaded?: () => void }) => {
   const [hasError, setHasError] = useState(false);
 
-  // Always call the hook - React hooks must be called unconditionally
   const gltf = useGLTF("/assets/avatar2.glb");
 
   useEffect(() => {
-    // Handle any loading errors
     if (!gltf.scene) {
       setHasError(true);
     } else {
-      // Notify parent that model is loaded
       onLoaded?.();
 
-      // Traverse the model and brighten materials
       gltf.scene.traverse((child) => {
         if (child instanceof THREE.Mesh) {
           if (child.material) {
-            // If it's an array of materials
             if (Array.isArray(child.material)) {
               child.material.forEach((material) => {
                 if (
                   material instanceof THREE.MeshStandardMaterial ||
                   material instanceof THREE.MeshPhysicalMaterial
                 ) {
-                  // Make material more natural (less shiny, less metallic)
-                  material.color.multiplyScalar(0.9); // Slightly less bright than before
-                  material.emissiveIntensity = 0; // Remove emissive for natural look
-                  material.metalness = 0.1; // Low metalness for skin/cloth
-                  material.roughness = 0.8; // High roughness for matte finish
+                  material.color.multiplyScalar(0.9);
+                  material.emissiveIntensity = 0;
+                  material.metalness = 0.1;
+                  material.roughness = 0.8;
                   material.needsUpdate = true;
                 }
               });
             } else {
-              // Single material
               const material = child.material;
               if (
                 material instanceof THREE.MeshStandardMaterial ||
                 material instanceof THREE.MeshPhysicalMaterial
               ) {
-                // Make material more natural (less shiny, less metallic)
-                material.color.multiplyScalar(0.9); // Slightly less bright than before
-                material.emissiveIntensity = 0; // Remove emissive for natural look
-                material.metalness = 0.1; // Low metalness for skin/cloth
-                material.roughness = 0.8; // High roughness for matte finish
+                material.color.multiplyScalar(0.9);
+                material.emissiveIntensity = 0;
+                material.metalness = 0.1;
+                material.roughness = 0.8;
                 material.needsUpdate = true;
               }
             }
@@ -555,10 +568,9 @@ const AvatarModel = ({ onLoaded }: { onLoaded?: () => void }) => {
         }
       });
     }
-  }, [gltf.scene]);
+  }, [gltf.scene, onLoaded]);
 
   if (hasError) {
-    // Fallback to torus knot if model fails to load
     return (
       <mesh>
         <torusKnotGeometry args={[1, 0.3, 128, 32]} />
@@ -576,7 +588,6 @@ const AvatarModel = ({ onLoaded }: { onLoaded?: () => void }) => {
   return <primitive object={gltf.scene} />;
 };
 
-// Preload the avatar model for better performance
 useGLTF.preload("/assets/avatar1.glb");
 
 const SkillsScene = () => {
@@ -629,7 +640,6 @@ const ProjectsScene = ({
 
   const [textures, setTextures] = useState<THREE.Texture[]>([]);
   const [loading, setLoading] = useState(true);
-  // Add state to track if textures are fully ready to be displayed
   const [ready, setReady] = useState(false);
 
   const [targetRotations, setTargetRotations] = useState<THREE.Euler[]>([]);
@@ -639,15 +649,15 @@ const ProjectsScene = ({
   const [targetScales, setTargetScales] = useState<THREE.Vector3[]>([]);
   const [currentScales, setCurrentScales] = useState<THREE.Vector3[]>([]);
 
-  // Environment map for reflections
   const [envMap, setEnvMap] = useState<THREE.Texture | null>(null);
   const { gl } = useThree();
 
-  // Glow effect texture
   const [glowTexture, setGlowTexture] = useState<THREE.Texture | null>(null);
 
+  // FIXED: Environment map creation with proper cleanup
   useEffect(() => {
-    // Generate glow texture
+    let isMounted = true;
+    
     const glowSize = 256;
     const canvas = document.createElement("canvas");
     canvas.width = glowSize;
@@ -669,26 +679,34 @@ const ProjectsScene = ({
       context.fillStyle = gradient;
       context.fillRect(0, 0, glowSize, glowSize);
       const texture = new THREE.CanvasTexture(canvas);
-      setGlowTexture(texture);
+      if (isMounted) {
+        setGlowTexture(texture);
+      } else {
+        texture.dispose();
+      }
     }
 
-    // Create environment map
     const pmremGenerator = new THREE.PMREMGenerator(gl);
     pmremGenerator.compileEquirectangularShader();
 
     const cubeRenderTarget = pmremGenerator.fromScene(new THREE.Scene(), 0.04);
 
-    setEnvMap(cubeRenderTarget.texture);
+    if (isMounted) {
+      setEnvMap(cubeRenderTarget.texture);
+    }
 
     return () => {
+      isMounted = false;
       if (envMap) envMap.dispose();
       if (glowTexture) glowTexture.dispose();
-      if (cubeRenderTarget) cubeRenderTarget.dispose();
+      cubeRenderTarget.dispose();
       pmremGenerator.dispose();
     };
   }, [gl]);
 
+  // FIXED: Texture loading with proper cleanup
   useEffect(() => {
+    let isMounted = true;
     const loader = new THREE.TextureLoader();
     const projectImages = [
       "/assets/project1.png",
@@ -699,34 +717,40 @@ const ProjectsScene = ({
     const loadedTextures: THREE.Texture[] = [];
     let loadedCount = 0;
 
-    // Pre-fill with nulls to maintain order
     for (let i = 0; i < projectImages.length; i++) loadedTextures.push(null as any);
 
     projectImages.forEach((url, index) => {
       loader.load(
         url,
         (texture) => {
+          if (!isMounted) {
+            texture.dispose();
+            return;
+          }
+          
           texture.minFilter = THREE.LinearFilter;
           texture.magFilter = THREE.LinearFilter;
           texture.anisotropy = 16;
-          texture.colorSpace = THREE.SRGBColorSpace; // Ensure correct color space
+          texture.colorSpace = THREE.SRGBColorSpace;
 
           loadedTextures[index] = texture;
           loadedCount++;
 
-          if (loadedCount === projectImages.length) {
+          if (loadedCount === projectImages.length && isMounted) {
             setTextures(loadedTextures);
             setLoading(false);
-            // Add a small delay before showing to ensure everything is rendered
-            setTimeout(() => setReady(true), 100);
+            setTimeout(() => {
+              if (isMounted) {
+                setReady(true);
+              }
+            }, 100);
           }
         },
         undefined,
         (error) => {
           console.error("Error loading project texture:", error);
-          // Even on error, we should probably proceed or show placeholders
           loadedCount++;
-          if (loadedCount === projectImages.length) {
+          if (loadedCount === projectImages.length && isMounted) {
             setLoading(false);
             setReady(true);
           }
@@ -735,30 +759,28 @@ const ProjectsScene = ({
     });
 
     return () => {
+      isMounted = false;
       loadedTextures.forEach((texture) => texture?.dispose());
     };
   }, []);
 
   const aspectRatio = 16 / 9;
-  // Adjust card sizes for better presentation
   const mainCardWidth = 3.2;
   const mainCardHeight = mainCardWidth / aspectRatio;
   const secondaryCardWidth = mainCardWidth * 0.65;
   const secondaryCardHeight = secondaryCardWidth / aspectRatio;
 
   useEffect(() => {
-    // Initial positions with more dramatic offsets
     const positions: THREE.Vector3[] = [
-      new THREE.Vector3(0, -mainCardHeight * 1.2, -1.2), // bottom position (further back and lower)
-      new THREE.Vector3(0, 0, 0), // center/main position
-      new THREE.Vector3(0, mainCardHeight * 1.2, -1.2), // top position (further back and higher)
+      new THREE.Vector3(0, -mainCardHeight * 1.2, -1.2),
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, mainCardHeight * 1.2, -1.2),
     ];
 
-    // More pronounced rotation angles
     const rotations: THREE.Euler[] = [
-      new THREE.Euler(-0.5, 0, 0), // bottom card rotated up
-      new THREE.Euler(0, 0, 0), // center card straight
-      new THREE.Euler(0.5, 0, 0), // top card rotated down
+      new THREE.Euler(-0.5, 0, 0),
+      new THREE.Euler(0, 0, 0),
+      new THREE.Euler(0.5, 0, 0),
     ];
 
     const scales: THREE.Vector3[] = [
@@ -778,45 +800,43 @@ const ProjectsScene = ({
   useEffect(() => {
     if (targetPositions.length === 0 || targetScales.length === 0) return;
 
-    // Calculate the new positions, rotations, and scales based on the selected project
     const newPositions: THREE.Vector3[] = [];
     const newRotations: THREE.Euler[] = [];
     const newScales: THREE.Vector3[] = [];
 
     for (let i = 0; i < 3; i++) {
-      // Calculate relative position in the rotation based on project index
       let relativePos;
 
       if (i === selectedProject) {
-        relativePos = 0; // Selected project is always centered
+        relativePos = 0;
       } else if (
         (i === 0 && selectedProject === 2) ||
         (i === 1 && selectedProject === 0) ||
         (i === 2 && selectedProject === 1)
       ) {
-        relativePos = 2; // This project should be at top
+        relativePos = 2;
       } else {
-        relativePos = 1; // This project should be at bottom
+        relativePos = 1;
       }
 
       switch (relativePos) {
-        case 0: // Center/selected project
+        case 0:
           newPositions[i] = new THREE.Vector3(0, 0, 0);
           newRotations[i] = new THREE.Euler(0, 0, 0);
           newScales[i] = new THREE.Vector3(mainCardWidth, mainCardHeight, 0.05);
           break;
-        case 1: // Bottom project
+        case 1:
           newPositions[i] = new THREE.Vector3(0, -mainCardHeight * 1.2, -1.2);
-          newRotations[i] = new THREE.Euler(-0.5, 0, 0); // Rotate to face upward
+          newRotations[i] = new THREE.Euler(-0.5, 0, 0);
           newScales[i] = new THREE.Vector3(
             secondaryCardWidth,
             secondaryCardHeight,
             0.05
           );
           break;
-        case 2: // Top project
+        case 2:
           newPositions[i] = new THREE.Vector3(0, mainCardHeight * 1.2, -1.2);
-          newRotations[i] = new THREE.Euler(0.5, 0, 0); // Rotate to face downward
+          newRotations[i] = new THREE.Euler(0.5, 0, 0);
           newScales[i] = new THREE.Vector3(
             secondaryCardWidth,
             secondaryCardHeight,
@@ -837,51 +857,37 @@ const ProjectsScene = ({
     secondaryCardWidth,
   ]);
 
-  // Animation ref for opacity transition
   const opacityRef = useRef(0);
 
   useFrame(({ clock }) => {
     const elapsedTime = clock.getElapsedTime();
 
-    // Smooth opacity transition
     if (ready) {
       opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, 1, 0.05);
     }
 
     if (groupRef.current) {
-      // Apply opacity to the entire group if possible, or handle per object
-      // Since we can't easily set opacity on a group, we'll do it in the materials
-
-      // Add a floating animation to the entire group
       groupRef.current.position.y = Math.sin(elapsedTime * 0.5) * 0.1;
-
-      // Add subtle rotation to the entire scene
       groupRef.current.rotation.z = Math.sin(elapsedTime * 0.2) * 0.03;
 
-      // Smooth animations for each card with improved easing
       if (targetPositions.length === 3 && currentPositions.length === 3) {
         for (let i = 0; i < 3; i++) {
           const isSelected = i === selectedProject;
-          // Use different animation speeds for selected vs non-selected cards
           const lerpFactor = isSelected ? 0.08 : 0.06;
 
-          // Position animation with elastic-like motion
           if (currentPositions[i] && targetPositions[i]) {
             currentPositions[i].lerp(targetPositions[i], lerpFactor);
 
-            // Add subtle floating effect
             const floatOffset = isSelected
               ? Math.sin(elapsedTime * 0.8 + i) * 0.03
               : Math.sin(elapsedTime * 0.5 + i) * 0.015;
 
-            // Apply position with floating effect
             if (groupRef.current.children[i]) {
               groupRef.current.children[i].position.copy(currentPositions[i]);
               groupRef.current.children[i].position.y += floatOffset;
             }
           }
 
-          // Rotation animation with smoother easing
           if (currentRotations[i] && targetRotations[i]) {
             currentRotations[i].x +=
               (targetRotations[i].x - currentRotations[i].x) * lerpFactor;
@@ -890,7 +896,6 @@ const ProjectsScene = ({
             currentRotations[i].z +=
               (targetRotations[i].z - currentRotations[i].z) * lerpFactor;
 
-            // Add subtle rotation wobble to selected card
             let wobbleX = 0,
               wobbleY = 0,
               wobbleZ = 0;
@@ -910,11 +915,9 @@ const ProjectsScene = ({
             }
           }
 
-          // Scale animation with bounce effect
           if (currentScales[i] && targetScales[i]) {
             currentScales[i].lerp(targetScales[i], lerpFactor);
 
-            // Add subtle pulse to selected card
             const pulse = isSelected ? 1 + Math.sin(elapsedTime * 2) * 0.02 : 1;
 
             if (groupRef.current.children[i]) {
@@ -942,7 +945,6 @@ const ProjectsScene = ({
       <pointLight position={[0, 0, 3]} intensity={0.3} color="#ffffff" />
 
       <group ref={groupRef}>
-        {/* Always render the cards structure, but fade in the content */}
         {[0, 1, 2].map((i) => (
           <group
             key={i}
@@ -950,11 +952,9 @@ const ProjectsScene = ({
             rotation={currentRotations[i] || [0, 0, 0]}
             scale={currentScales[i] || [1, 1, 1]}
           >
-            {/* Main card with texture or placeholder */}
             <mesh>
               <planeGeometry args={[1, 1, 5, 5]} />
               {loading || !textures[i] ? (
-                // Placeholder material
                 <meshStandardMaterial
                   color="#1a1a2e"
                   emissive="#8B5CF6"
@@ -966,18 +966,16 @@ const ProjectsScene = ({
                   {envMap && <primitive attach="envMap" object={envMap} />}
                 </meshStandardMaterial>
               ) : (
-                // Actual texture material
                 <meshBasicMaterial
                   map={textures[i]}
                   transparent
-                  opacity={ready ? 1 : 0} // Hard switch for now, but could be lerped if we passed opacityRef
+                  opacity={ready ? 1 : 0}
                   side={THREE.DoubleSide}
                   toneMapped={false}
                 />
               )}
             </mesh>
 
-            {/* Glowing border for selected card */}
             {i === selectedProject && (
               <>
                 <mesh position={[0, 0, -0.01]} scale={[1.05, 1.05, 1]}>
@@ -997,7 +995,6 @@ const ProjectsScene = ({
         ))}
       </group>
 
-      {/* Global fog for depth effect */}
       <fog attach="fog" args={["#070726", 10, 25]} />
     </>
   );
@@ -1021,11 +1018,15 @@ const ContactScene = () => {
   const [texturesError, setTexturesError] = useState(false);
   const [glowTexture, setGlowTexture] = useState<THREE.Texture | null>(null);
 
+  // FIXED: Texture loading with proper cleanup
   useEffect(() => {
+    let isMounted = true;
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onError = (url) => {
       console.error(`Error loading texture from ${url}`);
-      setTexturesError(true);
+      if (isMounted) {
+        setTexturesError(true);
+      }
     };
 
     const textureLoader = new THREE.TextureLoader(loadingManager);
@@ -1057,7 +1058,11 @@ const ContactScene = () => {
       context.fillStyle = gradient;
       context.fillRect(0, 0, glowSize, glowSize);
       const texture = new THREE.CanvasTexture(canvas);
-      setGlowTexture(texture);
+      if (isMounted) {
+        setGlowTexture(texture);
+      } else {
+        texture.dispose();
+      }
     }
 
     const loadedTextures: THREE.Texture[] = [];
@@ -1067,6 +1072,11 @@ const ContactScene = () => {
       textureLoader.load(
         src,
         (texture) => {
+          if (!isMounted) {
+            texture.dispose();
+            return;
+          }
+          
           texture.minFilter = THREE.LinearFilter;
           texture.magFilter = THREE.LinearFilter;
           texture.anisotropy = 16;
@@ -1075,7 +1085,7 @@ const ContactScene = () => {
           loadedTextures[index] = texture;
 
           loadedCount++;
-          if (loadedCount === textureSources.length) {
+          if (loadedCount === textureSources.length && isMounted) {
             setCubeTextures(loadedTextures);
             setIsLoadingTextures(false);
           }
@@ -1083,12 +1093,15 @@ const ContactScene = () => {
         undefined,
         (error) => {
           console.error(`Error loading texture ${index}:`, error);
-          setTexturesError(true);
+          if (isMounted) {
+            setTexturesError(true);
+          }
         }
       );
     });
 
     return () => {
+      isMounted = false;
       loadedTextures.forEach((texture) => texture?.dispose());
       if (glowTexture) glowTexture.dispose();
     };
@@ -1210,7 +1223,8 @@ const ContactScene = () => {
     }
   });
 
-  const createCubeMaterials = () => {
+  // FIXED: Memoize materials to prevent recreation on every render
+  const cubeMaterials = useMemo(() => {
     if (isLoadingTextures || texturesError) {
       return [
         new THREE.MeshStandardMaterial({
@@ -1253,7 +1267,14 @@ const ContactScene = () => {
         toneMapped: false,
       });
     });
-  };
+  }, [isLoadingTextures, texturesError, cubeTextures]);
+
+  // Cleanup materials on unmount
+  useEffect(() => {
+    return () => {
+      cubeMaterials.forEach((material) => material.dispose());
+    };
+  }, [cubeMaterials]);
 
   return (
     <>
@@ -1283,7 +1304,7 @@ const ContactScene = () => {
       <group ref={boxRef}>
         <mesh position={[0, 0.3, 0]} scale={[1.98, 1.98, 1.98]}>
           <boxGeometry args={[1, 1, 1]} />
-          {createCubeMaterials().map((material, index) => (
+          {cubeMaterials.map((material, index) => (
             <primitive
               key={index}
               object={material}
