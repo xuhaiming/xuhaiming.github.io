@@ -1,11 +1,18 @@
 import React, { useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import ThreeScene from "../ThreeScene";
 import { Mail, MapPin, Github, Linkedin } from "lucide-react";
 import ParticleEffect from "../ParticleEffect";
 
 const ContactSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  
+  // NEW: Track if 3D scene should be visible
+  const sceneInView = useInView(sectionRef, { 
+    once: false, 
+    amount: 0.1,
+    margin: "100px"
+  });
 
   // Profile information
   const profile = {
@@ -213,7 +220,7 @@ const ContactSection = () => {
             <div className="h-[600px] rounded-lg overflow-hidden border border-neon-purple/30 relative group perspective-1000 transform transition-all duration-500 hover:scale-[1.01]">
               {/* Enhanced 3D scene backdrop with proper styling */}
               <div className="absolute inset-0 z-10">
-                <ThreeScene sceneType="contact" />
+                <ThreeScene sceneType="contact" isVisible={sceneInView} />
               </div>
 
               {/* Animated overlay effects */}

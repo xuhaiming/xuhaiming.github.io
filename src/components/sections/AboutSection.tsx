@@ -12,6 +12,13 @@ const AboutSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: false, amount: 0.3 });
   
+  // NEW: Track if 3D scene should be visible (more aggressive threshold)
+  const sceneInView = useInView(sectionRef, { 
+    once: false, 
+    amount: 0.1,
+    margin: "100px"
+  });
+  
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoCanPlay, setVideoCanPlay] = useState(false);
   const [videoError, setVideoError] = useState(false);
@@ -142,7 +149,7 @@ const AboutSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div className="md:order-2 relative h-[500px] w-full">
             <div className="absolute inset-0">
-              <ThreeScene sceneType="about" />
+              <ThreeScene sceneType="about" isVisible={sceneInView} />
             </div>
 
             <motion.div

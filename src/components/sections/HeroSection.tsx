@@ -6,6 +6,7 @@ import {
   useSpring,
   useMotionTemplate,
   useMotionValue,
+  useInView, // NEW: Import useInView
 } from "framer-motion";
 import ThreeScene from "../ThreeScene";
 
@@ -33,7 +34,13 @@ const TypewriterText = ({ text, delay = 0 }: { text: string; delay?: number }) =
   return <span>{displayedText}</span>;
 };
 
-const MagneticButton = ({ children, onClick, className }: any) => {
+interface MagneticButtonProps {
+  children: React.ReactNode;
+  onClick: () => void;
+  className?: string;
+}
+
+const MagneticButton = ({ children, onClick, className }: MagneticButtonProps) => {
   const ref = useRef<HTMLButtonElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -71,6 +78,13 @@ const MagneticButton = ({ children, onClick, className }: any) => {
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  // NEW: Track if section is in viewport
+  const isInView = useInView(sectionRef, { 
+    once: false, 
+    amount: 0.1, // Trigger when 10% visible
+    margin: "100px" // Start loading slightly before entering viewport
+  });
+  
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
@@ -87,7 +101,7 @@ const HeroSection = () => {
       className="h-[calc(100vh-134px)] md:h-screen w-full relative overflow-hidden"
     >
       <div className="absolute inset-0 z-0">
-        <ThreeScene sceneType="hero" />
+        <ThreeScene sceneType="hero" isVisible={isInView} />
       </div>
 
       <div className="absolute inset-0 bg-gradient-to-t from-space-dark to-transparent z-10" />

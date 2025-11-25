@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { motion, useMotionTemplate, useMotionValue, useSpring, Variants } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue, useSpring, Variants, useInView } from "framer-motion";
 import ThreeScene from "../ThreeScene";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -49,7 +49,14 @@ const cardVariants: Variants = {
   }
 };
 
-const ProjectCard = ({ project, index, isSelected, onClick }: any) => {
+interface ProjectCardProps {
+  project: Project;
+  index: number;
+  isSelected: boolean;
+  onClick: () => void;
+}
+
+const ProjectCard = ({ project, index, isSelected, onClick }: ProjectCardProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -147,12 +154,21 @@ const ProjectCard = ({ project, index, isSelected, onClick }: any) => {
 
 const ProjectsSection = () => {
   const sceneRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null); // NEW: Add section ref
   const [selectedProject, setSelectedProject] = useState(1);
   const isMobile = useIsMobile();
+  
+  // NEW: Track if 3D scene should be visible
+  const sceneInView = useInView(sectionRef, { 
+    once: false, 
+    amount: 0.1,
+    margin: "100px"
+  });
 
   return (
     <section
       id="projects"
+      ref={sectionRef}
       className="min-h-screen py-20 md:py-28 relative bg-space overflow-hidden"
     >
       {/* Background Elements */}
@@ -233,6 +249,7 @@ const ProjectsSection = () => {
                     sceneType="projects"
                     className="h-full w-full"
                     selectedProject={selectedProject}
+                    isVisible={sceneInView}
                   />
                   
                   {/* Decorative overlay for the 3D scene */}

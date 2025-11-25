@@ -10,6 +10,7 @@ interface ThreeSceneProps {
   className?: string;
   sceneType: "hero" | "about" | "skills" | "projects" | "contact";
   selectedProject?: number;
+  isVisible?: boolean; // NEW: Control rendering based on visibility
 }
 
 const ShootingStar = () => {
@@ -64,6 +65,18 @@ const ShootingStar = () => {
       }
     }
   });
+
+  // Cleanup geometry and material on unmount
+  useEffect(() => {
+    return () => {
+      if (mesh.current?.geometry) {
+        mesh.current.geometry.dispose();
+      }
+      if (mesh.current?.material && 'dispose' in mesh.current.material) {
+        (mesh.current.material as THREE.Material).dispose();
+      }
+    };
+  }, []);
 
   return (
     <mesh ref={mesh} visible={active} rotation={[Math.PI / 2, 0, 0]}>
@@ -209,9 +222,13 @@ const HeroScene = () => {
   const [glowTexture, setGlowTexture] = useState<THREE.Texture | null>(null);
   const [noiseTexture, setNoiseTexture] = useState<THREE.Texture | null>(null);
 
-  // Load textures with proper cleanup
+  // FIXED: Load textures with proper cleanup using local variables
   useEffect(() => {
     let isMounted = true;
+    let loadedTexture: THREE.Texture | null = null;
+    let loadedGlowTexture: THREE.Texture | null = null;
+    let loadedNoiseTexture: THREE.Texture | null = null;
+
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onError = (url) => {
       console.error(`Error loading texture from ${url}`);
@@ -243,25 +260,26 @@ const HeroScene = () => {
 
       textureLoader.load(
         path,
-        (loadedTexture) => {
+        (tex) => {
           if (!isMounted) {
-            loadedTexture.dispose();
+            tex.dispose();
             return;
           }
           console.log(`Texture loaded successfully from: ${path}`);
-          loadedTexture.wrapS = THREE.ClampToEdgeWrapping;
-          loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
-          loadedTexture.repeat.set(1, 1);
-          loadedTexture.offset.set(0, 0);
-          loadedTexture.center.set(0.5, 0.5);
-          loadedTexture.rotation = 0;
-          loadedTexture.colorSpace = THREE.SRGBColorSpace;
-          loadedTexture.flipY = true;
-          loadedTexture.minFilter = THREE.LinearFilter;
-          loadedTexture.magFilter = THREE.LinearFilter;
-          loadedTexture.anisotropy = 16;
-          loadedTexture.needsUpdate = true;
-          setTexture(loadedTexture);
+          tex.wrapS = THREE.ClampToEdgeWrapping;
+          tex.wrapT = THREE.ClampToEdgeWrapping;
+          tex.repeat.set(1, 1);
+          tex.offset.set(0, 0);
+          tex.center.set(0.5, 0.5);
+          tex.rotation = 0;
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.flipY = true;
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          tex.anisotropy = 16;
+          tex.needsUpdate = true;
+          loadedTexture = tex;
+          setTexture(tex);
         },
         (progressEvent) => {
           console.log(`Loading texture progress from ${path}:`, progressEvent);
@@ -294,10 +312,9 @@ const HeroScene = () => {
       context.fillStyle = gradient;
       context.fillRect(0, 0, glowSize, glowSize);
       const glowTex = new THREE.CanvasTexture(canvas);
+      loadedGlowTexture = glowTex;
       if (isMounted) {
         setGlowTexture(glowTex);
-      } else {
-        glowTex.dispose();
       }
     }
 
@@ -383,17 +400,17 @@ const HeroScene = () => {
       THREE.RGBAFormat
     );
     noiseTex.needsUpdate = true;
+    loadedNoiseTexture = noiseTex;
     if (isMounted) {
       setNoiseTexture(noiseTex);
-    } else {
-      noiseTex.dispose();
     }
 
     return () => {
       isMounted = false;
-      if (texture) texture.dispose();
-      if (glowTexture) glowTexture.dispose();
-      if (noiseTexture) noiseTexture.dispose();
+      // Cleanup using local variables, not state
+      if (loadedTexture) loadedTexture.dispose();
+      if (loadedGlowTexture) loadedGlowTexture.dispose();
+      if (loadedNoiseTexture) loadedNoiseTexture.dispose();
     };
   }, []);
 
@@ -526,6 +543,7 @@ const AboutScene = () => {
 
 const AvatarModel = ({ onLoaded }: { onLoaded?: () => void }) => {
   const [hasError, setHasError] = useState(false);
+  const hasModifiedMaterials = useRef(false);
 
   const gltf = useGLTF("/assets/avatar2.glb");
 
@@ -535,11 +553,26 @@ const AvatarModel = ({ onLoaded }: { onLoaded?: () => void }) => {
     } else {
       onLoaded?.();
 
-      gltf.scene.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          if (child.material) {
-            if (Array.isArray(child.material)) {
-              child.material.forEach((material) => {
+      // Only modify materials once
+      if (!hasModifiedMaterials.current) {
+        gltf.scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach((material) => {
+                  if (
+                    material instanceof THREE.MeshStandardMaterial ||
+                    material instanceof THREE.MeshPhysicalMaterial
+                  ) {
+                    material.color.multiplyScalar(0.9);
+                    material.emissiveIntensity = 0;
+                    material.metalness = 0.1;
+                    material.roughness = 0.8;
+                    material.needsUpdate = true;
+                  }
+                });
+              } else {
+                const material = child.material;
                 if (
                   material instanceof THREE.MeshStandardMaterial ||
                   material instanceof THREE.MeshPhysicalMaterial
@@ -550,24 +583,33 @@ const AvatarModel = ({ onLoaded }: { onLoaded?: () => void }) => {
                   material.roughness = 0.8;
                   material.needsUpdate = true;
                 }
-              });
-            } else {
-              const material = child.material;
-              if (
-                material instanceof THREE.MeshStandardMaterial ||
-                material instanceof THREE.MeshPhysicalMaterial
-              ) {
-                material.color.multiplyScalar(0.9);
-                material.emissiveIntensity = 0;
-                material.metalness = 0.1;
-                material.roughness = 0.8;
-                material.needsUpdate = true;
               }
             }
           }
-        }
-      });
+        });
+        hasModifiedMaterials.current = true;
+      }
     }
+
+    // Cleanup on unmount
+    return () => {
+      if (gltf.scene) {
+        gltf.scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            if (child.geometry) {
+              child.geometry.dispose();
+            }
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach((material) => material.dispose());
+              } else {
+                child.material.dispose();
+              }
+            }
+          }
+        });
+      }
+    };
   }, [gltf.scene, onLoaded]);
 
   if (hasError) {
@@ -588,7 +630,7 @@ const AvatarModel = ({ onLoaded }: { onLoaded?: () => void }) => {
   return <primitive object={gltf.scene} />;
 };
 
-useGLTF.preload("/assets/avatar1.glb");
+useGLTF.preload("/assets/avatar2.glb");
 
 const SkillsScene = () => {
   const cubesRef = useRef<THREE.Group>(null);
@@ -601,6 +643,28 @@ const SkillsScene = () => {
       });
     }
   });
+
+  // Cleanup geometries and materials on unmount
+  useEffect(() => {
+    return () => {
+      if (cubesRef.current) {
+        cubesRef.current.children.forEach((cube) => {
+          if (cube instanceof THREE.Mesh) {
+            if (cube.geometry) {
+              cube.geometry.dispose();
+            }
+            if (cube.material) {
+              if (Array.isArray(cube.material)) {
+                cube.material.forEach((material) => material.dispose());
+              } else {
+                cube.material.dispose();
+              }
+            }
+          }
+        });
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -654,9 +718,13 @@ const ProjectsScene = ({
 
   const [glowTexture, setGlowTexture] = useState<THREE.Texture | null>(null);
 
-  // FIXED: Environment map creation with proper cleanup
+  // FIXED: Environment map creation with proper cleanup using local variables
   useEffect(() => {
     let isMounted = true;
+    let glowTex: THREE.Texture | null = null;
+    let envTex: THREE.Texture | null = null;
+    let renderTarget: THREE.WebGLRenderTarget | null = null;
+    let pmremGen: THREE.PMREMGenerator | null = null;
     
     const glowSize = 256;
     const canvas = document.createElement("canvas");
@@ -678,29 +746,29 @@ const ProjectsScene = ({
       gradient.addColorStop(1, "rgba(255,255,255,0)");
       context.fillStyle = gradient;
       context.fillRect(0, 0, glowSize, glowSize);
-      const texture = new THREE.CanvasTexture(canvas);
+      glowTex = new THREE.CanvasTexture(canvas);
       if (isMounted) {
-        setGlowTexture(texture);
-      } else {
-        texture.dispose();
+        setGlowTexture(glowTex);
       }
     }
 
-    const pmremGenerator = new THREE.PMREMGenerator(gl);
-    pmremGenerator.compileEquirectangularShader();
+    pmremGen = new THREE.PMREMGenerator(gl);
+    pmremGen.compileEquirectangularShader();
 
-    const cubeRenderTarget = pmremGenerator.fromScene(new THREE.Scene(), 0.04);
+    renderTarget = pmremGen.fromScene(new THREE.Scene(), 0.04);
+    envTex = renderTarget.texture;
 
     if (isMounted) {
-      setEnvMap(cubeRenderTarget.texture);
+      setEnvMap(envTex);
     }
 
     return () => {
       isMounted = false;
-      if (envMap) envMap.dispose();
-      if (glowTexture) glowTexture.dispose();
-      cubeRenderTarget.dispose();
-      pmremGenerator.dispose();
+      // Cleanup using local variables, not state
+      if (glowTex) glowTex.dispose();
+      if (envTex) envTex.dispose();
+      if (renderTarget) renderTarget.dispose();
+      if (pmremGen) pmremGen.dispose();
     };
   }, [gl]);
 
@@ -717,7 +785,7 @@ const ProjectsScene = ({
     const loadedTextures: THREE.Texture[] = [];
     let loadedCount = 0;
 
-    for (let i = 0; i < projectImages.length; i++) loadedTextures.push(null as any);
+    for (let i = 0; i < projectImages.length; i++) loadedTextures.push(undefined as unknown as THREE.Texture);
 
     projectImages.forEach((url, index) => {
       loader.load(
@@ -1018,9 +1086,11 @@ const ContactScene = () => {
   const [texturesError, setTexturesError] = useState(false);
   const [glowTexture, setGlowTexture] = useState<THREE.Texture | null>(null);
 
-  // FIXED: Texture loading with proper cleanup
+  // FIXED: Texture loading with proper cleanup using local variables
   useEffect(() => {
     let isMounted = true;
+    let glowTex: THREE.Texture | null = null;
+    
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onError = (url) => {
       console.error(`Error loading texture from ${url}`);
@@ -1057,11 +1127,9 @@ const ContactScene = () => {
       gradient.addColorStop(1, "rgba(255,255,255,0)");
       context.fillStyle = gradient;
       context.fillRect(0, 0, glowSize, glowSize);
-      const texture = new THREE.CanvasTexture(canvas);
+      glowTex = new THREE.CanvasTexture(canvas);
       if (isMounted) {
-        setGlowTexture(texture);
-      } else {
-        texture.dispose();
+        setGlowTexture(glowTex);
       }
     }
 
@@ -1103,7 +1171,8 @@ const ContactScene = () => {
     return () => {
       isMounted = false;
       loadedTextures.forEach((texture) => texture?.dispose());
-      if (glowTexture) glowTexture.dispose();
+      // Cleanup using local variable, not state
+      if (glowTex) glowTex.dispose();
     };
   }, []);
 
@@ -1224,9 +1293,19 @@ const ContactScene = () => {
   });
 
   // FIXED: Memoize materials to prevent recreation on every render
+  const cubeMaterialsRef = useRef<THREE.Material[]>([]);
+  
   const cubeMaterials = useMemo(() => {
+    // Dispose old materials before creating new ones
+    if (cubeMaterialsRef.current.length > 0) {
+      cubeMaterialsRef.current.forEach((material) => material.dispose());
+      cubeMaterialsRef.current = [];
+    }
+
+    let newMaterials: THREE.Material[];
+    
     if (isLoadingTextures || texturesError) {
-      return [
+      newMaterials = [
         new THREE.MeshStandardMaterial({
           color: "#8B5CF6",
           emissive: "#8B5CF6",
@@ -1258,23 +1337,39 @@ const ContactScene = () => {
           emissiveIntensity: 0.2,
         }),
       ];
+    } else {
+      newMaterials = cubeTextures.map((texture) => {
+        return new THREE.MeshBasicMaterial({
+          map: texture,
+          color: 0xffffff,
+          toneMapped: false,
+        });
+      });
     }
 
-    return cubeTextures.map((texture) => {
-      return new THREE.MeshBasicMaterial({
-        map: texture,
-        color: 0xffffff,
-        toneMapped: false,
-      });
-    });
+    cubeMaterialsRef.current = newMaterials;
+    return newMaterials;
   }, [isLoadingTextures, texturesError, cubeTextures]);
 
   // Cleanup materials on unmount
   useEffect(() => {
     return () => {
-      cubeMaterials.forEach((material) => material.dispose());
+      cubeMaterialsRef.current.forEach((material) => material.dispose());
+      cubeMaterialsRef.current = [];
     };
-  }, [cubeMaterials]);
+  }, []);
+
+  // Cleanup particles geometry on unmount
+  useEffect(() => {
+    return () => {
+      if (particlesRef.current?.geometry) {
+        particlesRef.current.geometry.dispose();
+      }
+      if (particlesRef.current?.material && 'dispose' in particlesRef.current.material) {
+        (particlesRef.current.material as THREE.Material).dispose();
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -1353,6 +1448,100 @@ const ContactScene = () => {
   );
 };
 
+// NEW: Add cleanup component for Canvas
+const CanvasCleanup = () => {
+  const { gl, scene } = useThree();
+  
+  useEffect(() => {
+    return () => {
+      // Dispose of all geometries, materials, and textures in the scene
+      scene.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          // Dispose geometry and buffer attributes
+          if (object.geometry) {
+            const geometry = object.geometry;
+            if (geometry.attributes) {
+              Object.keys(geometry.attributes).forEach((key) => {
+                const attribute = geometry.attributes[key];
+                if (attribute && attribute.array) {
+                  delete geometry.attributes[key];
+                }
+              });
+            }
+            geometry.dispose();
+          }
+          
+          // Dispose materials and their textures
+          if (object.material) {
+            const disposeMaterial = (mat: THREE.Material) => {
+              // Check and dispose textures
+              if ('map' in mat && mat.map) (mat.map as THREE.Texture).dispose();
+              if ('normalMap' in mat && mat.normalMap) (mat.normalMap as THREE.Texture).dispose();
+              if ('roughnessMap' in mat && mat.roughnessMap) (mat.roughnessMap as THREE.Texture).dispose();
+              if ('metalnessMap' in mat && mat.metalnessMap) (mat.metalnessMap as THREE.Texture).dispose();
+              if ('emissiveMap' in mat && mat.emissiveMap) (mat.emissiveMap as THREE.Texture).dispose();
+              if ('displacementMap' in mat && mat.displacementMap) (mat.displacementMap as THREE.Texture).dispose();
+              mat.dispose();
+            };
+            
+            if (Array.isArray(object.material)) {
+              object.material.forEach(disposeMaterial);
+            } else {
+              disposeMaterial(object.material);
+            }
+          }
+        }
+        
+        // Dispose Points geometry and material
+        if (object instanceof THREE.Points) {
+          if (object.geometry) {
+            const geometry = object.geometry;
+            if (geometry.attributes) {
+              Object.keys(geometry.attributes).forEach((key) => {
+                delete geometry.attributes[key];
+              });
+            }
+            geometry.dispose();
+          }
+          if (object.material && 'dispose' in object.material) {
+            const material = object.material as THREE.PointsMaterial;
+            if (material.map) material.map.dispose();
+            material.dispose();
+          }
+        }
+        
+        // Dispose Sprite material
+        if (object instanceof THREE.Sprite) {
+          if (object.material) {
+            if (object.material.map) object.material.map.dispose();
+            object.material.dispose();
+          }
+        }
+      });
+      
+      // Clear the scene
+      while (scene.children.length > 0) {
+        scene.remove(scene.children[0]);
+      }
+      
+      // Dispose renderer resources
+      gl.dispose();
+      
+      // Force clear render lists
+      if (gl.renderLists) {
+        gl.renderLists.dispose();
+      }
+      
+      // Clear any cached programs
+      if (gl.info && gl.info.programs) {
+        gl.info.programs.length = 0;
+      }
+    };
+  }, [gl, scene]);
+  
+  return null;
+};
+
 const SceneSelector = ({
   sceneType,
   selectedProject,
@@ -1380,10 +1569,43 @@ const ThreeScene = ({
   className,
   sceneType,
   selectedProject,
+  isVisible = true, // NEW: Default to visible for backward compatibility
 }: ThreeSceneProps) => {
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  
+  // NEW: Clean up on visibility change
+  useEffect(() => {
+    if (!isVisible && canvasContainerRef.current) {
+      // Force garbage collection by clearing the container
+      while (canvasContainerRef.current.firstChild) {
+        canvasContainerRef.current.removeChild(canvasContainerRef.current.firstChild);
+      }
+    }
+  }, [isVisible]);
+  
+  // NEW: Don't render Canvas if not visible
+  if (!isVisible) {
+    return (
+      <div ref={canvasContainerRef} className={cn("w-full h-full bg-space-dark", className)} />
+    );
+  }
+
   return (
-    <div className={cn("w-full h-full", className)}>
-      <Canvas>
+    <div ref={canvasContainerRef} className={cn("w-full h-full", className)}>
+      <Canvas
+        key={`canvas-${sceneType}`}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+          preserveDrawingBuffer: false,
+          failIfMajorPerformanceCaveat: false,
+        }}
+        dpr={[1, 2]}
+        performance={{ min: 0.5 }}
+        frameloop="always"
+      >
+        <CanvasCleanup />
         <PerspectiveCamera makeDefault position={[0, 0, 5]} />
         <SceneSelector
           sceneType={sceneType}
