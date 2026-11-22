@@ -1,0 +1,93 @@
+<section id="range" class="chapter" style="--len: 9" aria-label="Range">
+  <div class="pin">
+    <div class="r-intro">
+      <p class="eyebrow">Range</p>
+      <h2>One engineer,<br />the whole path.</h2>
+      <p class="r-lede">Four benches in one workshop. Each is a working model of a part of the stack: walk past them, or jump to one and try it.</p>
+    </div>
+
+    <article class="r-st r-left" data-st="0">
+      <p class="eyebrow"><span>01</span> Frontend</p>
+      <h3>One page, five layers deep.</h3>
+      <p class="r-body">Consumer web at Shopee and Tencent scale, in-app mini programs, admin and content platforms, micro-frontends, and the performance work that keeps them quick.</p>
+      <p class="kit">React · Next.js · TypeScript · Tailwind CSS · Vue · Vite · SSR · i18n</p>
+      <div class="r-ctl">
+        <div class="r-seg" role="group" aria-label="How the page is rendered">
+          <span>First paint</span>
+          <button type="button" data-mode="ssr" aria-pressed="true">Server</button>
+          <button type="button" data-mode="csr" aria-pressed="false">Client</button>
+        </div>
+        <div class="r-seg" role="group" aria-label="Locale">
+          <span>Locale</span>
+          <button type="button" data-locale="en" aria-pressed="true">EN</button>
+          <button type="button" data-locale="zh" aria-pressed="false" lang="zh" aria-label="Chinese">CN</button>
+          <button type="button" data-locale="id" aria-pressed="false">ID</button>
+        </div>
+      </div>
+      <p class="r-status" aria-live="polite">Server-rendered, then hydrated. Readable first, interactive second.</p>
+      <p class="r-hint"><i></i>Point at a layer to pull it out. Tap the page to press its button and follow the state.</p>
+    </article>
+
+    <article class="r-st r-right" data-st="1">
+      <p class="eyebrow"><span>02</span> Backend and cloud</p>
+      <h3>I write the server side of what I ship.</h3>
+      <p class="r-body">Services, APIs, data stores and serverless pipelines, and I have run them in production on AWS.</p>
+      <p class="kit">Node.js · Python · GraphQL · MySQL · Redis · Lambda · Step Functions · ECS / EKS</p>
+      <div class="r-ctl">
+        <button type="button" class="r-btn" data-fire="read">Send a request</button>
+        <button type="button" class="r-btn ghost" data-fire="job">Run a pipeline</button>
+      </div>
+      <p class="r-status" aria-live="polite">Send the same request twice: the second one never reaches the database.</p>
+      <p class="r-hint"><i></i>Tap the graph to send a request and follow it.</p>
+    </article>
+
+    <article class="r-st r-left" data-st="2">
+      <p class="eyebrow"><span>03</span> AI agents</p>
+      <h3>The loop, built from scratch.</h3>
+      <p class="r-body">Agent systems used daily by people who do not write code: the agent loop, tool calling and MCP, retrieval over real documents, and the evals, tracing and guardrails that make them dependable.</p>
+      <p class="kit">Agent loops · MCP · RAG · Evals · Tracing · Vector search · GPT and Gemini APIs</p>
+      <div class="r-ctl">
+        <button type="button" class="r-btn chip" data-tool="0" aria-pressed="true">Docs</button>
+        <button type="button" class="r-btn chip" data-tool="1" aria-pressed="false">MCP server</button>
+        <button type="button" class="r-btn chip" data-tool="2" aria-pressed="false">Internal tool</button>
+      </div>
+      <p class="r-task">Task <b>“How do refunds work?”</b></p>
+      <ol class="r-trace" aria-live="polite">
+        <li><b>plan</b><span>pick a tool: search the docs</span></li>
+        <li><b>guardrail</b><span>allowed for this user</span></li>
+        <li><b>tool</b><span>docs.search("refund policy")</span></li>
+        <li><b>observe</b><span>3 passages came back</span></li>
+        <li><b>repeat</b><span>enough to answer? if not, go round again</span></li>
+      </ol>
+      <p class="r-hint"><i></i>Pick a tool and watch one turn of the loop.</p>
+    </article>
+
+    <article class="r-st r-right" data-st="3">
+      <p class="eyebrow"><span>04</span> Visual craft</p>
+      <h3>This one is running in your browser.</h3>
+      <p class="r-body">Motion, interaction and real-time graphics, plus generative pipelines for images, 3D and video. The object on the table was generated on my own machine: a picture, then a mesh, then points.</p>
+      <p class="kit">Three.js · GLSL · GSAP · Blender · ComfyUI · Stable Diffusion</p>
+      <div class="r-ctl r-scrub">
+        <label class="sr" for="r-k">Stage of the pipeline</label>
+        <input id="r-k" type="range" min="0" max="3" step="0.001" value="0" />
+        <div class="r-stops">
+          <button type="button" aria-pressed="true">Image</button>
+          <button type="button" aria-pressed="false">Mesh</button>
+          <button type="button" aria-pressed="false">Points</button>
+          <button type="button" aria-pressed="false">Motion</button>
+        </div>
+      </div>
+      <p class="r-status" aria-live="polite">A prompt becomes a picture.</p>
+      <p class="r-hint"><i></i>Drag the slider, then move the pointer across the object to bend it.</p>
+    </article>
+
+    <nav class="r-nav" aria-label="Benches">
+      <button type="button"><s>01</s><span>Frontend</span></button>
+      <button type="button"><s>02</s><span>Backend</span></button>
+      <button type="button"><s>03</s><span>AI agents</span></button>
+      <button type="button"><s>04</s><span>Visual craft</span></button>
+    </nav>
+    <p class="r-scroll" aria-hidden="true">Scroll to walk the hall</p>
+    <div class="r-labels"></div>
+  </div>
+</section>

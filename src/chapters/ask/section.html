@@ -1,0 +1,50 @@
+<section id="ask" class="chapter" style="--len: 4.5" aria-label="Ask the site">
+  <div class="pin">
+    <div class="a-side">
+      <header class="a-head">
+        <p class="eyebrow">Scripted demo</p>
+        <h2>Ask the site</h2>
+        <p class="a-lede">
+          Watch how an agent would answer: it plans, calls tools, reads the results, then replies. This one is a scripted demo, so no
+          model is running and the answers are written by hand.
+        </p>
+      </header>
+
+      <div class="a-card">
+        <form class="a-form" autocomplete="off">
+          <label class="sr" for="ask-q">Your question</label>
+          <input id="ask-q" name="q" type="text" placeholder="Ask about his work, stack or team" maxlength="120" enterkeyhint="send" />
+          <button type="submit">Ask</button>
+        </form>
+
+        <ul class="a-chips" aria-label="Suggested questions">
+          <li><button type="button" data-topic="build" data-tool="scale"><span class="l">What does he build?</span><span class="s" aria-hidden="true">Work</span></button></li>
+          <li><button type="button" data-topic="agents" data-tool="systems"><span class="l">What agent work has he done?</span><span class="s" aria-hidden="true">Agents</span></button></li>
+          <li><button type="button" data-topic="lead" data-tool="path"><span class="l">Has he led a team?</span><span class="s" aria-hidden="true">Team</span></button></li>
+          <li><button type="button" data-topic="stack" data-tool="range"><span class="l">What is his stack?</span><span class="s" aria-hidden="true">Stack</span></button></li>
+          <li><button type="button" data-topic="site" data-tool="about"><span class="l">How was this site made?</span><span class="s" aria-hidden="true">This site</span></button></li>
+          <li><button type="button" data-topic="reach" data-tool="links"><span class="l">How do I reach him?</span><span class="s" aria-hidden="true">Reach</span></button></li>
+        </ul>
+
+        <ol class="a-run" aria-live="polite" aria-label="The run, step by step"></ol>
+
+        <p class="a-next"></p>
+        <p class="a-hint" hidden><i aria-hidden="true"></i>Hover, focus or tap a step to replay it in the scene.</p>
+        <p class="a-fine">Scripted demo. No model is running and nothing leaves this page.</p>
+      </div>
+    </div>
+
+    <ul class="a-tags" aria-label="The tools around him. Press one to ask its question.">
+      <li><button type="button" class="a-tag" data-tool="range" style="--tool: #3f6bff"><b>Range</b><span class="o" aria-hidden="true"></span></button></li>
+      <li><button type="button" class="a-tag" data-tool="systems" style="--tool: #b8ff3c"><b>Systems</b><span class="o" aria-hidden="true"></span></button></li>
+      <li><button type="button" class="a-tag" data-tool="scale" style="--tool: #ffa62b"><b>Scale</b><span class="o" aria-hidden="true"></span></button></li>
+      <li><button type="button" class="a-tag" data-tool="path" style="--tool: #2fe0c2"><b>Path</b><span class="o" aria-hidden="true"></span></button></li>
+      <li><button type="button" class="a-tag" data-tool="about" style="--tool: #ff5d8f"><b>About</b><span class="o" aria-hidden="true"></span></button></li>
+      <li><button type="button" class="a-tag" data-tool="links" style="--tool: #c9b8ff"><b>Links</b><span class="o" aria-hidden="true"></span></button></li>
+    </ul>
+
+    <div class="a-goals" aria-hidden="true"><span></span><span></span><span></span></div>
+    <p class="a-state" aria-hidden="true"></p>
+  </div>
+  <script type="module" src="/src/chapters/ask/boot.ts"></script>
+</section>

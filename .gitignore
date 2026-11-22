@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.claude/
+.impeccable/
+tools/gen/src/
+tools/gen/backup-glb/
+tools/gen/backup-img/

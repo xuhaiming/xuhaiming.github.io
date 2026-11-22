@@ -1,0 +1,94 @@
+#contact {
+  --accent: #cfe6ff;
+}
+
+#contact .c-copy {
+  position: absolute;
+  left: var(--gut);
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: min(44rem, calc(100% - 2 * var(--gut)));
+}
+
+#contact h2 {
+  font-size: clamp(2.75rem, 6.3vw, 7rem);
+  line-height: 0.94;
+}
+
+#contact .c-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2.75rem;
+  margin-top: 2.25rem;
+}
+
+#contact .c-links a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-stretch: 72%;
+  font-weight: 720;
+  font-size: clamp(1.75rem, 2.8vw, 2.75rem);
+  line-height: 1.2;
+  border-bottom: 1px solid var(--line);
+  transition:
+    color 0.3s,
+    border-color 0.3s;
+}
+
+#contact .c-links a:hover {
+  color: var(--accent);
+  border-color: currentColor;
+}
+
+#contact .c-fine,
+#contact .c-again {
+  position: absolute;
+  bottom: 2rem;
+  font-size: 0.875rem;
+  color: var(--ink-3);
+}
+
+#contact .c-fine {
+  left: var(--gut);
+}
+
+#contact .c-again {
+  right: var(--gut);
+  color: var(--ink-2);
+}
+
+#contact .c-again:hover {
+  color: var(--ink);
+}
+
+.no-gl #contact .c-copy,
+html:not(.js) #contact .c-copy,
+.no-gl #contact .c-fine,
+html:not(.js) #contact .c-fine,
+.no-gl #contact .c-again,
+html:not(.js) #contact .c-again {
+  position: static;
+  transform: none;
+  display: block;
+  margin-top: 2rem;
+}
+
+@media (max-width: 860px) {
+  #contact .c-copy {
+    top: auto;
+    bottom: 7.5rem;
+    transform: none;
+  }
+
+  #contact .c-again {
+    right: auto;
+    left: var(--gut);
+    bottom: 4.75rem;
+  }
+
+  #contact .c-fine {
+    right: var(--gut);
+    bottom: 1.25rem;
+  }
+}

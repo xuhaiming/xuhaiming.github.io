@@ -1,0 +1,905 @@
+#path {
+  --accent: #2fe0c2;
+  --p-glass: rgb(4 20 22 / 0.58);
+  --p-edge: rgb(47 224 194 / 0.22);
+  --p-dim: rgb(170 226 214 / 0.62);
+}
+
+/* ---------- title beat ---------- */
+
+#path .p-head {
+  position: absolute;
+  left: var(--gut);
+  top: 50%;
+  transform: translateY(-46%);
+  max-width: min(34rem, calc(100% - 2 * var(--gut)));
+  visibility: hidden;
+  opacity: 0;
+}
+
+#path .p-head h2 {
+  margin-top: 1rem;
+  font-size: clamp(2.75rem, 5.6vw, 6rem);
+  line-height: 0.94;
+}
+
+#path .p-lead {
+  margin-top: 1.5rem;
+  max-width: 24rem;
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* ---------- year counter ---------- */
+
+#path .p-clock {
+  position: absolute;
+  left: var(--gut);
+  top: clamp(5.25rem, 12vh, 7.5rem);
+  visibility: hidden;
+  opacity: 0;
+}
+
+#path .p-year {
+  display: flex;
+  font-stretch: 68%;
+  font-weight: 800;
+  font-size: clamp(4.5rem, 10.5vw, 11rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
+  text-shadow: 0 0 2.5rem rgb(47 224 194 / 0.25);
+}
+
+#path .p-fix {
+  color: rgb(238 243 255 / 0.42);
+}
+
+#path .p-reel {
+  display: block;
+  height: 1em;
+  overflow: hidden;
+  /* soft top and bottom so a digit rolls out of sight, not off a hard edge */
+  mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+}
+
+#path .p-reel i {
+  display: flex;
+  flex-direction: column;
+  font-style: normal;
+  will-change: transform;
+}
+
+#path .p-reel b {
+  display: block;
+  height: 1em;
+  font-weight: inherit;
+  text-align: center;
+}
+
+#path .p-where {
+  position: relative;
+  height: 1.5em;
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+#path .p-where span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  opacity: 0;
+  padding-left: 1.4em;
+}
+
+#path .p-where span::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0.5em;
+  height: 0.5em;
+  margin-top: -0.25em;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0.75em currentColor;
+}
+
+/* ---------- milestone cards ---------- */
+
+#path .p-stops {
+  position: absolute;
+  inset: 0;
+}
+
+#path .p-stop {
+  position: absolute;
+  left: 0;
+  top: -1.5rem;
+  display: flex;
+  flex-direction: column-reverse;
+  max-width: min(22rem, calc(100vw - 1.5rem));
+  border: 1px solid var(--p-edge);
+  border-radius: 0.875rem;
+  background: var(--p-glass);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow:
+    0 1.25rem 2.5rem rgb(0 0 0 / 0.35),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+  visibility: hidden;
+  opacity: 0;
+  will-change: transform;
+  transition:
+    border-color 0.4s,
+    background 0.4s,
+    box-shadow 0.4s;
+}
+
+/* the stem that ties the card to its lantern in the scene */
+#path .p-stop::after {
+  content: '';
+  position: absolute;
+  left: var(--ax, 22px);
+  top: 100%;
+  width: 2px;
+  margin-left: -1px;
+  height: 1.5rem;
+  background: linear-gradient(rgb(47 224 194 / 0.9), rgb(47 224 194 / 0.15));
+}
+
+#path .p-stop.dock::after {
+  display: none;
+}
+
+#path .p-stop.dock {
+  width: calc(100vw - 1.5rem);
+  max-width: none;
+}
+
+#path .p-stop.now,
+#path .p-stop.open {
+  border-color: rgb(47 224 194 / 0.55);
+}
+
+#path .p-stop.open {
+  background: rgb(4 24 26 / 0.74);
+  box-shadow:
+    0 1.5rem 3rem rgb(0 0 0 / 0.45),
+    0 0 2.5rem rgb(47 224 194 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+#path .p-tag {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.85rem 0.55rem 0.7rem;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  border-radius: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#path .p-pin {
+  grid-row: 1 / span 2;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  transition:
+    background 0.3s,
+    box-shadow 0.3s;
+}
+
+#path .p-stop.now .p-pin,
+#path .p-stop.open .p-pin {
+  background: var(--accent);
+  box-shadow: 0 0 0.75rem var(--accent);
+}
+
+#path .p-yrs {
+  grid-column: 2;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+#path .p-name {
+  grid-column: 2;
+  font-stretch: 82%;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.15;
+}
+
+/* the affordance: a plus that turns into a minus when the card is open */
+#path .p-tag::after {
+  content: '';
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  border: 1px solid var(--p-edge);
+  background:
+    linear-gradient(var(--accent), var(--accent)) center / 0.5rem 1.5px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) center / 1.5px 0.5rem no-repeat;
+  transition:
+    transform 0.5s var(--ease),
+    background-size 0.3s,
+    border-color 0.3s;
+}
+
+#path .p-tag:hover::after {
+  border-color: var(--accent);
+}
+
+#path .p-stop.open .p-tag::after {
+  transform: rotate(180deg);
+  background-size:
+    0.5rem 1.5px,
+    1.5px 0;
+}
+
+#path .p-tag:active {
+  transform: scale(0.985);
+}
+
+#path .p-more {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding: 0 0.95rem 0 2rem;
+  transition:
+    max-height 0.55s var(--ease),
+    opacity 0.35s,
+    padding 0.55s var(--ease);
+}
+
+#path .p-stop.open .p-more {
+  max-height: 9rem;
+  opacity: 1;
+  padding-top: 0.85rem;
+  padding-bottom: 0.2rem;
+}
+
+#path .p-loc {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--p-dim);
+}
+
+#path .p-role {
+  margin-top: 0.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+#path .p-note {
+  margin-top: 0.15rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+#path .p-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+#path .p-chips li {
+  padding: 0.12rem 0.55rem;
+  border: 1px solid var(--p-edge);
+  border-radius: 99px;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+/* ---------- route chart and timeline ---------- */
+
+#path .p-route {
+  position: absolute;
+  right: var(--gut);
+  bottom: clamp(1.75rem, 5vh, 3rem);
+  width: clamp(19rem, 27vw, 25rem);
+  padding: 0.75rem 0.85rem 0.6rem;
+  border: 1px solid var(--p-edge);
+  border-radius: 1rem;
+  background: var(--p-glass);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.4);
+  visibility: hidden;
+  opacity: 0;
+  transition: border-color 0.4s;
+}
+
+#path .p-route.held {
+  border-color: rgb(47 224 194 / 0.6);
+}
+
+#path .p-map {
+  position: relative;
+  aspect-ratio: 160 / 84;
+}
+
+#path .p-land,
+#path .p-arcs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#path .p-arcs {
+  overflow: visible;
+  stroke-width: 1.5;
+}
+
+#path .p-arcs path {
+  vector-effect: non-scaling-stroke;
+}
+
+#path .p-arc-base {
+  stroke: rgb(150 232 214 / 0.34);
+  stroke-dasharray: 2 4;
+}
+
+#path .p-arc-done {
+  stroke: var(--accent);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 3px rgb(47 224 194 / 0.8));
+}
+
+#path .p-dot {
+  position: absolute;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin: -0.3125rem;
+  border-radius: 50%;
+  background: #eafffa;
+  box-shadow:
+    0 0 0 3px rgb(47 224 194 / 0.35),
+    0 0 1rem var(--accent);
+  pointer-events: none;
+}
+
+#path .p-dot::after {
+  content: '';
+  position: absolute;
+  inset: -0.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  animation: p-ping 2.4s var(--ease) infinite;
+}
+
+#path .p-dot.fly {
+  transform: scale(0.7);
+}
+
+@keyframes p-ping {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+#path .p-city {
+  position: absolute;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.875rem;
+  padding: 0;
+  font: inherit;
+  color: var(--p-dim);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#path .p-city i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin: -0.21875rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--p-dim);
+  background: #04181a;
+  transition:
+    transform 0.4s var(--ease),
+    border-color 0.3s,
+    background 0.3s;
+}
+
+#path .p-city span {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  margin-left: -0.3rem;
+  transform: translateY(-50%);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+
+/* labels sit on the sea side of each city */
+#path .p-city[data-place='0'] span {
+  top: 100%;
+  left: 50%;
+  margin: 0.1rem 0 0;
+  transform: translateX(-30%);
+}
+
+#path .p-city[data-place='3'] span {
+  left: auto;
+  right: 100%;
+  margin: 0 -0.3rem 0 0;
+}
+
+#path .p-city.past i {
+  border-color: var(--accent);
+}
+
+#path .p-city.on i {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+#path .p-city.on span,
+#path .p-city:hover span {
+  color: var(--ink);
+}
+
+#path .p-city:hover i {
+  transform: scale(1.7);
+  border-color: var(--accent);
+}
+
+#path .p-city:active i {
+  transform: scale(1.2);
+}
+
+#path .p-ruler {
+  position: relative;
+  height: 3.25rem;
+  margin: 0.35rem 0 0;
+  padding: 0 14px;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  border-radius: 0.5rem;
+}
+
+#path .p-route.held .p-ruler {
+  cursor: grabbing;
+}
+
+#path .p-track,
+#path .p-ticks {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+}
+
+#path .p-track {
+  top: 0.9375rem;
+  height: 2px;
+  background: rgb(150 232 214 / 0.2);
+  border-radius: 2px;
+}
+
+#path .p-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 0.5rem rgb(47 224 194 / 0.7);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+#path .p-ticks {
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+}
+
+#path .p-tick {
+  position: absolute;
+  top: 0.9375rem;
+  width: 0;
+}
+
+#path .p-tick i {
+  position: absolute;
+  left: -0.5px;
+  top: 0.3125rem;
+  width: 1px;
+  height: 0.4375rem;
+  background: var(--p-dim);
+  opacity: 0.6;
+}
+
+#path .p-tick em {
+  position: absolute;
+  top: 0.95rem;
+  left: 0;
+  transform: translateX(-50%);
+  font-style: normal;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--p-dim);
+  opacity: 0.75;
+  transition:
+    color 0.3s,
+    opacity 0.3s;
+}
+
+#path .p-tick:first-child em {
+  transform: translateX(-30%);
+}
+
+#path .p-tick-end em {
+  transform: translateX(-70%);
+}
+
+#path .p-tick.on em {
+  color: var(--ink);
+  opacity: 1;
+}
+
+#path .p-gem {
+  position: absolute;
+  top: 0.9375rem;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin: -0.15625rem 0 0 -0.21875rem;
+  transform: rotate(45deg);
+  background: #04181a;
+  border: 1.5px solid var(--p-dim);
+  transition:
+    background 0.3s,
+    border-color 0.3s;
+}
+
+#path .p-gem.past {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* the handle reads the year and says "drag me" with its arrows */
+#path .p-thumb {
+  position: absolute;
+  top: 0.9375rem;
+  left: 0;
+  margin-left: 14px;
+  width: calc(100% - 28px);
+  height: 0;
+  pointer-events: none;
+}
+
+#path .p-thumb {
+  left: 0 !important;
+}
+
+#path .p-thumb b {
+  position: absolute;
+  left: var(--f, 0%);
+  top: 0;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 1.5rem;
+  padding: 0 0.45rem;
+  border-radius: 99px;
+  background: var(--accent);
+  color: #02110f;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 0 0 4px rgb(47 224 194 / 0.18),
+    0 0.25rem 1rem rgb(0 0 0 / 0.5);
+  transition:
+    box-shadow 0.3s,
+    transform 0.3s var(--ease);
+}
+
+#path .p-thumb b::before,
+#path .p-thumb b::after {
+  content: '';
+  width: 0.3rem;
+  height: 0.3rem;
+  border-left: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.7;
+}
+
+#path .p-thumb b::after {
+  transform: rotate(-135deg);
+}
+
+#path .p-ruler:hover .p-thumb b {
+  box-shadow:
+    0 0 0 6px rgb(47 224 194 / 0.24),
+    0 0.25rem 1rem rgb(0 0 0 / 0.5);
+}
+
+#path .p-route.held .p-thumb b {
+  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow:
+    0 0 0 9px rgb(47 224 194 / 0.22),
+    0 0 1.5rem rgb(47 224 194 / 0.6);
+}
+
+/* until someone has used it, the handle breathes */
+#path .p-route:not(.used) .p-thumb b {
+  animation: p-nudge 2.6s var(--ease) infinite;
+}
+
+@keyframes p-nudge {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 4px rgb(47 224 194 / 0.18),
+      0 0.25rem 1rem rgb(0 0 0 / 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px rgb(47 224 194 / 0),
+      0 0.25rem 1rem rgb(0 0 0 / 0.5);
+  }
+}
+
+#path .p-tip {
+  position: absolute;
+  right: 0.9rem;
+  top: 0.7rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--p-dim);
+  transition: opacity 0.6s;
+}
+
+#path .p-route.used .p-tip {
+  opacity: 0;
+}
+
+/* ---------- arrival ---------- */
+
+#path .p-end {
+  position: absolute;
+  left: var(--gut);
+  top: 50%;
+  transform: translateY(-30%);
+  max-width: min(30rem, calc(100% - 2 * var(--gut)));
+  visibility: hidden;
+  opacity: 0;
+}
+
+#path .p-last {
+  text-shadow: 0 0.1em 1.5em rgb(0 10 10 / 0.9);
+  font-stretch: 70%;
+  font-weight: 780;
+  font-size: clamp(2rem, 3.7vw, 4rem);
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+#path .p-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.75rem;
+  padding: 0.7rem 1.15rem 0.7rem 0.95rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--p-glass);
+  border: 1px solid rgb(47 224 194 / 0.5);
+  border-radius: 99px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition:
+    background 0.3s,
+    color 0.3s,
+    transform 0.4s var(--ease);
+}
+
+#path .p-back svg {
+  width: 0.8em;
+  height: 0.8em;
+  color: var(--accent);
+  transition: transform 0.4s var(--ease);
+}
+
+#path .p-back:hover {
+  background: var(--accent);
+  color: #02110f;
+}
+
+#path .p-back:hover svg {
+  color: inherit;
+  transform: translateX(-0.25rem);
+}
+
+#path .p-back:active {
+  transform: scale(0.97);
+}
+
+/* ---------- phone ---------- */
+
+@media (max-width: 860px) {
+  #path .p-head {
+    top: 5.25rem;
+    transform: none;
+  }
+
+  #path .p-head h2 {
+    font-size: clamp(2.5rem, 11.5vw, 3.5rem);
+  }
+
+  #path .p-lead {
+    margin-top: 1rem;
+    max-width: 19rem;
+  }
+
+  #path .p-clock {
+    top: 4.5rem;
+  }
+
+  #path .p-year {
+    font-size: 4.25rem;
+  }
+
+  #path .p-route {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.9rem;
+    width: auto;
+    padding: 0.55rem 0.65rem 0.4rem;
+  }
+
+  #path .p-map {
+    aspect-ratio: 160 / 58;
+  }
+
+  #path .p-ruler {
+    height: 3rem;
+  }
+
+  #path .p-end {
+    top: auto;
+    bottom: 14.25rem;
+    transform: none;
+  }
+
+  #path .p-last {
+    font-size: 1.875rem;
+  }
+
+  #path .p-back {
+    margin-top: 1rem;
+  }
+
+  #path .p-name {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #path .p-dot::after,
+  #path .p-route:not(.used) .p-thumb b {
+    animation: none;
+  }
+}
+
+/* ---------- without WebGL: an ordinary timeline ---------- */
+
+.no-gl #path .p-head,
+html:not(.js) #path .p-head,
+.no-gl #path .p-end,
+html:not(.js) #path .p-end {
+  position: static;
+  transform: none;
+  visibility: visible;
+  opacity: 1;
+}
+
+.no-gl #path .p-clock,
+html:not(.js) #path .p-clock,
+.no-gl #path .p-route,
+html:not(.js) #path .p-route {
+  display: none;
+}
+
+.no-gl #path .p-stops,
+html:not(.js) #path .p-stops {
+  position: static;
+  display: grid;
+  gap: 0.75rem;
+  max-width: 34rem;
+  margin: 3rem 0;
+}
+
+.no-gl #path .p-stop,
+html:not(.js) #path .p-stop {
+  position: static;
+  flex-direction: column;
+  max-width: none;
+  visibility: visible;
+  opacity: 1;
+  transform: none !important;
+}
+
+.no-gl #path .p-stop::after,
+html:not(.js) #path .p-stop::after,
+.no-gl #path .p-tag::after,
+html:not(.js) #path .p-tag::after {
+  display: none;
+}
+
+.no-gl #path .p-more,
+html:not(.js) #path .p-more {
+  max-height: none;
+  opacity: 1;
+  padding: 0 0.95rem 0.75rem 2rem;
+}
+
+/* Phones (tier 0: coarse pointer or 860 px and narrower, the same test main.ts uses): no backdrop
+   blur over the live canvas, which is costly on mobile GPUs; a darker, more opaque glass instead. */
+@media (pointer: coarse), (max-width: 860px) {
+  #path .p-stop,
+  #path .p-route,
+  #path .p-back {
+    background: rgb(3 16 18 / 0.88);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  #path .p-stop.open {
+    background: rgb(3 20 22 / 0.92);
+  }
+  #path .p-back:hover {
+    background: var(--accent);
+  }
+}

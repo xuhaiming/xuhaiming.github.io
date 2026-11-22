@@ -1,0 +1,128 @@
+<section id="systems" class="chapter" style="--len: 10" aria-label="Work, part one: agent systems">
+  <div class="pin">
+    <div class="s-scrim" aria-hidden="true"></div>
+
+    <header class="s-case s-intro">
+      <p class="eyebrow">Work · part one</p>
+      <h2>Agent systems, built from scratch.</h2>
+      <p class="s-lede">Three systems, three machines. Walk up to each one and run it yourself.</p>
+    </header>
+
+    <!-- 01 · app builder -->
+    <article class="s-case s-c1">
+      <p class="eyebrow"><span class="s-no">01</span> App builder</p>
+      <h3>An app builder for a whole company</h3>
+      <p class="s-body">
+        Any employee, technical or not, describes an internal web tool in plain language and gets it generated, deployed and
+        shared with colleagues. The apps run on real internal services and data, and an SDK lets other teams embed their own
+        agent apps.
+      </p>
+      <p class="s-fact"><b>80+</b> employees published their own apps in the first month</p>
+      <div class="s-ctl" role="group" aria-label="Ask the builder for a tool">
+        <p class="s-hint">Ask for a tool</p>
+        <button class="s-chip" type="button" aria-pressed="true">Team leave</button>
+        <button class="s-chip" type="button" aria-pressed="false">Ticket dashboard</button>
+        <button class="s-chip" type="button" aria-pressed="false">Room booking</button>
+      </div>
+    </article>
+
+    <div class="s-float s-card s-prompt" aria-hidden="true">
+      <span class="s-k">Request, in plain language</span>
+      <p><span class="s-prompt-text"></span><i class="s-caret"></i></p>
+    </div>
+    <ol class="s-float s-steps" aria-hidden="true">
+      <li>Layout</li>
+      <li>Components</li>
+      <li>Live data</li>
+      <li>Deploy</li>
+    </ol>
+    <p class="s-float s-tag s-svc" aria-hidden="true"><i></i><span>Service</span></p>
+    <p class="s-float s-tag s-svc" aria-hidden="true"><i></i><span>Service</span></p>
+    <p class="s-float s-tag s-svc" aria-hidden="true"><i></i><span>Service</span></p>
+    <p class="s-float s-count" aria-hidden="true"><b>0</b><span>apps published<br />in the first month</span></p>
+    <p class="s-float s-tag s-tilename" aria-hidden="true"></p>
+    <p class="s-float s-tag s-opened" aria-hidden="true">Opened by a colleague</p>
+    <div class="s-float s-cursor" aria-hidden="true">
+      <svg viewBox="0 0 20 20"><path d="M3 2 16 9.5 10 11 7.5 17Z" /></svg>
+      <span>colleague</span>
+    </div>
+
+    <!-- 02 · agent platform -->
+    <article class="s-case s-c2">
+      <p class="eyebrow"><span class="s-no">02</span> Agent platform</p>
+      <h3>A team agent platform, built from zero</h3>
+      <p class="s-body">
+        The full agent loop, with tool calling into internal tools and MCP servers and skills shared across the team. A web app
+        and a chat bot let product and operations people run whole workflows with no local setup. Evaluation sets, tracing, cost
+        and latency work, permissions and guardrails keep it dependable.
+      </p>
+      <p class="s-fact"><b>130+</b> people use it every month</p>
+      <div class="s-ctl s-scrubber">
+        <p class="s-hint">One run, traced. Drag the playhead or point at a span.</p>
+        <div class="s-scrub-row">
+          <button class="s-run" type="button" aria-label="Play the run again">
+            <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 2.2 9.5 6l-6 3.8Z" /></svg>
+          </button>
+          <div class="s-scrub-box">
+            <div class="s-scrub-track" aria-hidden="true"></div>
+            <input class="s-scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Position in the traced run" />
+          </div>
+        </div>
+        <p class="s-meter" aria-hidden="true">
+          <span>latency <b class="s-meter-ms">0.0 s</b></span>
+          <span>tokens <b class="s-meter-tok">0.0k</b></span>
+          <span class="s-eg">example run</span>
+        </p>
+      </div>
+    </article>
+
+    <div class="s-float s-card s-span" aria-hidden="true">
+      <span class="s-k s-span-kind">Model</span>
+      <b class="s-span-name">Plan</b>
+      <p class="s-span-text"></p>
+      <span class="s-span-meta"></span>
+    </div>
+    <p class="s-float s-tag s-gate" aria-hidden="true"><i></i><span>Guardrail</span><em>no permission, call blocked</em></p>
+    <p class="s-float s-count s-crowd" aria-hidden="true"><b>130+</b><span>people send it work<br />every month</span></p>
+    <p class="s-float s-tag s-eval" aria-hidden="true"><i></i><span>Evaluation set</span><em>all checks pass</em></p>
+    <p class="s-float s-lane" aria-hidden="true">Model</p>
+    <p class="s-float s-lane" aria-hidden="true">Tools</p>
+    <p class="s-float s-lane" aria-hidden="true">Observations</p>
+    <p class="s-float s-tag s-port" aria-hidden="true"><i></i><span>Internal tools</span></p>
+    <p class="s-float s-tag s-port" aria-hidden="true"><i></i><span>MCP servers</span></p>
+    <p class="s-float s-tag s-port" aria-hidden="true"><i></i><span>Team skills</span></p>
+    <p class="s-float s-tag s-door" aria-hidden="true"><span>Web app</span></p>
+    <p class="s-float s-tag s-door" aria-hidden="true"><span>Chat bot</span></p>
+
+    <!-- 03 · knowledge base -->
+    <article class="s-case s-c3">
+      <p class="eyebrow"><span class="s-no">03</span> Knowledge base</p>
+      <h3>A knowledge base that agents can read</h3>
+      <p class="s-body">
+        Retrieval over a team's technical and product documentation. A scheduled job refreshes chunks, embeddings and metadata
+        every day. It is exposed as an MCP server, with code lookup so answers match what the software really does.
+      </p>
+      <p class="s-fact">Refreshed <b>daily</b>, served over MCP</p>
+      <div class="s-ctl" role="group" aria-label="Ask the knowledge base">
+        <p class="s-hint">Ask it something, or move through the cloud</p>
+        <button class="s-chip" type="button" aria-pressed="true">How fresh is it?</button>
+        <button class="s-chip" type="button" aria-pressed="false">How do agents reach it?</button>
+        <button class="s-chip" type="button" aria-pressed="false">What if the docs are wrong?</button>
+      </div>
+    </article>
+
+    <div class="s-float s-card s-answer" aria-hidden="true">
+      <span class="s-k">Answer, with sources</span>
+      <b class="s-answer-q"></b>
+      <p class="s-answer-a"></p>
+      <ol class="s-answer-cites"></ol>
+    </div>
+    <p class="s-float s-tag s-probe" aria-hidden="true"></p>
+    <p class="s-float s-tag s-qtag" aria-hidden="true"><i></i><span>Query</span><em>4 nearest chunks</em></p>
+    <p class="s-float s-tag s-dial" aria-hidden="true"><i></i><span>Daily refresh</span><em class="s-dial-state">Index is current</em></p>
+    <p class="s-float s-tag s-mcp" aria-hidden="true"><i></i><span>MCP server</span><em>to the agent platform</em></p>
+    <p class="s-float s-tag s-doc" aria-hidden="true"><span>ops/daily-refresh.md</span></p>
+    <p class="s-float s-tag s-doc" aria-hidden="true"><span>mcp/server.md</span></p>
+    <p class="s-float s-tag s-doc" aria-hidden="true"><span>guides/code-lookup.md</span></p>
+  </div>
+</section>

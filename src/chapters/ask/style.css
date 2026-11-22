@@ -1,0 +1,979 @@
+#ask {
+  --accent: #9b7bff;
+  --a-line: rgb(170 150 255 / 0.2);
+  --a-glass: rgb(13 11 24 / 0.62);
+  --mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+}
+
+#ask [data-tool='range'] { --tool: #3f6bff; }
+#ask [data-tool='systems'] { --tool: #b8ff3c; }
+#ask [data-tool='scale'] { --tool: #ffa62b; }
+#ask [data-tool='path'] { --tool: #2fe0c2; }
+#ask [data-tool='about'] { --tool: #ff5d8f; }
+#ask [data-tool='links'] { --tool: #c9b8ff; }
+
+/* ---------- the console column ---------- */
+
+#ask .a-side {
+  position: absolute;
+  left: var(--gut);
+  top: clamp(5.25rem, 11.5vh, 7.5rem);
+  width: min(33rem, 37vw);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2.2vh, 1.6rem);
+  visibility: hidden;
+  opacity: 0;
+  transform: translate3d(calc((1 - var(--in, 1)) * -2.5rem), 0, 0);
+}
+
+#ask .a-head h2 {
+  margin-top: 0.5rem;
+  font-size: clamp(2.25rem, 3.5vw, 3.75rem);
+}
+
+#ask .a-head .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+#ask .a-head .eyebrow::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0.8rem var(--accent);
+}
+
+#ask .a-lede {
+  margin-top: 0.9rem;
+  max-width: 44ch;
+  font-size: 0.9688rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* the card: glass in front of the scene, lit along its top edge like everything else in the room */
+#ask .a-card {
+  position: relative;
+  padding: 1.1rem 1.15rem 0.9rem;
+  border-radius: 1.1rem;
+  background: linear-gradient(rgb(155 123 255 / 0.07), rgb(155 123 255 / 0) 9rem), var(--a-glass);
+  border: 1px solid var(--a-line);
+  box-shadow:
+    inset 0 1px 0 rgb(220 210 255 / 0.16),
+    0 1.5rem 4rem rgb(0 0 0 / 0.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  backdrop-filter: blur(18px) saturate(1.25);
+  transform: translate3d(var(--tx, 0), var(--ty, 0), 0);
+}
+
+/* a hairline along the top edge fills as the run advances (and follows a replay) */
+#ask .a-card::before {
+  content: '';
+  position: absolute;
+  left: 1.1rem;
+  right: 1.1rem;
+  top: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), #e9e2ff);
+  transform-origin: left;
+  transform: scaleX(var(--run, 0));
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+#ask .a-card.busy::before,
+#ask .a-card.replaying::before {
+  opacity: 1;
+}
+
+/* ---------- question ---------- */
+
+#ask .a-form {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem 0.3rem 0.3rem 1rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.045);
+  border: 1px solid var(--a-line);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    background-color 0.3s;
+}
+
+#ask .a-form:focus-within {
+  border-color: var(--accent);
+  background: rgb(155 123 255 / 0.08);
+  box-shadow: 0 0 0 4px rgb(155 123 255 / 0.14);
+}
+
+#ask .a-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.0625rem;
+  caret-color: var(--accent);
+}
+
+#ask .a-form input::placeholder {
+  color: var(--ink-3);
+  opacity: 1;
+}
+
+#ask .a-form button {
+  flex: none;
+  padding: 0.5rem 1.25rem;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 650;
+  color: #0b0817;
+  background: #e9e2ff;
+  cursor: pointer;
+  transition:
+    background-color 0.25s,
+    transform 0.25s var(--ease),
+    box-shadow 0.25s;
+}
+
+#ask .a-form button:hover {
+  background: #fff;
+  box-shadow: 0 0 1.4rem rgb(155 123 255 / 0.55);
+}
+
+#ask .a-form button:active {
+  transform: scale(0.95);
+}
+
+/* ---------- suggested questions ---------- */
+
+#ask .a-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+
+#ask .a-chips button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.34rem 0.8rem 0.34rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--a-line);
+  background: rgb(255 255 255 / 0.02);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.3;
+  cursor: pointer;
+  transition:
+    color 0.25s,
+    border-color 0.25s,
+    background-color 0.25s,
+    transform 0.3s var(--ease);
+}
+
+#ask .a-chips button::before {
+  content: '';
+  flex: none;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--tool);
+  transition:
+    transform 0.4s var(--ease),
+    box-shadow 0.4s;
+}
+
+#ask .a-chips button:hover,
+#ask .a-chips button:focus-visible,
+#ask .a-chips button.on {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--tool) 70%, transparent);
+  background: color-mix(in srgb, var(--tool) 9%, transparent);
+}
+
+#ask .a-chips button:hover::before,
+#ask .a-chips button.on::before {
+  transform: scale(1.35);
+  box-shadow: 0 0 0.7rem var(--tool);
+}
+
+#ask .a-chips button:active {
+  transform: scale(0.96);
+}
+
+/* once a run is on screen the questions fold down to one short row, so the trace has the room */
+#ask .a-chips .s {
+  display: none;
+}
+
+#ask .a-card.has-run .a-chips {
+  flex-wrap: nowrap;
+}
+
+#ask .a-card.has-run .a-chips .s {
+  display: inline;
+  white-space: nowrap;
+}
+
+#ask .a-card.has-run .a-chips .l {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+#ask .a-card.has-run .a-chips button {
+  padding: 0.28rem 0.7rem 0.28rem 0.55rem;
+  font-size: 0.8125rem;
+}
+
+#ask .a-side:has(.has-run) .a-lede {
+  display: none;
+}
+
+#ask .a-side:has(.has-run) .a-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+#ask .a-side:has(.has-run) .a-head h2 {
+  order: -1;
+  margin: 0;
+  font-size: clamp(1.9rem, 2.6vw, 2.6rem);
+}
+
+/* idle: one suggestion at a time lights up, in step with its object in the scene */
+#ask .a-chips button.pulse {
+  color: var(--ink);
+  animation: a-pulse 3.2s var(--ease) both;
+}
+
+#ask .a-chips button.pulse::before {
+  animation: a-dot 3.2s var(--ease) both;
+}
+
+@keyframes a-pulse {
+  0%,
+  100% {
+    border-color: var(--a-line);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  35% {
+    border-color: var(--tool);
+    box-shadow: 0 0 1.3rem -0.2rem var(--tool);
+  }
+}
+
+@keyframes a-dot {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+  35% {
+    transform: scale(1.6);
+    box-shadow: 0 0 0.8rem var(--tool);
+  }
+}
+
+/* ---------- the run ---------- */
+
+#ask .a-run {
+  position: relative;
+  margin-top: 0.9rem;
+  display: grid;
+  min-height: 3.2rem;
+}
+
+#ask .a-run:empty {
+  min-height: 0;
+  margin: 0;
+}
+
+#ask .a-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6.4rem minmax(0, 1fr);
+  gap: 0.6rem;
+  padding: 0.36rem 0.5rem 0.36rem 0.25rem;
+  margin-inline: -0.25rem;
+  border-radius: 0.6rem;
+  animation: a-in 0.6s var(--ease) both;
+  transition: background-color 0.3s;
+}
+
+/* the trace: one line through every step, a node on each, coloured by the tool it touched */
+#ask .a-step::before {
+  content: '';
+  position: absolute;
+  left: calc(0.25rem + 0.3rem - 0.5px);
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--a-line);
+}
+
+#ask .a-step:first-child::before {
+  top: 1rem;
+}
+
+#ask .a-step:last-child::before {
+  bottom: calc(100% - 1rem);
+}
+
+#ask .a-role {
+  position: relative;
+  align-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.12rem 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink-3);
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.25s;
+}
+
+#ask .a-role i {
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: #0d0b18;
+  border: 1.5px solid var(--tool, var(--accent));
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.4s var(--ease);
+}
+
+#ask .a-step.now .a-role i,
+#ask .a-step.replay .a-role i {
+  background: var(--tool);
+  box-shadow: 0 0 0.9rem var(--tool);
+  transform: scale(1.25);
+}
+
+#ask .a-step.now .a-role,
+#ask .a-step.replay .a-role,
+#ask .a-role:hover {
+  color: var(--ink);
+}
+
+#ask .a-card.done .a-step:hover,
+#ask .a-step.replay {
+  background: color-mix(in srgb, var(--tool) 9%, transparent);
+}
+
+#ask .a-card.done .a-step {
+  cursor: pointer;
+}
+
+#ask .a-body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+#ask .a-you .a-body {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+#ask .a-body code {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+#ask .a-body code b {
+  font-weight: 600;
+  color: var(--tool);
+}
+
+#ask .a-obs {
+  position: relative;
+  margin-top: 0.3rem;
+  padding-left: 1.1rem;
+  font-size: 0.875rem;
+  color: var(--ink);
+  animation: a-in 0.5s var(--ease) both;
+}
+
+#ask .a-obs::before {
+  content: '';
+  position: absolute;
+  left: 0.1rem;
+  top: 0.42em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 2px;
+  background: var(--tool);
+  box-shadow: 0 0 0.6rem var(--tool);
+}
+
+#ask .a-obs.empty {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+#ask .a-obs.empty::before {
+  background: none;
+  box-shadow: none;
+  border: 1.5px dashed var(--ink-3);
+}
+
+#ask .a-answer .a-body {
+  font-size: 0.9688rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+#ask .a-typed {
+  min-height: 1.5em;
+}
+
+#ask .a-typed.typing::after {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 0.2em;
+  vertical-align: -0.15em;
+  background: var(--accent);
+  animation: a-caret 0.9s steps(2) infinite;
+}
+
+#ask .a-next {
+  padding-left: calc(6.4rem + 0.6rem);
+}
+
+#ask .a-next:empty {
+  display: none;
+}
+
+#ask .a-jump {
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.42rem 0.95rem 0.42rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tool) 65%, transparent);
+  background: color-mix(in srgb, var(--tool) 10%, transparent);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+  animation: a-in 0.6s var(--ease) both;
+  transition:
+    background-color 0.25s,
+    box-shadow 0.25s,
+    transform 0.3s var(--ease);
+}
+
+#ask .a-jump::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--tool);
+  box-shadow: 0 0 0.7rem var(--tool);
+}
+
+#ask .a-jump svg {
+  transition: transform 0.3s var(--ease);
+}
+
+#ask .a-jump:hover {
+  background: color-mix(in srgb, var(--tool) 22%, transparent);
+  box-shadow: 0 0 1.6rem -0.3rem var(--tool);
+}
+
+#ask .a-jump:hover svg {
+  transform: translate(2px, -2px);
+}
+
+#ask .a-jump:active {
+  transform: scale(0.96);
+}
+
+#ask .a-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--a-line);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  animation: a-in 0.6s 0.2s var(--ease) both;
+}
+
+#ask .a-hint[hidden] {
+  display: none;
+}
+
+/* a small "play" mark: the steps above are a trace you can scrub */
+#ask .a-hint i {
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 0.5rem solid var(--accent);
+  border-block: 0.32rem solid transparent;
+  animation: a-nudge 1.8s var(--ease) infinite;
+}
+
+#ask .a-fine {
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--ink-3);
+}
+
+@keyframes a-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes a-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes a-nudge {
+  50% {
+    transform: translateX(0.2rem);
+  }
+}
+
+/* ---------- labels pinned to things in the scene ---------- */
+
+#ask .a-tags li {
+  display: contents;
+}
+
+#ask .a-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.3rem 0.7rem 0.34rem;
+  border-radius: 0.7rem;
+  border: 1px solid transparent;
+  background: transparent;
+  font: inherit;
+  color: var(--ink-2);
+  cursor: pointer;
+  visibility: hidden;
+  opacity: 0;
+  will-change: transform;
+  transition:
+    color 0.3s,
+    border-color 0.3s,
+    background-color 0.3s;
+}
+
+#ask .a-tag b {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#ask .a-tag b::before {
+  content: '';
+  width: 0.34rem;
+  height: 0.34rem;
+  border-radius: 50%;
+  background: var(--tool);
+  box-shadow: 0 0 0.5rem var(--tool);
+}
+
+#ask .a-tag i {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.6875rem;
+  color: var(--ink-3);
+  white-space: nowrap;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.4s var(--ease),
+    opacity 0.3s;
+}
+
+#ask .a-tag:hover,
+#ask .a-tag:focus-visible,
+#ask .a-tag.hot {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--tool) 55%, transparent);
+  background: rgb(10 8 20 / 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+#ask .a-tag:hover i,
+#ask .a-tag:focus-visible i,
+#ask .a-tag.hot i {
+  max-height: 1.2rem;
+  opacity: 1;
+}
+
+/* the result a tool returned unfolds under its name */
+#ask .a-tag .o {
+  display: none;
+  width: max-content;
+  max-width: 12.5rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink);
+}
+
+#ask .a-tag.has-obs {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--tool) 55%, transparent);
+  background: linear-gradient(color-mix(in srgb, var(--tool) 12%, transparent), transparent), rgb(10 8 20 / 0.66);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+#ask .a-tag.has-obs .o {
+  display: block;
+  margin-top: 0.2rem;
+  animation: a-in 0.5s var(--ease) both;
+}
+
+#ask .a-tag.has-obs i {
+  max-height: 1.2rem;
+  opacity: 1;
+  color: var(--tool);
+}
+
+#ask .a-tag.open i {
+  color: var(--tool);
+}
+
+#ask .a-goals span,
+#ask .a-state {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+#ask .a-goals span {
+  padding: 0.16rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tool) 60%, transparent);
+  background: rgb(10 8 20 / 0.66);
+  font-size: 0.75rem;
+  font-weight: 550;
+  color: var(--ink);
+}
+
+#ask .a-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.24rem 0.8rem;
+  border-radius: 999px;
+  background: rgb(10 8 20 / 0.6);
+  border: 1px solid var(--a-line);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+#ask .a-state::before {
+  content: '';
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--tool, var(--accent));
+  box-shadow: 0 0 0.6rem var(--tool, var(--accent));
+  animation: a-caret 1s steps(2) infinite;
+}
+
+/* ---------- shorter laptop screens: the lede has been read once the first run starts ---------- */
+
+@media (min-width: 861px) and (max-height: 860px) {
+  #ask .a-side {
+    top: 4.75rem;
+    gap: 0.9rem;
+  }
+
+  #ask .a-head h2 {
+    font-size: clamp(2rem, 3vw, 3rem);
+  }
+
+  #ask .a-step {
+    padding-block: 0.4rem;
+  }
+}
+
+@media (min-width: 861px) and (max-height: 820px) {
+  #ask .a-side {
+    top: 4.4rem;
+    gap: 0.6rem;
+  }
+
+  /* the header keeps saying "Scripted demo" beside the title, so the footnote can go */
+  #ask .a-card.has-run .a-fine {
+    display: none;
+  }
+}
+
+@media (min-width: 861px) and (max-height: 740px) {
+  #ask .a-run {
+    max-height: calc(100svh - 19rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+/* ---------- phones: the scene above, the console below ---------- */
+
+@media (max-width: 860px) {
+  #ask .a-side {
+    left: 0.75rem;
+    right: 0.75rem;
+    top: auto;
+    bottom: 0.7rem;
+    width: auto;
+    gap: 0.55rem;
+    transform: translate3d(0, calc((1 - var(--in, 1)) * 2.5rem), 0);
+  }
+
+  #ask .a-head {
+    padding-inline: 0.35rem;
+  }
+
+  #ask .a-head .eyebrow {
+    display: none;
+  }
+
+  #ask .a-head h2 {
+    margin: 0;
+    font-size: 1.75rem;
+  }
+
+  #ask .a-lede {
+    margin-top: 0.35rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    max-width: none;
+  }
+
+  #ask .a-side:has(.has-run) .a-head {
+    display: none;
+  }
+
+  #ask .a-card {
+    padding: 0.7rem 0.7rem 0.6rem;
+    border-radius: 1rem;
+  }
+
+  #ask .a-form input {
+    font-size: 1rem;
+    padding: 0.4rem 0;
+  }
+
+  /* wrapped, not a scroll row: the pin layer ignores the pointer, so a row could not be swiped */
+  #ask .a-chips {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.6rem;
+  }
+
+  /* and they stay wrapped once a run is on screen (the short labels keep it to one or two rows) */
+  #ask .a-card.has-run .a-chips {
+    flex-wrap: wrap;
+  }
+
+  /* the second row of chips comes out of the trace's height, so the card does not climb over the scene */
+  #ask .a-card.has-run .a-run {
+    max-height: min(10.8rem, 19svh);
+  }
+
+  #ask .a-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  #ask .a-chips button {
+    white-space: nowrap;
+    font-size: 0.78rem;
+  }
+
+  #ask .a-run {
+    margin-top: 0.5rem;
+    max-height: min(13rem, 23svh);
+    overflow-y: auto;
+    scrollbar-width: none;
+    touch-action: pan-y;
+  }
+
+  #ask .a-step {
+    grid-template-columns: 5.4rem minmax(0, 1fr);
+    gap: 0.5rem;
+    padding-block: 0.34rem;
+  }
+
+  #ask .a-next {
+    padding-left: 0;
+  }
+
+  #ask .a-jump {
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+  }
+
+  #ask .a-role {
+    font-size: 0.6875rem;
+    gap: 0.45rem;
+  }
+
+  #ask .a-body,
+  #ask .a-answer .a-body {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  #ask .a-body code {
+    font-size: 0.75rem;
+  }
+
+  #ask .a-obs {
+    font-size: 0.8125rem;
+  }
+
+  #ask .a-hint {
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  #ask .a-fine {
+    margin-top: 0.4rem;
+    font-size: 0.6875rem;
+  }
+
+  #ask .a-tag {
+    padding: 0.2rem 0.4rem;
+  }
+
+  #ask .a-tag b {
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+  }
+
+  #ask .a-tag i {
+    display: none;
+  }
+
+  #ask .a-goals span,
+  #ask .a-state {
+    font-size: 0.6875rem;
+  }
+}
+
+/* ---------- without WebGL: an ordinary section; the console still runs ---------- */
+
+.no-gl #ask .a-side,
+html:not(.js) #ask .a-side {
+  position: static;
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  width: min(40rem, 100%);
+}
+
+.no-gl #ask .a-tags,
+.no-gl #ask .a-goals,
+.no-gl #ask .a-state,
+.no-gl #ask .a-hint,
+html:not(.js) #ask .a-tags,
+html:not(.js) #ask .a-goals,
+html:not(.js) #ask .a-state,
+html:not(.js) #ask .a-form,
+html:not(.js) #ask .a-chips {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ask .a-step,
+  #ask .a-obs,
+  #ask .a-jump,
+  #ask .a-hint {
+    animation: none;
+  }
+}
+
+/* Phones (tier 0: coarse pointer or 860 px and narrower, the same test main.ts uses): no backdrop
+   blur over the live canvas, which is costly on mobile GPUs; a darker, more opaque glass instead. */
+@media (pointer: coarse), (max-width: 860px) {
+  #ask .a-card {
+    background: linear-gradient(rgb(155 123 255 / 0.07), rgb(155 123 255 / 0) 9rem), rgb(11 9 21 / 0.9);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  #ask .a-tag:hover,
+  #ask .a-tag:focus-visible,
+  #ask .a-tag.hot {
+    background: rgb(10 8 20 / 0.86);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  #ask .a-tag.has-obs {
+    background: linear-gradient(color-mix(in srgb, var(--tool) 12%, transparent), transparent), rgb(10 8 20 / 0.9);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

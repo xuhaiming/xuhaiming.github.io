@@ -1,0 +1,360 @@
+#about {
+  --accent: #ff5d8f;
+  --a-glass: rgb(26 10 16 / 0.52);
+  --a-edge: rgb(255 150 180 / 0.22);
+  --a-warm: #ffe9e2;
+}
+
+#about button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- copy ---------- */
+
+#about .a-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(7 3 4 / 0.78) 0%, rgb(7 3 4 / 0.5) 26%, rgb(7 3 4 / 0) 50%);
+  opacity: 0;
+}
+
+#about .a-beat {
+  position: absolute;
+  left: var(--gut);
+  top: 50%;
+  max-width: min(31rem, calc(100% - 2 * var(--gut)));
+  transform: translateY(calc(-50% + var(--y, 0px)));
+  visibility: hidden;
+  opacity: 0;
+}
+
+#about .a-say {
+  margin-top: 1rem;
+  font-size: clamp(1.25rem, 1.72vw, 1.7rem);
+  line-height: 1.34;
+  font-stretch: 88%;
+  font-weight: 480;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+/* ---------- fact cards: glass pinned in the scene ---------- */
+
+#about .a-cards li {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.7rem 1rem 0.8rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--a-edge);
+  background: linear-gradient(140deg, rgb(255 140 170 / 0.13), rgb(26 10 16 / 0.5) 45%, rgb(26 10 16 / 0.62));
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow:
+    0 1.2rem 2.6rem rgb(0 0 0 / 0.45),
+    inset 0 1px 0 rgb(255 200 215 / 0.22);
+  white-space: nowrap;
+  visibility: hidden;
+  opacity: 0;
+  filter: blur(var(--blur, 0px));
+  will-change: transform;
+  cursor: default;
+  transition:
+    border-color 0.4s var(--ease),
+    box-shadow 0.4s var(--ease);
+}
+
+#about .a-cards li::before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: -1px;
+  width: 1.6rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+#about .a-cards li:hover {
+  border-color: rgb(255 150 180 / 0.6);
+  box-shadow:
+    0 1.2rem 2.6rem rgb(0 0 0 / 0.5),
+    0 0 2.4rem rgb(255 93 143 / 0.22),
+    inset 0 1px 0 rgb(255 200 215 / 0.35);
+}
+
+#about .a-cards span {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+#about .a-cards b {
+  font-stretch: 76%;
+  font-weight: 740;
+  font-size: 1.4rem;
+  line-height: 1.05;
+  color: var(--a-warm);
+}
+
+/* ---------- the lens ---------- */
+
+#about .a-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  gap: 0.1rem;
+  padding-left: 0.8rem;
+  border-left: 1px solid var(--accent);
+  visibility: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  will-change: transform;
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.9);
+}
+
+#about .a-tag.flip {
+  padding-left: 0;
+  padding-right: 0.8rem;
+  border-left: 0;
+  border-right: 1px solid var(--accent);
+  text-align: right;
+}
+
+#about .a-tag b {
+  font-stretch: 74%;
+  font-weight: 760;
+  font-size: 1.25rem;
+  line-height: 1.05;
+  color: var(--a-warm);
+}
+
+#about .a-tag em {
+  margin-top: 0.25rem;
+  font-style: normal;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+#about .a-modes {
+  position: absolute;
+  right: var(--gut);
+  bottom: clamp(2.75rem, 8vh, 5rem);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.3rem;
+  border-radius: 99px;
+  border: 1px solid var(--a-edge);
+  background: var(--a-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow:
+    0 1rem 2.4rem rgb(0 0 0 / 0.45),
+    inset 0 1px 0 rgb(255 200 215 / 0.18);
+  visibility: hidden;
+  opacity: 0;
+}
+
+#about .a-modes-t {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.7rem 0 0.8rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+#about .a-modes-t i {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  box-shadow: 0 0 10px rgb(255 93 143 / 0.7);
+  animation: a-ping 2.6s var(--ease) infinite;
+}
+
+@keyframes a-ping {
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+#about .a-modes button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.5rem;
+  padding: 0 0.95rem 0 0.6rem;
+  border-radius: 99px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-2);
+  transition:
+    background 0.45s var(--ease),
+    color 0.45s var(--ease),
+    transform 0.35s var(--ease);
+}
+
+#about .a-modes kbd {
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgb(255 150 180 / 0.28);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  transition: inherit;
+}
+
+#about .a-modes button:hover {
+  color: var(--ink);
+  background: rgb(255 93 143 / 0.14);
+}
+
+#about .a-modes button:active {
+  transform: scale(0.94);
+}
+
+#about .a-modes button[aria-pressed='true'] {
+  background: var(--accent);
+  color: #1a0308;
+}
+
+#about .a-modes button[aria-pressed='true'] kbd {
+  border-color: rgb(26 3 8 / 0.4);
+  color: #1a0308;
+}
+
+/* ---------- without WebGL: an ordinary section ---------- */
+
+.no-gl #about .a-beat,
+html:not(.js) #about .a-beat {
+  position: static;
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  margin-bottom: 2.5rem;
+}
+
+.no-gl #about :is(.a-scrim, .a-cards, .a-tag, .a-modes),
+html:not(.js) #about :is(.a-scrim, .a-cards, .a-tag, .a-modes) {
+  display: none;
+}
+
+/* ---------- phone ---------- */
+
+@media (max-width: 860px) {
+  #about .a-scrim {
+    background: linear-gradient(0deg, rgb(7 3 4 / 0.92) 0%, rgb(7 3 4 / 0.7) 24%, rgb(7 3 4 / 0) 48%);
+  }
+
+  #about .a-beat {
+    top: auto;
+    bottom: 2.75rem;
+    transform: translateY(var(--y, 0px));
+  }
+
+  #about .a-say {
+    margin-top: 0.6rem;
+    font-size: 1.0625rem;
+    line-height: 1.38;
+  }
+
+  #about .a-cards li {
+    padding: 0.5rem 0.75rem 0.55rem;
+    border-radius: 0.7rem;
+  }
+
+  #about .a-cards b {
+    font-size: 1.05rem;
+  }
+
+  #about .a-cards span {
+    font-size: 0.625rem;
+  }
+
+  #about .a-modes {
+    right: auto;
+    left: 50%;
+    bottom: auto;
+    top: 4.4rem;
+    transform: translateX(-50%);
+  }
+
+  #about .a-modes-t,
+  #about .a-modes kbd {
+    display: none;
+  }
+
+  #about .a-modes button {
+    height: 2.4rem;
+    padding: 0 0.85rem;
+    font-size: 0.8125rem;
+  }
+
+  #about .a-tag {
+    padding: 0 0.6rem;
+    border-left: 0;
+    border-top: 1px solid var(--accent);
+    padding-top: 0.3rem;
+    text-align: center;
+  }
+
+  #about .a-tag em {
+    display: none;
+  }
+
+  #about .a-tag b {
+    font-size: 1.05rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #about .a-modes-t i {
+    animation: none;
+  }
+}
+
+/* phones: no live blur over the moving canvas (costly on mobile GPUs); a deeper fill instead */
+@media (pointer: coarse), (max-width: 860px) {
+  #about .a-cards li {
+    background: linear-gradient(140deg, rgb(255 140 170 / 0.12), rgb(22 9 14 / 0.9) 45%, rgb(20 8 13 / 0.92));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  #about .a-modes {
+    background: rgb(20 8 13 / 0.9);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
