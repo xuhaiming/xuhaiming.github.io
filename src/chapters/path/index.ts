@@ -1086,10 +1086,10 @@ function update(f: Frame, ctx: Ctx) {
 
   ctx.bg.copy(now.bg);
   ctx.fog.color.copy(now.bg).lerp(now.haze, 0.5);
-  ctx.fog.density = 0.012 + mistK * 0.02;
-  ctx.post.bloom = 0.72 + warp * 0.12;
+  ctx.fog.density = 0.006 + mistK * 0.01;
+  ctx.post.bloom = 0.4 + warp * 0.1;
   ctx.post.threshold = 1.1;
-  ctx.post.vignette = 0.55;
+  ctx.post.vignette = 0.42;
   ctx.post.exposure = 1.05;
   ctx.scene.environmentIntensity = 0.5 + (1 - now.night) * 0.25;
 

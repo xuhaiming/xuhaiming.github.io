@@ -377,11 +377,10 @@ function frame(f: Frame, ctx: Ctx) {
   // ---------------------------------------------------------------- frame
   ctx.bg.copy(BG);
   ctx.fog.color.copy(BG);
-  ctx.fog.density = 0.05;
-  ctx.post.bloom = 0.5;
-  ctx.post.threshold = 0.9;
-  ctx.post.vignette = 0.62;
-  ctx.post.grain = 0.7;
+  ctx.fog.density = 0.024;
+  ctx.post.bloom = 0.3;
+  ctx.post.threshold = 0.94;
+  ctx.post.vignette = 0.45;
   ctx.scene.environmentIntensity = 0.32;
 
   // ---------------------------------------------------------------- copy

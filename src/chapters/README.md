@@ -50,7 +50,7 @@ export default chapter;
 
 - Add every object, including lights, to your `group`. The director shows it only while you are active.
 - Each frame, before `update`, the director resets: `ctx.bg` (black), `ctx.fog` (off), `ctx.post`
-  (bloom 0.55, threshold 0.82, vignette 0.45, grain 0.5, exposure 1), `scene.environmentIntensity`
+  (bloom 0.3, threshold 0.92, vignette 0.36, exposure 1; `grain` is ignored, there is no film grain), `scene.environmentIntensity`
   (0.55), camera fov (35) and the whole hero state. So set what you want every frame; nothing leaks.
 - You own the camera while active: set `ctx.camera.position` and `lookAt` every frame.
 - `init` may be async, but the chapter stays blacked out until it resolves: load only what the first

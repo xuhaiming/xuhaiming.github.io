@@ -103,9 +103,9 @@ function update(f: Frame, ctx: Ctx) {
 
   ctx.bg.copy(BG);
   ctx.fog.color.copy(ctx.bg);
-  ctx.fog.density = 0.03;
-  ctx.post.bloom = 0.85;
-  ctx.post.threshold = 0.92;
+  ctx.fog.density = 0.015;
+  ctx.post.bloom = 0.45;
+  ctx.post.threshold = 0.95;
   show(copy, smooth(seg(p, 0.08, 0.3)));
 }
 

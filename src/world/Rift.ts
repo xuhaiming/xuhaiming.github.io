@@ -433,7 +433,7 @@ export class Rift {
             float dist = -mv.z;
             // fine: a pixel or two, a rare larger one
             float big = pow(aR.z, 4.0);
-            gl_PointSize = max(1.5, uS * (1.6 + big * 3.0) * (6.0 / max(dist, 0.2)));
+            gl_PointSize = max(2.0, uS * (1.5 + big * 1.5) * (6.0 / max(dist, 0.2)));
             float fade = smoothstep(0.0, 0.08, life) * (1.0 - smoothstep(0.45, 1.0, life)) * pow(riftProf(y0), 0.35);
             // sparse: most motes are faint, a few catch the light
             float lit = 0.25 + 1.6 * pow(aR.x, 3.0);
@@ -446,7 +446,7 @@ export class Rift {
           ${TOP}
           void main() {
             float d = length(gl_PointCoord - 0.5);
-            float a = smoothstep(0.5, 0.1, d);
+            float a = 1.0 - smoothstep(0.34, 0.5, d);
             gl_FragColor = vec4(clamp(vC * a * topFade(), 0.0, 4.0), 1.0);
           }`,
       }),

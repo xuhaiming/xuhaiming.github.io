@@ -137,7 +137,7 @@ export function buildSet(ctx: Ctx, group: THREE.Group): StageSet {
           float edge = smoothstep(0.0, 0.2, th) * smoothstep(1.0, 0.8, th) * mix(0.15, 1.0, smoothstep(uShade.x - 0.1, uShade.x + 0.08, gl_FragCoord.x / uShade.y));
           col += lit * edge * (0.03 + 0.2 * back * back) * uA;
 
-          float fog = 1.0 - exp(-distance(vW, cameraPosition) * uFog * 1.6);
+          float fog = 1.0 - exp(-distance(vW, cameraPosition) * uFog * 0.8);
           gl_FragColor = vec4(mix(col, uBg * 0.6, clamp(fog, 0.0, 1.0)), 1.0);
         }`,
     }),

@@ -45,7 +45,8 @@ const kindOf = (o: THREE.Object3D) => {
 const darkLight = (k: number): THREE.Light =>
   k === 0 ? new THREE.DirectionalLight(0xffffff, 0) : k === 1 ? new THREE.PointLight(0xffffff, 0) : k === 2 ? new THREE.SpotLight(0xffffff, 0) : new THREE.HemisphereLight(0xffffff, 0x000000, 0);
 
-const POST: Post = { bloom: 0.55, threshold: 0.82, vignette: 0.45, grain: 0.5, exposure: 1 };
+// grain stays in the Post type for old chapters but is ignored: the finish pass has no film grain, only a fixed 1-LSB dither
+const POST: Post = { bloom: 0.3, threshold: 0.92, vignette: 0.36, grain: 0, exposure: 1 };
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 const idle = (fn: (d?: IdleDeadline) => void, timeout = 600) =>
@@ -68,7 +69,6 @@ const finish = {
     uCut: { value: 0 },
     uTime: { value: 0 },
     uVig: { value: 0.45 },
-    uGrain: { value: 0.5 },
     uRes: { value: new THREE.Vector2(1, 1) },
     uCell: { value: 14 },
     uExposure: { value: 1 },
@@ -76,7 +76,7 @@ const finish = {
   vertexShader: VERT,
   // the old separate OutputPass is folded in here: ACES (three's fit, same exposure scaling) + sRGB
   fragmentShader: /* glsl */ `
-    uniform sampler2D tDiffuse; uniform float uCut, uTime, uVig, uGrain, uCell, uExposure; uniform vec2 uRes; varying vec2 vUv;
+    uniform sampler2D tDiffuse; uniform float uCut, uTime, uVig, uCell, uExposure; uniform vec2 uRes; varying vec2 vUv;
     float hash(vec2 p) { vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
     ${CLEAN}
     vec3 rrtOdt(vec3 v) {
@@ -114,10 +114,10 @@ const finish = {
       }
       vec2 q = vUv - 0.5;
       col *= 1.0 - uVig * smoothstep(0.25, 0.95, dot(q, q) * 2.2);
-      float g = hash(px + fract(uTime) * 311.7) - 0.5;
-      col += g * 0.035 * uGrain;
-      col = max(col, 0.0);
-      gl_FragColor = vec4(srgb(aces(col)), 1.0);
+      // output is 8-bit: a static (not animated) interleaved-gradient dither of +-0.5/255 after the sRGB
+      // transform breaks up banding in dark gradients without any visible noise
+      float dith = fract(52.9829189 * fract(dot(floor(px), vec2(0.06711056, 0.00583715)))) - 0.5;
+      gl_FragColor = vec4(srgb(aces(col)) + dith / 255.0, 1.0);
     }`,
 };
 
@@ -180,7 +180,8 @@ class DirectPass extends Pass {
 interface Level {
   dpr: number;
   msaa: boolean;
-  half: boolean;
+  /** bloom pass dropped altogether (the first thing to go, before MSAA and before any resolution) */
+  noBloom: boolean;
 }
 
 /**
@@ -263,7 +264,8 @@ export class World {
   private idleAsked = new Set<number>();
   private uploads: THREE.Texture[] = [];
   private levels: Level[] = [];
-  private bloomHalf = false;
+  /** MSAA samples of the scene target at full quality */
+  private msaaN = 4;
   /** dark stand-in lights, by kind, always in the scene */
   private pads: THREE.Light[][] = [[], [], [], []];
   private padRoot = new THREE.Group();
@@ -281,7 +283,7 @@ export class World {
   private warmed = new WeakMap<THREE.Material, string>();
   private videos: HTMLVideoElement[] = [];
   private pausedByUs = new Set<HTMLVideoElement>();
-  private gov = { n: 0, minDt: 1, avg: 0, work: 0, slow: 0, fast: 0, lastUp: 0, lastDown: 0, upWait: 10 };
+  private gov = { n: 0, minDt: 1, avg: 0, work: 0, slow: 0, fast: 0, lastUp: 0, lastDown: 0, upWait: 6 };
   onFirstFrame: (() => void) | null = null;
   onActive: ((id: string, index: number) => void) | null = null;
   /** run at the top of every frame (smooth scroll goes here, so the frame reads this frame's scroll) */
@@ -304,7 +306,10 @@ export class World {
     const tier = opts.tier;
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' });
     this.renderer = renderer;
-    const dpr = Math.min(devicePixelRatio || 1, [1.5, 1.75, 2][tier]);
+    // quality first: the device's own ratio up to a cap; strong phones may go to 2.5. The governor steps down if needed
+    const strong = (navigator.hardwareConcurrency || 0) >= 8 && ((navigator as { deviceMemory?: number }).deviceMemory ?? 0) >= 6;
+    const dprCap = tier === 0 ? (strong ? 2.5 : 2) : tier === 1 ? 2.5 : 3;
+    const dpr = Math.min(devicePixelRatio || 1, dprCap);
     renderer.setPixelRatio(dpr);
     // tone mapping and the output transform happen in the finish pass; scene renders go to HDR targets
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -352,17 +357,19 @@ export class World {
         meshopt.catch((e) => console.warn('meshopt decoder unavailable', e)),
       ]);
       const g = await gltf.parseAsync(buf, url.slice(0, url.lastIndexOf('/') + 1));
-      // phones: material textures at most 512 wide (the owner approved half-size textures on tier 0)
-      if (small) {
+      // phones: material textures at most 1024 wide (quality first: was 512)
+      {
         const jobs = new Map<object, Promise<void>>();
         const tex = new Set<THREE.Texture>();
         collect(g.scene, tex, new Set());
         for (const t of tex) {
+          t.anisotropy = maxAniso;
+          if (!small) continue;
           const s = t.source as { data: unknown; needsUpdate: boolean };
           if (jobs.has(s)) continue;
           jobs.set(
             s,
-            shrink(s.data, 512, false).then((bm) => {
+            shrink(s.data, 1024, false).then((bm) => {
               if (!bm) return;
               const old = s.data;
               s.data = bm;
@@ -409,16 +416,16 @@ export class World {
           // decoded off the main thread into an ImageBitmap straight from the file's bytes (from an <img>,
           // createImageBitmap copies and scales on the main thread: 60-90 ms per texture on a phone, right
           // when a neighbouring chapter loads during an entrance), so the GPU upload later is a plain copy.
-          // Phones also halve anything wider than 1024 (the owner approved). An ImageBitmap ignores flipY
+          // Phones only scale down anything wider than 2048 (was: halve above 1024). An ImageBitmap ignores flipY
           // at upload, so the flip happens here.
           let t: THREE.Texture;
           const blob = typeof createImageBitmap === 'function' ? await fetch(url).then((r) => (r.ok ? r.blob() : null)).catch(() => null) : null;
           let bm = blob ? await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none', imageOrientation: flip ? 'flipY' : 'from-image' }).catch(() => null) : null;
-          if (bm && tier === 0 && bm.width > 1024) {
-            const half = await shrink(bm, bm.width / 2, false);
-            if (half) {
+          if (bm && tier === 0 && bm.width > 2048) {
+            const capped = await shrink(bm, 2048, false);
+            if (capped) {
               bm.close();
-              bm = half;
+              bm = capped;
             }
           }
           if (bm) {
@@ -452,18 +459,25 @@ export class World {
           this.videos.push(el);
           const tex = new THREE.VideoTexture(el);
           tex.colorSpace = THREE.SRGBColorSpace;
+          // frames change every tick: no mipmaps (a rebuild per frame), plain bilinear
+          tex.generateMipmaps = false;
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
           return { el, tex };
         }),
       glb: (url) => once(`g:${url}`, () => loadGlb(url, tier === 0)),
     };
 
     // ping-pong buffers: single-sample half float, no depth (phones render the scene straight into them, so they keep depth there)
-    const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 0, depthBuffer: tier === 0, stencilBuffer: false }));
-    if (tier > 0) {
-      this.scenePass = new ScenePass(scene, camera, 4);
+    // every tier renders the scene into a multisampled target (phones included); DirectPass remains only
+    // as the fallback when the GPU offers fewer than 2 samples
+    const msaaOk = renderer.capabilities.maxSamples >= 2;
+    const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 0, depthBuffer: !msaaOk, stencilBuffer: false }));
+    if (msaaOk) {
+      this.scenePass = new ScenePass(scene, camera, Math.min(4, renderer.capabilities.maxSamples));
       composer.addPass(this.scenePass);
     } else composer.addPass(new DirectPass(scene, camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), POST.bloom, 0.7, POST.threshold);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), POST.bloom, 0.35, POST.threshold);
     // the bloom chain reads only its high-pass, so guarding that keeps a bad pixel from spreading
     const hp = this.bloom.materialHighPassFilter;
     hp.fragmentShader = hp.fragmentShader
@@ -475,15 +489,17 @@ export class World {
     composer.addPass(this.fin);
     this.composer = composer;
 
-    // quality ladder, best first: resolution steps, then MSAA off, then half-resolution bloom
-    const minDpr = tier === 0 ? 0.85 : 1;
+    // quality ladder, best first: bloom goes first (the costliest, subtlest pass), then MSAA, and only then
+    // resolution steps; the floor is 1.25 so the picture never gets soft
+    const minDpr = Math.min(dpr, 1.25);
     let d = dpr;
-    const msaa = tier > 0;
-    this.levels.push({ dpr: d, msaa, half: false });
-    while (d - 0.25 >= minDpr - 1e-3) this.levels.push({ dpr: (d = Math.round((d - 0.25) * 100) / 100), msaa, half: false });
-    if (d > minDpr + 1e-3) this.levels.push({ dpr: (d = minDpr), msaa, half: false });
-    if (msaa) this.levels.push({ dpr: d, msaa: false, half: false });
-    this.levels.push({ dpr: d, msaa: false, half: true });
+    const msaa = msaaOk;
+    this.msaaN = msaaOk ? Math.min(4, renderer.capabilities.maxSamples) : 0;
+    this.levels.push({ dpr: d, msaa, noBloom: false });
+    this.levels.push({ dpr: d, msaa, noBloom: true });
+    if (msaa) this.levels.push({ dpr: d, msaa: false, noBloom: true });
+    while (d - 0.25 >= minDpr - 1e-3) this.levels.push({ dpr: (d = Math.round((d - 0.25) * 100) / 100), msaa: false, noBloom: true });
+    if (d > minDpr + 1e-3) this.levels.push({ dpr: (d = minDpr), msaa: false, noBloom: true });
     Object.assign(this.quality, { level: 0, levels: this.levels.length, dpr, msaa, bloomHalf: false });
 
     for (const el of sections) {
@@ -597,8 +613,6 @@ export class World {
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(s.dpr);
     this.composer.setSize(w, h);
-    // the composer sizes bloom at half the frame; the last quality step halves it again
-    if (this.bloomHalf) this.bloom.setSize((w * s.dpr) / 2, (h * s.dpr) / 2);
     this.fin.uniforms.uRes.value.set(w * s.dpr, h * s.dpr);
     this.fin.uniforms.uCell.value = Math.round((s.narrow ? 9 : 13) * s.dpr);
     this.ctx.camera.aspect = w / h;
@@ -1150,8 +1164,7 @@ export class World {
       u.uCut.value = cut;
       u.uTime.value = t;
       u.uVig.value = ctx.post.vignette;
-      u.uGrain.value = ctx.post.grain;
-      this.composer.render(dt);
+            this.composer.render(dt);
       this.pumpUploads(ctx.tier === 0 ? 1 : 2);
     }
 
@@ -1167,9 +1180,9 @@ export class World {
 
   /**
    * Learns the display's frame interval from the fastest of the first 60 frames, then steps quality
-   * down after 2 s of frames averaging over 1.4x that, and back up after 6 s of clean frames with
-   * main-thread work under 0.7x of it (at most every 10 s, waiting longer after each step that
-   * had to be undone).
+   * down after 3 s of frames averaging over 1.6x that, and back up after 4 s of clean frames with
+   * main-thread work under 0.7x of it (at most every 6 s, waiting longer, up to 60 s, after each step
+   * that had to be undone). Order of steps down: bloom, MSAA, then resolution (floor 1.25).
    */
   private govern(dt: number, work: number, t: number) {
     const g = this.gov;
@@ -1192,19 +1205,19 @@ export class World {
     // one-off hitches (a chapter starting up, a texture upload, a tab switch) say nothing about sustained
     // GPU load: leave them out of the average instead of letting them push quality down
     if (dt > budget * 4) return;
-    g.avg += (dt - g.avg) * 0.08;
-    g.work += (work / 1000 - g.work) * 0.08;
+    g.avg += (dt - g.avg) * 0.05;
+    g.work += (work / 1000 - g.work) * 0.05;
     q.avg = g.avg * 1000;
     q.work = g.work * 1000;
-    g.slow = g.avg > budget * 1.4 ? g.slow + dt : 0;
+    g.slow = g.avg > budget * 1.6 ? g.slow + dt : 0;
     g.fast = g.avg < budget * 1.12 && g.work < budget * 0.7 ? g.fast + dt : 0;
-    if (g.slow >= 2 && q.level < this.levels.length - 1) {
+    if (g.slow >= 3 && q.level < this.levels.length - 1) {
       // a step up that did not hold: wait longer before trying again
-      if (t - g.lastUp < 10) g.upWait = Math.min(120, g.upWait * 2);
+      if (t - g.lastUp < 8) g.upWait = Math.min(60, g.upWait * 2);
       this.setLevel(q.level + 1);
       g.lastDown = t;
       q.downs++;
-    } else if (g.fast >= 6 && q.level > 0 && t - Math.max(g.lastUp, g.lastDown) >= g.upWait) {
+    } else if (g.fast >= 4 && q.level > 0 && t - Math.max(g.lastUp, g.lastDown) >= g.upWait) {
       this.setLevel(q.level - 1);
       g.lastUp = t;
       q.ups++;
@@ -1217,11 +1230,12 @@ export class World {
     q.level = level;
     q.dpr = L.dpr;
     q.msaa = L.msaa;
-    q.bloomHalf = L.half;
     this.gov.slow = this.gov.fast = 0;
     this.gov.avg = this.quality.budget;
-    if (this.scenePass) this.scenePass.samples = L.msaa ? 4 : 0;
-    this.bloomHalf = L.half;
+    if (this.scenePass) this.scenePass.samples = L.msaa ? this.msaaN : 0;
+    // (quality.bloomHalf now means: the bloom pass is off)
+    q.bloomHalf = L.noBloom;
+    this.bloom.enabled = !L.noBloom;
     this.ctx.size.dpr = L.dpr;
     this.resize();
   }

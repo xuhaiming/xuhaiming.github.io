@@ -300,10 +300,10 @@ function update(f: Frame, ctx: Ctx) {
   // ---- frame ----
   ctx.bg.copy(BG);
   ctx.fog.color.copy(FOG);
-  ctx.fog.density = mix(0.03, 0.011, pre);
-  ctx.post.bloom = 0.62;
-  ctx.post.threshold = 0.78;
-  ctx.post.vignette = 0.5;
+  ctx.fog.density = mix(0.015, 0.006, pre);
+  ctx.post.bloom = 0.36;
+  ctx.post.threshold = 0.88;
+  ctx.post.vignette = 0.4;
   ctx.scene.environmentIntensity = 0.5;
 
   // ---- copy ----

@@ -173,9 +173,9 @@ function update(f: Frame, ctx: Ctx) {
 
   ctx.bg.copy(BG).lerp(NEXT, open * 0.035);
   ctx.fog.color.copy(ctx.bg);
-  ctx.fog.density = 0.028;
-  ctx.post.bloom = mix(0.6, 0.5, open);
-  ctx.post.threshold = 0.9;
+  ctx.fog.density = 0.014;
+  ctx.post.bloom = mix(0.38, 0.3, open);
+  ctx.post.threshold = 0.94;
 
   // ---- copy ----
   show(beats[0], 1 - smooth(seg(p, 0.1, 0.2)));

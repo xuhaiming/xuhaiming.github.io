@@ -390,10 +390,10 @@ function update(f: Frame, ctx: Ctx) {
   rift.cross(hero);
   ctx.bg.copy(BG).lerp(AMBER, out * 0.012);
   ctx.fog.color.copy(ctx.bg);
-  ctx.fog.density = 0.034;
-  ctx.post.bloom = 0.62;
-  ctx.post.threshold = 0.8;
-  ctx.post.vignette = 0.55;
+  ctx.fog.density = 0.016;
+  ctx.post.bloom = 0.36;
+  ctx.post.threshold = 0.9;
+  ctx.post.vignette = 0.42;
   ctx.scene.environmentIntensity = 0.5;
 
   /* ----- copy ----- */

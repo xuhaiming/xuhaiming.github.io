@@ -779,6 +779,18 @@ body::before {
     opacity: 1;
   }
 
+  /* on phones the bar never hides: the step pill sits beside Menu and stays put, so the bar must too.
+     main.ts still toggles .away; here it is harmless. Opacity is restored only once the page is ready,
+     so the initial .js fade-in is not overridden. */
+  .top.away {
+    transform: none;
+  }
+
+  .js.gl-ready .top.away,
+  .no-gl .top.away {
+    opacity: 1;
+  }
+
   .top nav {
     justify-content: safe center;
     overflow-y: auto;
@@ -810,8 +822,8 @@ body::before {
     color: var(--accent);
   }
 
-  /* the step pill sits left of Menu and stays put when the bar slides away: a pill that moved while
-     scrolling would put "previous" under a thumb that is tapping "next" */
+  /* the step pill sits left of Menu; the bar and the pill both stay put while scrolling (a pill that
+     moved would put "previous" under a thumb that is tapping "next") */
   .step {
     top: 1.5625rem;
     right: calc(var(--gut) + 3.875rem);
