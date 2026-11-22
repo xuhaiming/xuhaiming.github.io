@@ -531,8 +531,13 @@ export class World {
       }
     });
 
-    // the hero keeps full-size textures on every tier
-    hero.load('/assets/hero/hero.glb', (url) => once(`g:full:${url}`, () => loadGlb(url, false))).catch((e) => console.warn('hero model not available yet', e));
+    // the hero is exempt from the 512 rule for phones (it would blur his face). He ships as two files from
+    // the same export (tools/gen/hero2/web_export.mjs): phones fetch the one with base colour and normal map
+    // at 1024 and metal-roughness at 512, so they neither download nor decode the 2048 set
+    // (while developing, ?hero=<url> loads another file instead, to compare an export against its source)
+    const heroDev = import.meta.env.DEV ? new URLSearchParams(location.search).get('hero') : null;
+    const heroUrl = heroDev ?? (tier === 0 ? '/assets/hero/hero.m.glb' : '/assets/hero/hero.glb');
+    hero.load(heroUrl, (url) => once(`g:full:${url}`, () => loadGlb(url, false))).catch((e) => console.warn('hero model not available yet', e));
   }
 
   private makeEnv() {

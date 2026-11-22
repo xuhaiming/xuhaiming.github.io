@@ -3,10 +3,55 @@ import type { Tier } from './types';
 
 const TINT = new THREE.Color('#cfe6ff');
 
+/**
+ * The walk clip, as the animator delivers it (tools/gen/hero2/README.md, stage 3: "Walk numbers for the
+ * site"). Everything about walking derives from this one constant: drop new values in here when the clip changes.
+ *   cycles  full gait cycles (left step + right step) held by the `walk` clip
+ *   stride  ground covered by one full cycle at the figure's natural size, in metres
+ *   enter   clip times (seconds, within the first cycle) at which the walk pose is closest to idle: a walk
+ *           that starts from rest begins at the nearest of them, so the blend out of idle has little to cover
+ * The clip's own pace is stride * cycles / duration (1.024 m/s); the site drives the cycle by the distance
+ * travelled instead, so the feet stay planted at any scroll speed. To check a new clip, paste
+ * tools/gen/hero2/web_stride.js into the dev console: it prints the foot slide for a few stride values.
+ */
+export const WALK = { cycles: 2, stride: 1.2461, enter: [0.3, 0.91] };
+
+/**
+ * How his surface answers the chapters' lights. The chapters were lit for a matt, mid-grey figure; this
+ * one wears a white and silver jacket next to a face, so the response is shaped here, once, instead of
+ * re-lighting eight chapters.
+ *   env        multiplier on the environment light he receives (the scene's own intensity still applies)
+ *   roughMin   floor under the roughness map: no mirror-sharp highlights on the silver
+ *   metal      multiplier on the metalness map: full metal goes black wherever the dim environment is dark
+ *   white      [knee, ceiling]: how white the base colour may be. It works on the smallest channel, so the
+ *              neutral white of the jacket and the shoes is pulled down to a light grey that keeps its
+ *              shading under a key light, while skin (saturated: its blue channel is low) is left alone
+ *   light      [knee, ceiling]: his lit colour above the knee is compressed toward the ceiling (slowly, so
+ *              gradients survive). The ceiling sits near the default bloom threshold: a key light cannot
+ *              blow the jacket out or smear it
+ */
+const LOOK = { env: 1.5, roughMin: 0.42, metal: 0.55, white: [0.18, 0.4], light: [0.4, 0.86] };
+/** point density on the head and the hands relative to the rest of the body (their points are dimmed to match) */
+const DENSITY = { head: 2.6, hand: 1.8 };
+/**
+ * Blend times in seconds (the animator's recommendations): idle <-> walk when the visitor starts or stops
+ * scrolling, and [in, out] for each pose clip. `hold`: a one-shot that keeps its last frame for as long as
+ * the pose is asked for (think); the others (wave) play once and hand back to idle.
+ */
+const FADE = { walkIn: 0.3, walkOut: 0.38, pose: [0.35, 0.4] as const };
+const ONE_SHOT: Record<string, { hold: boolean; fade: readonly [number, number] }> = {
+  wave: { hold: false, fade: [0.2, 0.22] },
+  think: { hold: true, fade: [0.3, 0.55] },
+};
+/** rate for an exponential ease that covers 95% of the way in `seconds` */
+const rate = (seconds: number) => 3 / seconds;
+
 interface Act {
   name: string;
   action: THREE.AnimationAction;
   w: number;
+  /** plays once (wave, think) */
+  once: boolean;
 }
 
 /**
@@ -43,8 +88,11 @@ export class Hero {
   pose: string | null = null;
   /** opacity of the soft contact shadow under the feet */
   shadow = 0;
-  /** world units covered by one full walk cycle; lower it if the feet seem to slide */
-  stride = 0.6;
+  /**
+   * world units covered by one full walk cycle (two steps) at root scale 1. The default is the clip's own
+   * stride (WALK.stride), which keeps the feet planted; root scale is applied on top automatically.
+   */
+  stride = WALK.stride;
   /**
    * A rift he is walking through (set by Rift.cross): points that have passed behind its plane are
    * seen only through its opening. toLocal maps world space to the rift's space (plane z = 0, the
@@ -74,6 +122,12 @@ export class Hero {
   private walkWas = false;
   private walkW = 0;
   private forcedWalk = -1;
+  /** how much a pose still owns him (eased) */
+  private poseW = 0;
+  /** [in, out] blend times of the pose that owns him or is fading out */
+  private poseFade: readonly [number, number] = FADE.pose;
+  /** phase shift of the walk cycle (fraction of the clip), chosen when a walk starts from rest */
+  private walkOff = 0;
   private u = {
     uForm: { value: 0 },
     uScatter: { value: 0 },
@@ -95,6 +149,11 @@ export class Hero {
     uPortal: { value: new THREE.Matrix4() },
     uPortalShape: { value: new THREE.Vector2(0, 4) },
     uPortalCam: { value: new THREE.Vector3() },
+    uEnvK: { value: LOOK.env },
+    uRoughMin: { value: LOOK.roughMin },
+    uMetalK: { value: LOOK.metal },
+    uWhiteKnee: { value: new THREE.Vector2(LOOK.white[0], LOOK.white[1]) },
+    uLightKnee: { value: new THREE.Vector2(LOOK.light[0], LOOK.light[1]) },
   };
 
   constructor(private tier: Tier) {
@@ -163,7 +222,7 @@ export class Hero {
     this.grain = 1;
     this.pose = null;
     this.shadow = 0;
-    this.stride = 0.6;
+    this.stride = WALK.stride;
     this.portal.on = false;
     this.walkAsked = false;
     this.forcedWalk = -1;
@@ -198,12 +257,10 @@ export class Hero {
       scene.position.y -= box.min.y * s;
     }
 
+    // base colour, tangent-space normal map (the file carries MikkTSpace tangents) and metallic-roughness
+    // come from the file as they are; the response to light is shaped in the shader (LOOK)
     const src = sk.material as THREE.MeshStandardMaterial;
     const mat = src.clone();
-    mat.envMapIntensity = 1;
-    mat.roughness = Math.max(0.55, mat.roughness);
-    mat.metalness = 0;
-    mat.color.multiplyScalar(0.82);
     this.u.uMap.value = mat.map;
     this.u.uHeight.value = sk.geometry.boundingBox!.max.y - sk.geometry.boundingBox!.min.y;
     const yMin = sk.geometry.boundingBox!.min.y;
@@ -213,20 +270,25 @@ export class Hero {
         .replace('#include <common>', '#include <common>\nvarying vec3 vBind;')
         .replace('#include <begin_vertex>', '#include <begin_vertex>\nvBind = position;');
       s.fragmentShader = s.fragmentShader
-        .replace('#include <common>', `#include <common>\nvarying vec3 vBind;\nuniform float uForm; uniform float uHeight; uniform vec3 uTint;\n${NOISE}\n${sweep(yMin)}`)
         .replace(
-          '#include <map_fragment>',
-          // near-white parts of the texture (the shoes) would clip and bloom under any key light: knee them down
-          '#include <map_fragment>\n{ float l = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b)); diffuseColor.rgb *= mix(1.0, 0.5 / max(l, 0.001), smoothstep(0.45, 0.95, l)); }',
+          '#include <common>',
+          `#include <common>\nvarying vec3 vBind;\nuniform float uForm, uHeight, uEnvK, uRoughMin, uMetalK; uniform vec3 uTint; uniform vec2 uWhiteKnee, uLightKnee;\n${NOISE}\n${sweep(yMin)}\n${KNEE}`,
         )
+        // the white of the jacket and the shoes would clip under any key light: roll the base colour off
+        .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb = heroWhite(diffuseColor.rgb, uWhiteKnee);')
+        .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = max(roughnessFactor, uRoughMin);')
+        .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor *= uMetalK;')
+        .replace('#include <lights_fragment_maps>', '#include <lights_fragment_maps>\niblIrradiance *= uEnvK; radiance *= uEnvK;')
         .replace(
           '#include <emissivemap_fragment>',
           `#include <emissivemap_fragment>
           float kS = sweepK(vBind);
           float thr = uForm * 1.12 - 0.06;
           if (kS < thr) discard;
-          totalEmissiveRadiance += uTint * smoothstep(0.022, 0.0, kS - thr) * step(0.001, uForm) * 2.2;`,
-        );
+          vec3 heroEdge = uTint * smoothstep(0.022, 0.0, kS - thr) * step(0.001, uForm) * 2.2;`,
+        )
+        // his lit colour is rolled off under the bloom threshold; the dissolve edge is added after, so it still glows
+        .replace('#include <opaque_fragment>', 'outgoingLight = heroLight(outgoingLight, uLightKnee) + heroEdge;\n#include <opaque_fragment>');
     };
     sk.material = mat;
 
@@ -236,15 +298,16 @@ export class Hero {
     for (const clip of animations) {
       const a = this.mixer.clipAction(clip);
       const name = clip.name.toLowerCase();
+      const once = name in ONE_SHOT;
       a.play();
       a.setEffectiveWeight(0);
       if (name === 'walk') a.timeScale = 0;
-      if (name === 'wave') {
+      if (once) {
         a.setLoop(THREE.LoopOnce, 1);
         a.clampWhenFinished = true;
       }
       this.actions.set(name, a);
-      this.acts.push({ name, action: a, w: name === 'idle' ? 1 : 0 });
+      this.acts.push({ name, action: a, w: name === 'idle' ? 1 : 0, once });
     }
     this.walkAct = this.actions.get('walk') ?? null;
     this.ready = true;
@@ -263,20 +326,46 @@ export class Hero {
     const a = new THREE.Vector3();
     const b = new THREE.Vector3();
     const c = new THREE.Vector3();
+    // the head and the hands are a small share of the surface but carry the likeness and the gestures:
+    // they get more points per area (by which bones a triangle follows), each dimmed so the additive
+    // cloud stays evenly bright
+    const bones = mesh.skeleton.bones;
+    const gain = new Float32Array(bones.length).fill(1);
+    for (let i = 0; i < bones.length; i++)
+      for (let o: THREE.Object3D | null = bones[i]; o && (o as THREE.Bone).isBone; o = o.parent) {
+        if (/Head$/.test(o.name)) gain[i] = DENSITY.head;
+        else if (/Hand$/.test(o.name)) gain[i] = DENSITY.hand;
+        else continue;
+        break;
+      }
+    const gainAt = (v: number) => {
+      if (!si || !sw) return 1;
+      let g = 0;
+      let n = 0;
+      for (let k = 0; k < 4; k++) {
+        const w = sw.getComponent(v, k);
+        g += w * (gain[si.getComponent(v, k)] ?? 1);
+        n += w;
+      }
+      return n > 0 ? g / n : 1;
+    };
     const cdf = new Float32Array(tris);
+    const dens = new Float32Array(tris);
     let total = 0;
     for (let t = 0; t < tris; t++) {
       a.fromBufferAttribute(pos, vi(t, 0));
       b.fromBufferAttribute(pos, vi(t, 1));
       c.fromBufferAttribute(pos, vi(t, 2));
-      total += b.sub(a).cross(c.sub(a)).length();
+      dens[t] = (gainAt(vi(t, 0)) + gainAt(vi(t, 1)) + gainAt(vi(t, 2))) / 3;
+      total += b.sub(a).cross(c.sub(a)).length() * dens[t];
       cdf[t] = total;
     }
     const P = new Float32Array(count * 3);
     const U = new Float32Array(count * 2);
-    const I = new Uint16Array(count * 4);
+    const I = bones.length <= 256 ? new Uint8Array(count * 4) : new Uint16Array(count * 4);
     const W = new Float32Array(count * 4);
-    const S = new Float32Array(count);
+    // x: random seed, y: brightness (1 / the density gain of its triangle)
+    const S = new Float32Array(count * 2);
     let seed = 1234567;
     const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
     for (let i = 0; i < count; i++) {
@@ -312,14 +401,15 @@ export class Hero {
           W[i * 4 + k] = sw.getComponent(near, k);
         }
       }
-      S[i] = rnd();
+      S[i * 2] = rnd();
+      S[i * 2 + 1] = 1 / dens[lo];
     }
     const pg = new THREE.BufferGeometry();
     pg.setAttribute('position', new THREE.BufferAttribute(P, 3));
     pg.setAttribute('uv', new THREE.BufferAttribute(U, 2));
     pg.setAttribute('aSkinI', new THREE.BufferAttribute(I, 4));
     pg.setAttribute('aSkinW', new THREE.BufferAttribute(W, 4));
-    pg.setAttribute('aSeed', new THREE.BufferAttribute(S, 1));
+    pg.setAttribute('aSeed2', new THREE.BufferAttribute(S, 2));
 
     mesh.skeleton.computeBoneTexture();
     this.u.uBones.value = mesh.skeleton.boneTexture;
@@ -340,12 +430,14 @@ export class Hero {
         uniform highp sampler2D uBones;
         uniform sampler2D uMap;
         uniform mat4 uBind, uBindInv;
+        uniform vec2 uWhiteKnee;
         attribute vec4 aSkinI, aSkinW;
-        attribute float aSeed;
+        attribute vec2 aSeed2;
         varying vec3 vCol;
         varying float vA;
         ${NOISE}
         ${sweep(yMin)}
+        ${KNEE}
         mat4 boneM(float i) {
           int size = textureSize(uBones, 0).x;
           int j = int(i) * 4;
@@ -357,6 +449,7 @@ export class Hero {
           return vec3(vnoise(p * 1.3 + vec3(0.0, t, 7.1)), vnoise(p * 1.3 + vec3(13.7, 3.3, t)), vnoise(p * 1.3 + vec3(t, 29.1, 5.5))) - 0.5;
         }
         void main() {
+          float aSeed = aSeed2.x;
           vec4 p = vec4(position, 1.0);
           if (uSkinned > 0.5) {
             vec4 sp = uBind * p;
@@ -388,10 +481,13 @@ export class Hero {
           gl_Position = projectionMatrix * mv;
           float tw = 0.75 + 0.25 * sin(uTime * 2.3 + aSeed * 40.0);
           gl_PointSize = uSize * (1.0 + s2 * 2.5) * (0.7 + aSeed * 0.9) * (5.4 / -mv.z);
-          vec3 own = texture2D(uMap, uv).rgb;
-          own = own * 1.25 + 0.04;
+          // his own colours, with the same roll-off as the surface: the white jacket would burn the cloud out
+          vec3 own = heroWhite(texture2D(uMap, uv).rgb, uWhiteKnee);
+          // a floor under the blacks (hair, shirt, trousers), or half of him would be missing from the cloud
+          own = own * 1.5 + 0.1;
           vCol = mix(own, uTint, uTintMix) * uGlow * tw;
-          vA = born * (1.0 - smoothstep(0.55, 1.0, s));
+          // denser regions (head, hands) are dimmed back to an even brightness; scattered, every point counts the same
+          vA = born * (1.0 - smoothstep(0.55, 1.0, s)) * mix(aSeed2.y, 1.0, s2);
           // through a rift: behind its plane, a point shows only where the eye sees it through the opening
           if (uPortalOn > 0.5) {
             vec3 q = (uPortal * vec4(wp.xyz, 1.0)).xyz;
@@ -465,17 +561,47 @@ export class Hero {
       const prev = this.travel;
       this.travel += (this.travelTarget - this.travel) * (1 - Math.exp(-dt * 9));
       const speed = Math.abs(this.travel - prev) / Math.max(dt, 1e-4);
-      walkTarget = THREE.MathUtils.smoothstep(speed, 0.04, 0.5);
+      // a crawl stays mostly idle (a slow-motion stride reads worse than a slight slide); from about half
+      // of the clip's own pace the walk has him fully
+      walkTarget = THREE.MathUtils.smoothstep(speed, 0.05, 0.55);
       if (walk) {
+        // the clip holds WALK.cycles cycles: one clip length per that many strides
         const d = walk.getClip().duration;
-        walk.time = ((((this.travel / this.stride) % 1) + 1) % 1) * d;
+        const lap = Math.max(1e-3, this.stride * this.root.scale.x) * WALK.cycles;
+        let ph = this.travel / lap;
+        ph -= Math.floor(ph);
+        // from rest, the cycle is shifted so that it starts on the pose nearest to idle (the shift then
+        // stays for the whole walk: the feet follow the distance from there)
+        if (this.walkW < 0.03) {
+          let best = 9;
+          for (let c = 0; c < WALK.cycles; c++)
+            for (let i = 0; i < WALK.enter.length; i++) {
+              let off = WALK.enter[i] / d + c / WALK.cycles - ph;
+              off -= Math.round(off);
+              if (Math.abs(off) < Math.abs(best)) best = off;
+            }
+          this.walkOff = best;
+        }
+        ph += this.walkOff;
+        walk.time = (ph - Math.floor(ph)) * d;
       }
     }
     this.walkWas = this.walkAsked;
-    this.walkW += (walkTarget - this.walkW) * (1 - Math.exp(-dt * 7));
+    this.walkW += (walkTarget - this.walkW) * (1 - Math.exp(-dt * rate(walkTarget > this.walkW ? FADE.walkIn : FADE.walkOut)));
 
-    const pose = this.pose && this.actions.has(this.pose) ? this.pose : null;
-    const ease = 1 - Math.exp(-dt * 6);
+    // a pose the file does not have (a clip still to come) falls back to idle / walk
+    const asked = this.pose && this.actions.has(this.pose) ? this.pose : null;
+    let pose = asked;
+    if (pose) {
+      // a one-shot that does not hold (wave) hands back to idle once it has played, even while still asked for
+      const a = this.actions.get(pose)!;
+      const shot = ONE_SHOT[pose];
+      if (shot && !shot.hold && a.time >= a.getClip().duration - 1e-3) pose = null;
+    }
+    if (pose) this.poseFade = ONE_SHOT[pose]?.fade ?? FADE.pose;
+    const ease = 1 - Math.exp(-dt * rate(this.poseFade[pose ? 0 : 1]));
+    // idle and walk ease back in under a fading pose, then follow walkW directly
+    const free = !pose && this.poseW < 0.01;
     for (let i = 0; i < this.acts.length; i++) {
       const act = this.acts[i];
       const name = act.name;
@@ -485,11 +611,13 @@ export class Hero {
       else if (name === 'walk') target = this.walkW;
       else if (name === 'idle') target = 1 - this.walkW;
       const w = act.w;
-      const nw = name === 'walk' && !pose ? target : w + (target - w) * ease;
+      const nw = free && (name === 'walk' || name === 'idle') ? target : w + (target - w) * ease;
       act.w = nw;
       action.setEffectiveWeight(nw);
-      if (name === 'wave' && nw < 0.01 && target === 0) action.reset().play().setEffectiveWeight(0);
+      // a one-shot rewinds once it has faded out and is no longer asked for, ready for the next time
+      if (act.once && nw < 0.01 && name !== asked && action.time > 0) action.reset().play().setEffectiveWeight(0);
     }
+    this.poseW += ((pose ? 1 : 0) - this.poseW) * ease;
     this.mixer!.update(dt);
     this.root.updateWorldMatrix(true, true);
     this.mesh.skeleton.update();
@@ -502,6 +630,24 @@ float vnoise(vec3 x) {
   vec3 i = floor(x); vec3 f = fract(x); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(mix(hash31(i), hash31(i + vec3(1,0,0)), f.x), mix(hash31(i + vec3(0,1,0)), hash31(i + vec3(1,1,0)), f.x), f.y),
              mix(mix(hash31(i + vec3(0,0,1)), hash31(i + vec3(1,0,1)), f.x), mix(hash31(i + vec3(0,1,1)), hash31(i + vec3(1,1,1)), f.x), f.y), f.z);
+}`;
+
+/** the hero's tone shaping, shared by his surface and his points (see LOOK) */
+const KNEE = /* glsl */ `
+// neutral whites down to a light grey: a roll-off on the smallest channel, hue kept
+vec3 heroWhite(vec3 c, vec2 k) {
+  float m = min(c.r, min(c.g, c.b));
+  if (m <= k.x) return c;
+  float span = max(k.y - k.x, 1e-4);
+  return c * ((k.x + span * (1.0 - exp(-(m - k.x) / span))) / m);
+}
+// lit colour: above k.x the largest channel is compressed toward k.y (never reached), hue kept
+vec3 heroLight(vec3 c, vec2 k) {
+  float m = max(c.r, max(c.g, c.b));
+  if (m <= k.x) return c;
+  float span = max(k.y - k.x, 1e-4);
+  float d = m - k.x;
+  return c * ((k.x + d / (1.0 + d / span)) / m);
 }`;
 
 /** the dissolve order of a point on the bind-pose surface: low values convert first (feet), high last (head) */

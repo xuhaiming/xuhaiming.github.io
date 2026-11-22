@@ -1,0 +1,30 @@
+"""print head widths/heights of a hero_mesh.blend: blender -b -P head_measure.py -- file.blend"""
+import bpy, sys, numpy as np
+bpy.ops.wm.open_mainfile(filepath=sys.argv[sys.argv.index('--')+1])
+me = bpy.data.objects['Hero'].data; n = len(me.vertices)
+co = np.empty(n*3); me.vertices.foreach_get('co', co); co = co.reshape(-1,3)
+h = np.empty(n); me.attributes['hair'].data.foreach_get('value', h); h = h > .5
+reg = np.empty(len(me.polygons), np.int32); me.attributes['uv_region'].data.foreach_get('value', reg)
+pv = np.empty(len(me.loops), np.int64); me.loops.foreach_get('vertex_index', pv)
+pl = np.repeat(np.arange(len(me.polygons)), [p.loop_total for p in me.polygons])
+vmin = np.full(n, 99); vmax = np.full(n, -1)
+np.minimum.at(vmin, pv, reg[pl]); np.maximum.at(vmax, pv, reg[pl])
+x, y, z = co.T
+sk = (z > 1.44) & (z < 1.70) & ~h & (np.abs(x) < 0.14) & (vmax <= 3) & (vmin >= 2)
+def w(m, nm):
+    print('%-34s %.4f' % (nm, 2*np.abs(x[sk & m]).max()))
+nonear = ~((np.abs(x) > 0.072) & (y > -0.03) & (y < 0.035) & (z > 1.56) & (z < 1.64))
+w((z > 1.50) & (z < 1.54) & (y > -0.04) & (y < 0.03) & nonear, 'jaw width z1.50-1.54 (y -.04..0.03)')
+w((z > 1.52) & (z < 1.56) & (y > -0.03) & (y < 0.05) & nonear, 'jaw angle width z1.52-1.56')
+w((z > 1.50) & (z < 1.53) & (y < -0.02), 'lower jaw/chin width z1.50-1.53')
+w((z > 1.56) & (z < 1.60) & (y < 0.0) & nonear, 'cheek width z1.56-1.60')
+w((z > 1.56) & (z < 1.61) & (y < -0.02) & nonear, 'cheek width z1.56-1.61 front y<-.02')
+w((z > 1.60) & (z < 1.64) & (y < -0.02) & nonear, 'cheekbone width z1.60-1.64')
+w((z > 1.46) & (z < 1.49), 'neck width z1.46-1.49')
+ch = sk & (y < -0.05) & (z < 1.53) & (np.abs(x) < 0.03)
+print('chin bottom z %.4f  chin y %.4f' % (z[ch].min(), y[ch].min()))
+print('hair top %.4f  hair max |x| %.4f  hair ymin %.4f' % (z[h&(z>1.5)].max(), np.abs(x[h&(z>1.5)]).max(), y[h&(z>1.5)].min()))
+print('head height chin->crown %.4f  ratio 1/%.2f' % (z[h&(z>1.5)].max()-z[ch].min(), 1.75/(z[h&(z>1.5)].max()-z[ch].min())))
+ear = sk & ~nonear & (np.abs(x) > 0.072)
+print('ear outer x %.4f z-range %.4f..%.4f y-range %.4f..%.4f' % (np.abs(x[ear]).max(), z[ear].min(), z[ear].max(), y[ear].min(), y[ear].max()))
+print('eye-mouth skip; bounds z', z.min(), z.max())

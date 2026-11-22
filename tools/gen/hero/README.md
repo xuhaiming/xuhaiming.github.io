@@ -1,5 +1,7 @@
 # Hero character pipeline
 
+> Superseded: the site now uses the realistic figure built by `tools/gen/hero2/` (see its README; stage 4 holds the current GLB contract). This folder is kept for reference only.
+
 Builds the placeholder protagonist for the site: a stylised full-body character, rigged with
 Mixamo bone names and four baked clips, exported as `public/assets/hero/hero.glb`.
 

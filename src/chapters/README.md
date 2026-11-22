@@ -1,6 +1,6 @@
 # Chapters
 
-The site is one scroll-driven story. A rigged character (the "hero", a stylised figure of the site
+The site is one scroll-driven story. A rigged character (the "hero", a realistic likeness of the site
 owner) walks through a sequence of worlds, one per chapter, and is taken apart into points and put
 back together between them. Every chapter is a self-contained folder:
 
@@ -67,7 +67,11 @@ export default chapter;
 
 ## The hero (`src/world/Hero.ts`)
 
-1.75 units tall, feet at y = 0, faces +Z. All state is reset each frame.
+A realistic likeness of the site owner: 1.75 units tall, feet at y = 0, faces +Z, 82k triangles, 73 joints
+(body, fingers, face, helpers). The head spans about y 1.51 to 1.75, the shoulders are wide (about 0.55
+across in the jacket); at rest the wrists hang at about y 0.93, 0.24 out from the centre line, the
+fingertips at about y 0.75. He wears a white and silver
+jacket over black. All state is reset each frame.
 
 | | |
 |---|---|
@@ -78,14 +82,23 @@ export default chapter;
 | `hero.tint`, `hero.tintMix`, `hero.glow`, `hero.grain` | point colour, how much of it replaces his own colours, brightness, point size |
 | `hero.push` | 0..1, the pointer shoves points aside |
 | `hero.walkTo(distance)` | scroll-driven walking: pass the distance his root has travelled; the cycle follows it and relaxes to idle when it stops. Move `hero.root` yourself by the same distance, and rotate him to face where he is going |
+| `hero.stride` | world units per full walk cycle (two steps). Leave it alone: the default is the clip's own stride (`WALK.stride` in Hero.ts, 1.246), which keeps the feet planted; root scale is applied automatically. His natural pace is about 1 unit per second |
 | `hero.walkFree(amount)` | walk on the spot on its own clock (treadmill shots) |
-| `hero.pose = 'wave' \| 'think'` | hold a named clip (if the model has it; check `hero.clips`) |
+| `hero.pose = 'wave' \| 'think'` | play a named clip. `wave` plays once and hands back to idle even if you keep asking; `think` holds its last frame for as long as you ask. A clip the file does not have is ignored (check `hero.clips`) |
 | `hero.shadow` | soft contact shadow opacity, for when he stands on your floor |
-| `hero.bone('Head' \| 'RightHand' \| 'Hips' …)` | world position of a joint, to attach effects |
+| `hero.bone('Head' \| 'RightHand' \| 'Hips' …)` | world position of a joint, to attach effects. Any joint of the rig by its short name: the 22 Mixamo body joints, fingers (`LeftHandIndex1` …), face (`Jaw`, `LeftBrow` …) |
 
 He is lit by your lights plus a dim neutral environment map. Give him a key light and a rim light in
-your chapter's colour, and something to stand on. The model may not exist yet while you start
+your chapter's colour, and something to stand on. His material shapes its own response so that a key
+light strong enough for the room does not burn the jacket out (`LOOK` in Hero.ts: the white of the jacket
+is held to a light grey, his lit colour is compressed under the bloom threshold, the silver is kept from
+mirror highlights). If he looks wrong in your chapter, change your lights only after checking those
+numbers: they apply to every chapter. Do not pose his bones by hand without also setting the eight
+helper joints (see `tools/gen/hero2/README.md`). The model may not exist yet while you start
 (`hero.ready` false, nothing drawn); code against the API, he will appear.
+
+The file comes from `tools/gen/hero2/` (stage 4, `web_export.mjs`): `public/assets/hero/hero.glb` for
+laptops and desktops, `hero.m.glb` (smaller textures) for phones.
 
 ## Looking at your work
 

@@ -853,7 +853,6 @@ function update(f: Frame, ctx: Ctx) {
   hero.root.position.set(hx, 0, 0);
   hero.root.rotation.y = mix(mix(mix(Math.PI / 2, 0.5, title), 0.45, arrive), Math.PI / 2, smooth(seg(p, OUT0, OUT0 + 0.015)));
   hero.walkTo(hx);
-  hero.stride = 0.8;
   hero.form = 1 - io;
   hero.scatter = 1 - io;
   hero.tint.copy(ACCENT);

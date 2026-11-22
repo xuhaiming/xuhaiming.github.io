@@ -251,12 +251,13 @@ function frame(f: Frame, ctx: Ctx) {
   bez(camAim, va, vb, vc, pk);
   // middle: no copy, so he takes the centre of the frame
   if (solo > 0) {
+    // (his head is 0.24 tall, a real person's proportions: the camera stands close enough for a portrait)
     if (narrow) {
-      va.set(0.36, 1.56, 2.2);
-      vb.set(0, 1.47, 0);
+      va.set(0.3, 1.58, 1.9);
+      vb.set(0, 1.5, 0);
     } else {
-      va.set(0.42, 1.6, 1.95);
-      vb.set(0, 1.48, 0);
+      va.set(0.36, 1.62, 1.64);
+      vb.set(0, 1.52, 0);
     }
     camPos.lerp(va, solo);
     camAim.lerp(vb, solo);

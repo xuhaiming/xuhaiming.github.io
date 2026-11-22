@@ -75,6 +75,8 @@ export class XRay {
   private glassMesh: THREE.Mesh | null = null;
   private geo: { base: THREE.BufferGeometry; tri: THREE.BufferGeometry; pts: THREE.BufferGeometry; bone: THREE.InstancedBufferGeometry; joint: THREE.BufferGeometry } | null = null;
   private map: THREE.Texture | null = null;
+  private triGeo: THREE.BufferGeometry | null = null;
+  private ptsGeo: THREE.BufferGeometry | null = null;
   private tier = 1;
 
   /** call every frame until it returns true: the hero model may arrive late */
@@ -106,12 +108,18 @@ export class XRay {
     this.stats.tex = img?.width ?? 0;
 
     // --- geometries ---
-    const tri = g.index ? g.toNonIndexed() : g.clone();
-    const n = tri.attributes.position.count;
-    const bary = new Float32Array(n * 3);
-    for (let i = 0; i < n; i++) bary[i * 3 + (i % 3)] = 1;
-    tri.setAttribute('aBary', new THREE.BufferAttribute(bary, 3));
-    const pts = samplePoints(g, [14000, 30000, 46000][ctx.tier]);
+    // the two heavy ones are built on separate calls (tens of ms each on a phone): the caller keeps
+    // calling from idle time or once a frame until everything is there
+    if (!this.triGeo) {
+      this.triGeo = wireGeometry(g);
+      return false;
+    }
+    if (!this.ptsGeo) {
+      this.ptsGeo = samplePoints(g, [14000, 30000, 46000][ctx.tier], sk.skeleton.bones);
+      return false;
+    }
+    const tri = this.triGeo;
+    const pts = this.ptsGeo;
     this.stats.points = pts.attributes.position.count;
     const { bone, joint } = boneGeometry(sk, bb);
     this.geo = { base: g, tri, pts, bone, joint };
@@ -554,8 +562,33 @@ export class XRay {
   }
 }
 
+/**
+ * The wire view needs unshared corners (barycentric edges): an unindexed copy carrying only what its
+ * shader reads, in the file's own compact types (three times the vertices, so every byte counts).
+ */
+function wireGeometry(g: THREE.BufferGeometry) {
+  const lean = new THREE.BufferGeometry();
+  lean.setIndex(g.index);
+  for (const name of ['position', 'normal', 'skinIndex', 'skinWeight']) lean.setAttribute(name, g.attributes[name]);
+  const tri = g.index ? lean.toNonIndexed() : lean.clone();
+  const n = tri.attributes.position.count;
+  const bary = new Uint8Array(n * 3);
+  for (let i = 0; i < n; i++) bary[i * 3 + (i % 3)] = 255;
+  tri.setAttribute('aBary', new THREE.BufferAttribute(bary, 3, true));
+  return tri;
+}
+
 /** area-weighted surface samples that keep the skinning of their nearest vertex (the same idea as Hero.buildPoints) */
-function samplePoints(g: THREE.BufferGeometry, count: number) {
+function samplePoints(g: THREE.BufferGeometry, count: number, bones: THREE.Bone[]) {
+  // more points per area on the head (the face has to read through the lens) and a few more on the hands
+  const gain = new Float32Array(bones.length).fill(1);
+  for (let i = 0; i < bones.length; i++)
+    for (let o: THREE.Object3D | null = bones[i]; o && (o as THREE.Bone).isBone; o = o.parent) {
+      if (/Head$/.test(o.name)) gain[i] = 2.4;
+      else if (/Hand$/.test(o.name)) gain[i] = 1.5;
+      else continue;
+      break;
+    }
   const pos = g.attributes.position;
   const uv = g.attributes.uv;
   const si = g.attributes.skinIndex;
@@ -572,12 +605,16 @@ function samplePoints(g: THREE.BufferGeometry, count: number) {
     a.fromBufferAttribute(pos, vi(t, 0));
     b.fromBufferAttribute(pos, vi(t, 1));
     c.fromBufferAttribute(pos, vi(t, 2));
-    total += b.sub(a).cross(c.sub(a)).length();
+    // the triangle's first corner decides: regions are far larger than a triangle
+    const v0 = vi(t, 0);
+    let k = 0;
+    for (let j = 1; j < 4; j++) if (sw.getComponent(v0, j) > sw.getComponent(v0, k)) k = j;
+    total += b.sub(a).cross(c.sub(a)).length() * (gain[si.getComponent(v0, k)] ?? 1);
     cdf[t] = total;
   }
   const P = new Float32Array(count * 3);
   const U = new Float32Array(count * 2);
-  const I = new Uint16Array(count * 4);
+  const I = bones.length <= 256 ? new Uint8Array(count * 4) : new Uint16Array(count * 4);
   const W = new Float32Array(count * 4);
   const S = new Float32Array(count);
   let seed = 9871;
@@ -624,6 +661,9 @@ function samplePoints(g: THREE.BufferGeometry, count: number) {
   return pg;
 }
 
+const HELPER = /(ArmHalf|ElbowHalf|KneeHalf|ForeArmTwist)$/;
+const FACE = /(Jaw|Lip(Upper|Lower)|Eyelid(Upper|Lower)|Brow|MouthCorner|Cheek)$/;
+
 /** one octahedral bone per parent-child pair and one dot per joint, both posed in the shader from the bone texture */
 function boneGeometry(mesh: THREE.SkinnedMesh, bb: THREE.Box3) {
   const sk = mesh.skeleton;
@@ -667,9 +707,28 @@ function boneGeometry(mesh: THREE.SkinnedMesh, bb: THREE.Box3) {
   const JI: number[] = [];
   const JK: number[] = [];
   const JS: number[] = [];
+  const fwd = new THREE.Vector3(0, 0, 1).transformDirection(mesh.bindMatrix);
   sk.bones.forEach((b, i) => {
+    // helper joints (they only follow their neighbour at half strength to keep the skin's volume) are not
+    // part of the skeleton a person would draw
+    if (HELPER.test(b.name)) return;
     const pi = b.parent && (b.parent as THREE.Bone).isBone ? sk.bones.indexOf(b.parent as THREE.Bone) : -1;
     let len = 0.12;
+    if (pi >= 0 && FACE.test(b.name)) {
+      // face controls all hang off the head joint: drawn as spokes they would fill the skull. Each is a
+      // short pin under the skin, pointing out of the face, with a small dot
+      len = 0.026;
+      const tail = rest[i].clone().addScaledVector(fwd, len);
+      I.push(i, i);
+      R0.push(rest[i].x, rest[i].y, rest[i].z);
+      R1.push(tail.x, tail.y, tail.z);
+      K.push(kOf(rest[i]));
+      JP.push(tail.x, tail.y, tail.z);
+      JI.push(i);
+      JK.push(kOf(rest[i]));
+      JS.push(0.2);
+      return;
+    }
     if (pi >= 0) {
       len = rest[i].distanceTo(rest[pi]);
       if (len > 0.004) {
@@ -690,7 +749,7 @@ function boneGeometry(mesh: THREE.SkinnedMesh, bb: THREE.Box3) {
     JP.push(rest[i].x, rest[i].y, rest[i].z);
     JI.push(i);
     JK.push(kOf(rest[i]));
-    JS.push(THREE.MathUtils.clamp(len * 5.5, 0.3, 1));
+    JS.push(THREE.MathUtils.clamp(len * 5.5, 0.24, 1));
   });
   bone.setAttribute('aI', new THREE.InstancedBufferAttribute(new Float32Array(I), 2));
   bone.setAttribute('aR0', new THREE.InstancedBufferAttribute(new Float32Array(R0), 3));
