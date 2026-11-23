@@ -26,7 +26,7 @@ import numpy as np
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import anim_lib as al  # noqa: E402
-from anim_lib import T, mv, rad, rx, ry, rz  # noqa: E402
+from anim_lib import T, mv, rad, rot, rx, ry, rz  # noqa: E402
 
 FPS = 30
 S = np.diag([1.0, -1.0, -1.0])           # left <-> right for a local rotation: S @ B @ S
@@ -36,6 +36,37 @@ S = np.diag([1.0, -1.0, -1.0])           # left <-> right for a local rotation: 
 def mean_rot(M):
     q = al.quat_continuous(al.mat2quat(M))
     return al.quat2mat(al.unit(q.mean(0)))
+
+
+def drop_twist(M):
+    """remove the part of a rotation that spins around the bone's own axis (local Y): amplifying the take's swing must not
+    amplify its upper-arm twist, which wrings the sleeve like a candy wrapper"""
+    q = al.mat2quat(M)
+    ang = 2 * np.arctan2(q[..., 2], q[..., 0])
+    return M @ T(ry(ang))
+
+
+def clean_scalar(x, n_cycles=2, harmonics=3):
+    """keep only the mean and the first few harmonics of the gait cycle: the swing becomes a smooth, steady rhythm"""
+    x = np.asarray(x, float)
+    F = np.fft.rfft(x, axis=0)
+    keep = np.zeros(F.shape[0], bool)
+    for h in range(harmonics + 1):
+        if h * n_cycles < F.shape[0]:
+            keep[h * n_cycles] = True
+    F[~keep] = 0
+    return np.fft.irfft(F, n=len(x), axis=0)
+
+
+def clean_rot(M, n_cycles=2, harmonics=3):
+    """same for a looping series of rotations (taken as rotation vectors around their mean)"""
+    m = mean_rot(M)
+    q = al.mat2quat(M @ T(m))
+    vn = np.linalg.norm(q[..., 1:], axis=-1, keepdims=True)
+    rv = q[..., 1:] / np.maximum(vn, 1e-12) * 2 * np.arctan2(vn, q[..., :1])
+    rv = clean_scalar(rv, n_cycles, harmonics)
+    ang = np.linalg.norm(rv, axis=-1)
+    return rot(rv, ang) @ m
 
 
 def dev(M, k=1.0):
@@ -359,14 +390,16 @@ def sole_lift(low, prev):
 
 def build_walk(rig, src, info, mocap_stats, lift=None):
     WIDEN = 0.040                # each foot moved outward (the take walks on a line; bulky shoes and trousers need room)
-    BOB, FORE_AFT = 0.90, 0.5    # pelvis rise over the stance leg as a fraction of the straight-leg arc; fraction of the take's fore-aft pulse
+    BOB, FORE_AFT = 1.0, 0.5    # pelvis rise over the stance leg as a fraction of the straight-leg arc; fraction of the take's fore-aft pulse
     EXT = 0.9972                 # a leg never gets longer than this fraction of its full length (no knee lock, no pop)
-    SWAY, LIST, PELVIS_YAW = 0.58, 0.5, 4.5
-    CHEST_PITCH, CHEST_YAW, CHEST_ROLL = 1.8, 0.85, -0.25
-    ARM_GAIN = 2.25              # swing amplitude of the arms around their own mean (the take's arms swing little)
-    ARM_SYM = 0.65               # how far the two arms are pulled toward a common (mirrored, half a cycle apart) swing
-    ARM_OUT, ARM_OUT_PEAK, ARM_BACK, ARM_TWIST = 15.0, 8.0, 6.0, -10.0   # ARM_OUT_PEAK: extra abduction at the swing peaks (clears thigh pouches)
-    FLEX_MIN, FLEX_GAIN = 10.0, 0.8
+    SWAY, LIST, PELVIS_YAW = 0.8, 0.9, 6.5
+    CHEST_PITCH, CHEST_YAW, CHEST_ROLL = 2.5, 1.3, -0.6
+    ARM_GAIN = 3.0              # swing amplitude of the arms around their own mean (the take's arms swing little)
+    ARM_SYM = 0.85               # how far the two arms are pulled toward a common (mirrored, half a cycle apart) swing
+    ARM_OUT, ARM_OUT_PEAK, ARM_BACK, ARM_TWIST = 14.0, 3.0, 11.0, -10.0   # ARM_OUT_PEAK: extra abduction at the swing peaks (clears thigh pouches)
+    FLEX_MIN, FLEX_GAIN = 14.0, 1.1
+    FORE_IN = float(os.environ.get('FORE_IN', '18'))
+    CLAV_YAW = 6.0               # collar bone swings fore/aft with the arm (deg per unit of normalised swing); the arm keeps its own direction
 
     B0, loc0 = src
     D0, pos0 = rig.fk(B0, loc0)
@@ -439,11 +472,12 @@ def build_walk(rig, src, info, mocap_stats, lift=None):
     hips[:, 2] = z
     # ---- trunk: upright, shoulders turning against the hips
     cy, cp, cr = al.ypr(Dm[:, i('Spine2')])
-    chest = al.from_ypr(CHEST_YAW * (cy - cy.mean()), rad(CHEST_PITCH) + 0.4 * (cp - cp.mean()), CHEST_ROLL * (cr - cr.mean()))
+    chest = al.from_ypr(CHEST_YAW * (cy - cy.mean()), rad(CHEST_PITCH) + 0.4 * (cp - cp.mean()), CHEST_ROLL * (cr - cr.mean()) - 0.4 * roll2)
     chest = al.loop_smooth_rot(chest, 0.8)
     D[:, i('Spine2')] = chest
-    D[:, i('Spine')] = al.slerp(D[:, 0], chest, 0.33)
-    D[:, i('Spine1')] = al.slerp(D[:, 0], chest, 0.67)
+    _fr = np.arange(N)
+    D[:, i('Spine')] = al.slerp(D[:, 0], al.loop_sample(chest, _fr - 1.5, True), 0.33)
+    D[:, i('Spine1')] = al.slerp(D[:, 0], al.loop_sample(chest, _fr - 0.75, True), 0.67)
     hy, hp_, hr = al.ypr(Dm[:, i('Head')])
     head = al.from_ypr(0.25 * CHEST_YAW * (cy - cy.mean()), 0.25 * (hp_ - hp_.mean()), 0.3 * (hr - hr.mean()))
     head = al.loop_smooth_rot(head, 1.2)
@@ -474,26 +508,30 @@ def build_walk(rig, src, info, mocap_stats, lift=None):
     swing = {}
     for sd, sg, A, flex, H in (('Left', 1.0, La2, fl, Lh2), ('Right', -1.0, Ra2, fr_, Rh2)):
         ja, jf, jh = i(sd + 'Arm'), i(sd + 'ForeArm'), i(sd + 'Hand')
-        A = al.loop_smooth_rot(A, 1.0)
+        A = clean_rot(A)
         mA = mean_rot(A)
-        A = al.scale_rot(A @ T(mA), ARM_GAIN) @ mA
+        A = drop_twist(al.scale_rot(A @ T(mA), ARM_GAIN) @ mA)
         # in the rest frame of the (left) arm: X = back, Y = out along the T-pose arm, Z = down
         swing_ = al.to_euler(A)[:, 1]
         swing_ = (swing_ - swing_.mean()) / max(np.abs(swing_ - swing_.mean()).max(), 1e-6)
         out_ = ARM_OUT + ARM_OUT_PEAK * np.abs(swing_) ** 1.5
-        A = ry(rad(ARM_BACK)) @ rx(rad(-out_)) @ A @ ry(rad(ARM_TWIST))
-        flex = al.loop_smooth(np.degrees(0) + flex, 1.0)
+        A = ry(rad(ARM_BACK)) @ rx(rad(-out_)) @ A @ ry(rad(ARM_TWIST + 3.0 * swing_))
+        flex = clean_scalar(flex)
         flex = FLEX_MIN + FLEX_GAIN * (flex - flex.min())
-        Hm = al.scale_rot(al.loop_smooth_rot(H, 1.5), 0.45) @ al.euler((5.0, 6.0, 0.0))
-        Fm = rz(rad(flex))
+        Hm = al.scale_rot(clean_rot(H, harmonics=2), 0.45) @ al.euler((5.0, 6.0, 0.0))
+        Fm = ry(rad(FORE_IN)) @ rz(rad(flex)) @ ry(rad(-FORE_IN))     # the elbow bends a little inward, so the forearm does not splay out
         if sd == 'Right':
             A, Fm, Hm = S @ A @ S, S @ Fm @ S, S @ Hm @ S
-        D[:, i(sd + 'Shoulder')] = chest
+        D[:, i(sd + 'Shoulder')] = chest @ rz(rad(sg * CLAV_YAW) * swing_)
         D[:, ja] = chest @ rig.R[ja] @ A @ rig.R[ja].T
         D[:, jf] = D[:, ja] @ rig.R[jf] @ Fm @ rig.R[jf].T
         D[:, jh] = D[:, jf] @ rig.R[jh] @ Hm @ rig.R[jh].T
         swing[sd] = flex
     # ---- legs
+    # legs turn in: the take toes out 12-23 deg; thigh and knee turn in a little, the foot more (to about 5 deg out)
+    for sd, sg, kf in (('Left', 1.0, 17.0), ('Right', -1.0, 10.0)):
+        for bn, k in (('UpLeg', 6.0), ('Leg', 6.0), ('Foot', kf), ('ToeBase', kf)):
+            D[:, i(sd + bn)] = rz(-sg * rad(k)) @ D[:, i(sd + bn)]
     pos = rig.positions(D, hips)
     miss = 0.0
     for sd in ('Left', 'Right'):
