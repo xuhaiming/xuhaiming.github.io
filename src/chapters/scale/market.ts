@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { Ctx } from '../../world/types';
 import { damp, flag, mix, seg, show, smooth } from '../../world/util';
-import { A, FEATURES, MARKETS, PRODUCTS } from './data';
+import { A, FEATURES, MARKETS } from './data';
 import { AMBER, FONT, canvasTex, glow, loadImage, pin, prop, rng, rr, type Station, type StationFrame } from './shared';
 
 /**
@@ -182,7 +182,7 @@ export function createMarket(ctx: Ctx, el: HTMLElement): Station {
       rr(g, x, ty, tw, th, 10);
       g.fill();
       const ih = th - 50;
-      const im = thumbs[(i * 2 + n * 4) % Math.max(1, thumbs.length)];
+      const im = thumbs[i * 4 + n] ?? null;
       g.save();
       rr(g, x, ty, tw, ih, 10);
       g.clip();
@@ -662,9 +662,9 @@ export function createMarket(ctx: Ctx, el: HTMLElement): Station {
     downAt.f = -1;
   });
 
-  // thumbnails for the storefront tiles: the catalogue from world 1
-  Promise.all(PRODUCTS.flatMap((p) => [loadImage(`${A}near-${p.id}-1.webp`), loadImage(`${A}near-${p.id}-2.webp`), loadImage(`${A}near-${p.id}-3.webp`)])).then((ims) => {
-    ims.forEach((im) => im && thumbs.push(im));
+  // thumbnails for the storefront tiles: one distinct small image per tile (7 stores x 4 tiles)
+  Promise.all(Array.from({ length: nM * 4 }, (_, n) => loadImage(`${A}shop-${String(n + 1).padStart(2, '0')}.webp`))).then((ims) => {
+    ims.forEach((im, n) => (thumbs[n] = im));
     dirty.fill(true);
   });
   document.fonts?.ready.then(() => dirty.fill(true));
