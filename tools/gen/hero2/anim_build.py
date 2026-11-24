@@ -389,17 +389,33 @@ def sole_lift(low, prev):
 
 
 def build_walk(rig, src, info, mocap_stats, lift=None):
-    WIDEN = 0.040                # each foot moved outward (the take walks on a line; bulky shoes and trousers need room)
-    BOB, FORE_AFT = 1.0, 0.5    # pelvis rise over the stance leg as a fraction of the straight-leg arc; fraction of the take's fore-aft pulse
+    _e = lambda k, d: float(os.environ.get(k, d))      # tuning overrides (environment), defaults are the shipped values
+    BOBH, FORE_AFT = _e('BOBH', 0.030), 0.5    # pelvis rise over the stance leg as a fraction of the straight-leg arc; fraction of the take's fore-aft pulse
     EXT = 0.9972                 # a leg never gets longer than this fraction of its full length (no knee lock, no pop)
-    SWAY, LIST, PELVIS_YAW = 0.8, 0.9, 6.5
-    CHEST_PITCH, CHEST_YAW, CHEST_ROLL = 2.5, 1.3, -0.6
-    ARM_GAIN = 3.0              # swing amplitude of the arms around their own mean (the take's arms swing little)
-    ARM_SYM = 0.85               # how far the two arms are pulled toward a common (mirrored, half a cycle apart) swing
-    ARM_OUT, ARM_OUT_PEAK, ARM_BACK, ARM_TWIST = 14.0, 3.0, 11.0, -10.0   # ARM_OUT_PEAK: extra abduction at the swing peaks (clears thigh pouches)
-    FLEX_MIN, FLEX_GAIN = 14.0, 1.1
-    FORE_IN = float(os.environ.get('FORE_IN', '18'))
-    CLAV_YAW = 6.0               # collar bone swings fore/aft with the arm (deg per unit of normalised swing); the arm keeps its own direction
+    CHEST_PITCH = 2.5
+    # designed trunk (the take's pelvis list / sway were in the wrong phase and uneven between the two steps). Phases are
+    # fractions of a gait cycle after the left heel strike (0), the right one is at 0.5.
+    PEL_YAW, CH_YAW, CH_YAW_LAG = _e('PEL_YAW', 5.0), _e('CH_YAW', 4.6), _e('CH_YAW_LAG', 0.07)   # degrees: pelvis turns with the leading leg, chest against it, a little later
+    PEL_ROLL, PEL_ROLL_PK = _e('PEL_ROLL', 5.0), _e('PEL_ROLL_PK', 0.24)                    # swing-side hip drop (deg), reached at this phase after the left heel strike (left stance)
+    CH_ROLL_K = _e('CH_ROLL_K', 0.6)                                                       # spine lateral bend: chest answers the pelvis roll by this fraction
+    SWAY_AMP, SWAY_PK = _e('SWAY_AMP', 0.017), _e('SWAY_PK', 0.27)                          # pelvis sideways over the stance foot (m, peak), reached at this phase (left stance)
+    PEL_PITCH2 = _e('PEL_PITCH2', 0.8)                                                     # pelvis tilt twice per cycle (deg)
+    WIDTH, SWING_OUT = _e('WIDTH', 0.076), _e('SWING_OUT', 0.010)                           # ankle half-width at the planted foot, extra outward at mid swing (m)
+    TOE_OUT = _e('TOE_OUT', 7.0)                                                           # planted foot, degrees out from straight ahead
+    FOOT_ROLL_K, FOOT_YAW_K = _e('FOOT_ROLL_K', 0.3), _e('FOOT_YAW_K', 0.3)               # how much of the take's flailing foot roll / yaw in the swing is kept
+    HEAD_YAW_K, HEAD_ROLL_K, HEAD_PITCH2 = _e('HEAD_YAW_K', 0.38), _e('HEAD_ROLL_K', 0.3), _e('HEAD_PITCH2', 0.5)
+    MOD = _e('MOD', 0.12)                        # slow modulation (period = the two gait cycles) of the trunk amplitudes: the two halves of the loop differ
+    HARM = _e('HARM', 0.12)                      # second harmonic on pelvis roll and sway (a sharper, less sinusoidal rhythm)
+    SYM_LEG = _e('SYM_LEG', 0.5)                 # how far each leg's ankle path / foot pitch is pulled toward the other leg's, half a cycle later
+    DORSI, DORSI_PK = _e('DORSI', 22.0), _e('DORSI_PK', 0.45)   # swing: foot lifted toward flat (deg at the peak, fraction of the swing at which it peaks)
+    ELBOW_LAG = _e('ELBOW_LAG', 1.5)             # frames the elbow flexion trails the shoulder swing
+    ARM_GAIN = _e('ARM_GAIN', 1.6)              # swing amplitude of the arms around their own mean (the take's arms swing little)
+    ARM_SYM = _e('ARM_SYM', 0.85)               # how far the two arms are pulled toward a common (mirrored, half a cycle apart) swing
+    ARM_OUT, ARM_OUT_PEAK, ARM_BACK, ARM_TWIST = _e('ARM_OUT', 13.0), _e('ARM_OUT_PEAK', 2.5), _e('ARM_BACK', 5.0), _e('ARM_TWIST', -10.0)   # ARM_OUT_PEAK: extra abduction at the swing peaks (clears thigh pouches)
+    FLEX_MIN, FLEX_GAIN = _e('FLEX_MIN', 12.0), _e('FLEX_GAIN', 1.3)
+    FORE_IN = _e('FORE_IN', 0)       # elbow bend plane turned about the forearm axis (deg): 0 = pure forward hinge, > 0 cranks the forearm inward into the thigh
+    FORE_ADD, FORE_ADD_FWD = _e('FORE_ADD', 2.8), _e('FORE_ADD_FWD', 7.0)
+    CLAV_YAW = _e('CLAV_YAW', 6.0)               # collar bone swings fore/aft with the arm (deg per unit of normalised swing); the arm keeps its own direction
 
     B0, loc0 = src
     D0, pos0 = rig.fk(B0, loc0)
@@ -413,21 +429,31 @@ def build_walk(rig, src, info, mocap_stats, lift=None):
     Bm = rig.local(Dm)
     D = Dm.copy()
 
-    # ---- pelvis
-    yaw, pitch, roll = al.ypr(Dm[:, 0])
-    yaw2 = 0.35 * (yaw - yaw.mean()) - rad(PELVIS_YAW) * np.cos(ph)      # left hip forward at the left heel strike
-    pitch2 = 0.5 * (pitch - pitch.mean())
-    roll2 = LIST * (roll - roll.mean())
-    D[:, 0] = al.from_ypr(yaw2, pitch2, roll2)
+    # ---- pelvis rotation (designed; see constants), cycle phase 0 = left heel strike
+    cph = lambda pk: ph - 2 * np.pi * pk
+    mod = lambda phi, a=1.0: 1 + a * MOD * np.cos(ph / 2 + phi)           # one slow cycle per loop: cycle 1 and cycle 2 are not copies
+    pel_yaw = -rad(PEL_YAW) * mod(0.5) * (np.cos(ph) + 0.06 * np.cos(3 * ph + 0.4))   # left hip forward at the left heel strike
+    pel_roll = -rad(PEL_ROLL) * mod(2.1) * (np.cos(cph(PEL_ROLL_PK)) + HARM * np.cos(2 * cph(PEL_ROLL_PK) + 0.9))   # + = left side down: the right (swing) hip drops while the left leg carries
+    _, pitch, _ = al.ypr(Dm[:, 0])
+    pel_pitch = 0.4 * (pitch - pitch.mean()) + rad(PEL_PITCH2) * np.cos(2 * ph - 2 * np.pi * 0.1)
+    D[:, 0] = al.from_ypr(pel_yaw, pel_pitch, pel_roll)
     hm = pm[:, 0]
     hips = hm.copy()
-    hips[:, 0] = SWAY * (hm[:, 0] - hm[:, 0].mean())
-    # ---- feet: the mocap ankles, moved apart
+    hips[:, 0] = SWAY_AMP * mod(4.0, 1.4) * (np.cos(cph(SWAY_PK)) + 0.8 * HARM * np.cos(2 * cph(SWAY_PK) + 1.3))                          # over the stance foot at mid stance
+    # ---- feet: the mocap ankles, on a designed track (the take's feet circle outward / cross inward in the swing)
     ank = {}
+    base_z = np.percentile(pm[:, i('LeftToeBase'), 2], 3)
     for sd, sg in (('Left', 1.0), ('Right', -1.0)):
         a = pm[:, i(sd + 'Foot')].copy()
-        a[:, 0] += sg * WIDEN
+        toe_up = al.loop_smooth(np.clip((pm[:, i(sd + 'ToeBase'), 2] - base_z - 0.004) / 0.05, 0, 1), 1.0)
+        sw = al.smoothstep(toe_up)
+        a[:, 0] = sg * (WIDTH + SWING_OUT * sw)
         ank[sd] = a
+    _f0 = np.arange(N)
+    for sd, od in (('Left', 'Right'), ('Right', 'Left')):               # the take's two legs are not alike: pull each toward the other, half a cycle on
+        raw = pm[:, i(od + 'Foot')]
+        other = al.loop_sample(raw[:, 1:], _f0 + half)
+        ank[sd][:, 1:] = (1 - SYM_LEG) * pm[:, i(sd + 'Foot'), 1:] + SYM_LEG * other
     # ---- soles: per-frame ankle height correction measured on the deformed mesh by a first pass (see main)
     if lift is not None:
         for sd in ('Left', 'Right'):
@@ -453,6 +479,7 @@ def build_walk(rig, src, info, mocap_stats, lift=None):
     # ---- pelvis height: at every double support as high as the legs allow (no knee lock, no pop); between them the
     #      a fraction of the arc a straight stance leg would give (the take itself walks with bent knees)
     zl = limit(best)
+    zl = np.minimum(zl, al.loop_sample(zl, np.arange(N) + half))         # both steps share the lower of the two limits: an even double hump
     zs = al.loop_smooth(zl, 1.0)
     anchors = [f for f in range(N) if zs[f] <= zs[f - 1] and zs[f] < zs[(f + 1) % N] and zs[f] < np.median(zs)]
 
@@ -465,24 +492,36 @@ def build_walk(rig, src, info, mocap_stats, lift=None):
             u = al.smoothstep(np.arange(n) / n)
             out[(a + np.arange(n)) % N] = vals[k] * (1 - u) + vals[(k + 1) % len(anchors)] * u
         return out
-    z = through([zl[a] - 0.003 for a in anchors]) + BOB * (zs - through([zs[a] for a in anchors]))
-    for _ in range(25):
-        z = al.loop_smooth(np.minimum(z, zl - 0.002), 0.8)
-    z = -np.log(np.exp(-350 * z) + np.exp(-350 * zl)) / 350        # soft: a leg eases onto full length and off it again
+    # designed bob: the pelvis is as high as the legs allow at mid stance and sinks BOBH after each heel strike (loading response, knees
+    # take the weight), valley at BOB_VALLEY of the cycle after the heel strike; a little different on every step; never beyond leg reach
+    hi = np.percentile(zl, 90) - 0.0025
+    cp_ = lambda pk: ph - 2 * np.pi * pk
+    th = 2 * cp_(_e('BOB_VALLEY', 0.07))
+    shape = 0.5 - 0.5 * np.cos(th) + 0.10 * np.cos(2 * th + 0.8) * np.sin(th / 2) ** 2          # 0 at the valley, 1 at mid stance
+    z = hi - BOBH * mod(1.3, 1.5) * (1 - shape)
+    z = al.loop_smooth(z, 0.5)
+    z = -np.log(np.exp(-350 * z) + np.exp(-350 * (zl - 0.001))) / 350       # soft: a leg eases onto full length and off it again
     hips[:, 2] = z
-    # ---- trunk: upright, shoulders turning against the hips
-    cy, cp, cr = al.ypr(Dm[:, i('Spine2')])
-    chest = al.from_ypr(CHEST_YAW * (cy - cy.mean()), rad(CHEST_PITCH) + 0.4 * (cp - cp.mean()), CHEST_ROLL * (cr - cr.mean()) - 0.4 * roll2)
-    chest = al.loop_smooth_rot(chest, 0.8)
+    if os.environ.get('WALK_DEBUG'):
+        np.savez(os.environ['WALK_DEBUG'], zl=zl, zs=zs, z=z, anchors=np.array(anchors), best=best)
+    # ---- trunk: upright; the chest turns against the pelvis (a little later), leans back over the pelvis roll (lateral spine bend)
+    ch_yaw = rad(CH_YAW) * mod(3.3) * (np.cos(cph(CH_YAW_LAG)) + 0.07 * np.cos(3 * cph(CH_YAW_LAG) + 1.0))
+    ch_roll = -CH_ROLL_K * pel_roll
+    _, cp, _ = al.ypr(Dm[:, i('Spine2')])
+    ch_pitch = rad(CHEST_PITCH) + 0.3 * (cp - cp.mean()) + rad(0.5) * np.cos(2 * ph - 2 * np.pi * 0.28)
+    chest = al.from_ypr(ch_yaw, ch_pitch, ch_roll)
+    chest = al.loop_smooth_rot(chest, 0.6)
     D[:, i('Spine2')] = chest
     _fr = np.arange(N)
-    D[:, i('Spine')] = al.slerp(D[:, 0], al.loop_sample(chest, _fr - 1.5, True), 0.33)
-    D[:, i('Spine1')] = al.slerp(D[:, 0], al.loop_sample(chest, _fr - 0.75, True), 0.67)
-    hy, hp_, hr = al.ypr(Dm[:, i('Head')])
-    head = al.from_ypr(0.25 * CHEST_YAW * (cy - cy.mean()), 0.25 * (hp_ - hp_.mean()), 0.3 * (hr - hr.mean()))
-    head = al.loop_smooth_rot(head, 1.2)
+    D[:, i('Spine')] = al.slerp(D[:, 0], al.loop_sample(chest, _fr - 2.0, True), 0.33)
+    D[:, i('Spine1')] = al.slerp(D[:, 0], al.loop_sample(chest, _fr - 0.8, True), 0.67)
+    # head: steadier than the trunk. Yaw follows the chest a little and late, roll is mostly cancelled, nods twice per cycle
+    hy_ = HEAD_YAW_K * al.loop_sample(ch_yaw, _fr - 3.0)
+    hr_ = HEAD_ROLL_K * al.loop_sample(ch_roll, _fr - 2.0)
+    hp_ = rad(HEAD_PITCH2) * np.cos(2 * ph - 2 * np.pi * 0.42)
+    head = al.from_ypr(hy_, hp_, hr_)
     D[:, i('Head')] = head
-    D[:, i('Neck')] = al.slerp(chest, head, 0.5)
+    D[:, i('Neck')] = al.slerp(al.loop_sample(chest, _fr - 1.5, True), head, 0.5)
     # ---- arms: the take's swing relative to the chest, pulled toward left/right symmetry, cleaned
     La, Ra = Bm[:, i('LeftArm')], Bm[:, i('RightArm')]
     zl_, zr_ = al.to_euler(Bm[:, i('LeftForeArm')])[:, 2], -al.to_euler(Bm[:, i('RightForeArm')])[:, 2]
@@ -518,8 +557,11 @@ def build_walk(rig, src, info, mocap_stats, lift=None):
         A = ry(rad(ARM_BACK)) @ rx(rad(-out_)) @ A @ ry(rad(ARM_TWIST + 3.0 * swing_))
         flex = clean_scalar(flex)
         flex = FLEX_MIN + FLEX_GAIN * (flex - flex.min())
-        Hm = al.scale_rot(clean_rot(H, harmonics=2), 0.45) @ al.euler((5.0, 6.0, 0.0))
+        flex = al.loop_sample(flex, np.arange(N) - ELBOW_LAG)             # the elbow's bend peaks a little after the shoulder's swing
+        Hm = al.scale_rot(clean_rot(H, harmonics=2), _e('HAND_SWING', 0.5)) @ al.euler((5.0, 6.0, 0.0))
         Fm = ry(rad(FORE_IN)) @ rz(rad(flex)) @ ry(rad(-FORE_IN))     # the elbow bends a little inward, so the forearm does not splay out
+        fwd_w = al.smoothstep(np.clip((-swing_ + 0.15) / 0.85, 0, 1))      # 1 at the forward swing peak, 0 from mid swing on to the back swing
+        Fm = Fm @ rx(rad(FORE_ADD + (FORE_ADD_FWD - FORE_ADD) * fwd_w))                                  # forearm turned in the frontal plane (elbow adduction): the line from the elbow tilts toward the body
         if sd == 'Right':
             A, Fm, Hm = S @ A @ S, S @ Fm @ S, S @ Hm @ S
         D[:, i(sd + 'Shoulder')] = chest @ rz(rad(sg * CLAV_YAW) * swing_)
@@ -527,11 +569,41 @@ def build_walk(rig, src, info, mocap_stats, lift=None):
         D[:, jf] = D[:, ja] @ rig.R[jf] @ Fm @ rig.R[jf].T
         D[:, jh] = D[:, jf] @ rig.R[jh] @ Hm @ rig.R[jh].T
         swing[sd] = flex
-    # ---- legs
-    # legs turn in: the take toes out 12-23 deg; thigh and knee turn in a little, the foot more (to about 5 deg out)
-    for sd, sg, kf in (('Left', 1.0, 17.0), ('Right', -1.0, 10.0)):
-        for bn, k in (('UpLeg', 6.0), ('Leg', 6.0), ('Foot', kf), ('ToeBase', kf)):
-            D[:, i(sd + bn)] = rz(-sg * rad(k)) @ D[:, i(sd + bn)]
+    # ---- legs: feet at a designed toe-out, the swing's roll / yaw flail of the take mostly removed; thigh and shin face between
+    #      pelvis and foot (pure knee hinge)
+    for sd, sg in (('Left', 1.0), ('Right', -1.0)):
+        jf, jt, ju, jl = i(sd + 'Foot'), i(sd + 'ToeBase'), i(sd + 'UpLeg'), i(sd + 'Leg')
+        fy, fp, fr_ = al.ypr(Dm[:, jf])
+        lift_ = pm[:, jt, 2] - base_z
+        planted = (lift_ < 0.006)
+        ybar = float(np.mean(fy[planted]))
+        yaw_f = sg * rad(TOE_OUT - 6.0) + FOOT_YAW_K * (fy - ybar)
+        yaw_f = al.loop_smooth(yaw_f, 0.7)
+        Dold = Dm[:, jf]
+        fp = al.loop_smooth(fp, _e('FOOT_SMOOTH', 0.8))                       # the take's toe-off snap, eased
+        fp_o = al.loop_smooth(al.ypr(Dm[:, i(('Right' if sd == 'Left' else 'Left') + 'Foot')])[1], _e('FOOT_SMOOTH', 0.8))
+        fp = (1 - SYM_LEG) * fp + SYM_LEG * al.loop_sample(fp_o, np.arange(N) + half)
+        # swing: the take keeps the foot hanging toe-down (35 deg at mid swing); lift it toward flat, 0 at toe-off and at heel strike
+        up = lift_ > 0.004
+        bump = np.zeros(N)
+        start = [f for f in range(N) if up[f] and not up[f - 1]]
+        for f0 in start:
+            n = 0
+            while up[(f0 + n) % N] and n < N:
+                n += 1
+            idx = (f0 + np.arange(n)) % N
+            late = np.arange(n) >= n // 2
+            hs = int(np.argmin(np.where(late, fp[idx], 9.0)))               # heel strike = the foot's most toe-up frame at the end of the swing
+            u = np.arange(hs + 1) / max(hs, 1)
+            bump[idx[:hs + 1]] = np.sin(np.pi * u ** (np.log(0.5) / np.log(DORSI_PK))) ** 1.3
+        fp = fp - rad(DORSI) * al.loop_smooth(bump, 1.0)
+        Dnew = al.from_ypr(yaw_f, fp, FOOT_ROLL_K * fr_)
+        rel_toe = al.loop_smooth_rot(T(Dold) @ Dm[:, jt], _e('FOOT_SMOOTH', 0.8))
+        D[:, jf] = Dnew
+        D[:, jt] = Dnew @ rel_toe
+        yu = 0.5 * pel_yaw + 0.5 * yaw_f
+        D[:, ju] = al.from_ypr(yu, 0, 0)
+        D[:, jl] = D[:, ju]
     pos = rig.positions(D, hips)
     miss = 0.0
     for sd in ('Left', 'Right'):
@@ -550,7 +622,7 @@ def build_walk(rig, src, info, mocap_stats, lift=None):
     loc = rig.loc_from_hips(hips)
     info.update(frames=N + 1, duration=round(N / FPS, 4), loop=True, cycles=2, cycle_duration=round(cyc / FPS, 4),
                 stride_per_cycle=mocap_stats['stride_per_cycle'], ground_speed=round(mocap_stats['stride_per_cycle'] / (cyc / FPS), 4),
-                starts_on='left heel strike', leg_miss=round(miss, 5), pelvis_shift_fore_aft=round(float(best), 4), double_support_frames=[int(a) for a in anchors], track_widened_each_side=WIDEN, blink_times=[1.5])
+                starts_on='left heel strike', leg_miss=round(miss, 5), pelvis_shift_fore_aft=round(float(best), 4), double_support_frames=[int(a) for a in anchors], ankle_half_width=WIDTH, blink_times=[1.5])
     return close_loop(B, loc)
 
 
@@ -667,7 +739,7 @@ def main():
     info = {}
     clips['walk'] = build_walk(rig, mocap['walk'], info, mstats['walk'])
     lift = None
-    for _ in range(2):                       # floor contact on the real mesh: measure the soles, correct the ankles, rebuild
+    for _ in range(3):                       # floor contact on the real mesh: measure the soles, correct the ankles, rebuild
         low = sole_heights(rig, probe, clips['walk'])
         lift = sole_lift(low, lift)
         info = {}

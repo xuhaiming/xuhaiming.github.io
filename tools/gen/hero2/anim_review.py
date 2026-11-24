@@ -11,6 +11,7 @@ shot's cx,cy,cz as an offset), for close-ups of a hand or a foot that moves.
 check: on the deformed mesh, per frame: the lowest vertex (floor), and for pairs of body parts how deep the vertices of
 the first sit inside the surface of the second (negative = inside, metres) and the smallest gap between them.
 """
+import math
 import os
 import subprocess
 import sys
@@ -66,6 +67,19 @@ def shot_of(kw):
 
 def place(cam, arm, shot, view, follow):
     cx, cy, cz, size = shot
+    if view.startswith('site'):
+        # perspective camera like the first scene's third beat: behind him (+Y here), 7.6 m away, 1.55 m high, 35 deg fov.
+        # 'site' = full figure, 'sitez' = zoomed on the torso/pelvis, 'sitel' = zoomed on the legs. cx,cy,cz of the shot are ignored.
+        cam.data.type = 'PERSP'
+        cam.data.sensor_fit = 'VERTICAL'
+        zoom = {'site': (1.0, 1.0), 'sitez': (0.34, 1.2), 'sitel': (0.34, 0.55)}[view]
+        cam.data.angle_y = math.radians(35) * zoom[0]
+        cam.location = Vector((-0.95, 7.6, 1.55))
+        aim = Vector((0, 0, zoom[1] if view != 'site' else 1.0))
+        d = (aim - cam.location).normalized()
+        cam.rotation_euler = d.to_track_quat('-Z', 'Y').to_euler()
+        return
+    cam.data.type = 'ORTHO'
     c = Vector((cx, cy, cz))
     if follow:
         c = c + arm.matrix_world @ arm.pose.bones[P + follow].head

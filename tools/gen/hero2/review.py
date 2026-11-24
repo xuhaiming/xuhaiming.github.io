@@ -38,6 +38,13 @@ else:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.gltf(filepath=src)
 sc = bpy.context.scene
+if "clip" in opt:   # pose the armature: clip=<action name> frame=<n, 0-based>
+    arm = next(o for o in sc.objects if o.type == "ARMATURE")
+    arm.animation_data_create()
+    for t in list(arm.animation_data.nla_tracks): arm.animation_data.nla_tracks.remove(t)
+    act = next(a for a in bpy.data.actions if a.name.split("|")[-1].lower() == opt["clip"] or a.name == opt["clip"])
+    arm.animation_data.action = act
+    sc.frame_set(int(act.frame_range[0]) + int(opt.get("frame", 0)))
 name = opt.get("obj")
 ob = bpy.data.objects[name] if name else next(o for o in sc.objects if o.type == "MESH")
 for o in sc.objects:
